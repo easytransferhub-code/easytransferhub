@@ -1,0 +1,62 @@
+{
+  "business": {
+    "name": "Easytransferhub",
+    "owner": "Mr. Mir",
+    "phone": "+34 663 958 889",
+    "whatsapp": "34663958889",
+    "email": "easytransferhub@gmail.com",
+    "city": "Barcelona, Spain"
+  },
+  "routePrices": [
+    {
+      "name": "Barcelona Airport ↔ City Center",
+      "standard": 39,
+      "comfort": 47,
+      "van": 59
+    },
+    {
+      "name": "Barcelona Airport ↔ Cruise Port",
+      "standard": 43,
+      "comfort": 52,
+      "van": 65
+    },
+    {
+      "name": "Barcelona ↔ Sitges",
+      "standard": 74,
+      "comfort": 89,
+      "van": 112
+    },
+    {
+      "name": "Barcelona ↔ Montserrat",
+      "standard": 89,
+      "comfort": 105,
+      "van": 130
+    },
+    {
+      "name": "Barcelona ↔ Salou / PortAventura",
+      "standard": 164,
+      "comfort": 197,
+      "van": 246
+    },
+    {
+      "name": "Barcelona ↔ Girona",
+      "standard": 189,
+      "comfort": 227,
+      "van": 284
+    },
+    {
+      "name": "Barcelona ↔ Andorra",
+      "standard": 284,
+      "comfort": 341,
+      "van": 426
+    }
+  ],
+  "distanceTiers": [
+    { "maxKm": 25, "label": "Up to 25 km", "standard": 39, "comfort": 47, "van": 59 },
+    { "maxKm": 60, "label": "26 – 60 km", "standard": 74, "comfort": 89, "van": 112 },
+    { "maxKm": 130, "label": "61 – 130 km", "standard": 164, "comfort": 197, "van": 246 },
+    { "maxKm": 220, "label": "131 – 220 km", "standard": 284, "comfort": 341, "van": 426 },
+    { "maxKm": 380, "label": "221 – 380 km", "standard": 399, "comfort": 479, "van": 599 },
+    { "maxKm": 99999, "label": "Over 380 km", "standard": 650, "comfort": 780, "van": 975 }
+  ]
+}
