@@ -20,9 +20,9 @@ export const Navbar: React.FC<NavbarProps> = ({ language, setLanguage, onOpenAss
   ] as const;
 
   return (
-    <header className="sticky top-0 z-40 bg-[#0e2438] text-white border-b border-slate-800/80 shadow-md backdrop-blur-md">
+    <header className="sticky top-0 z-40 bg-[#0e2438] text-white border-b-2 border-amber-400/80 shadow-md backdrop-blur-md">
       {/* Top micro bar for quick direct contact */}
-      <div className="bg-[#081622] px-4 py-1.5 text-xs text-slate-300 border-b border-slate-800">
+      <div className="bg-[#081622] px-4 py-1.5 text-xs text-slate-300 border-b border-amber-400/40">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1.5">

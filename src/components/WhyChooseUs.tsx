@@ -56,7 +56,7 @@ export const WhyChooseUs: React.FC = () => {
             return (
               <div
                 key={idx}
-                className="bg-[#112331] border border-slate-700/80 rounded-2xl p-6 hover:border-slate-500 transition-colors"
+                className="bg-[#112331] border border-amber-400/50 hover:border-amber-400 rounded-2xl p-6 transition-all hover:shadow-md"
               >
                 <div className="w-10 h-10 rounded-xl bg-amber-400/10 border border-amber-400/20 text-amber-400 flex items-center justify-center mb-4">
                   <Icon className="w-5 h-5" />

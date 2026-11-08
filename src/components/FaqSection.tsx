@@ -30,7 +30,7 @@ export const FaqSection: React.FC = () => {
             return (
               <div
                 key={idx}
-                className="border border-slate-200 rounded-2xl overflow-hidden transition-all bg-slate-50/50 hover:bg-slate-50"
+                className="border-2 border-amber-400/50 hover:border-amber-400 rounded-2xl overflow-hidden transition-all bg-slate-50/50 hover:bg-slate-50 shadow-xs"
               >
                 <button
                   type="button"
@@ -59,7 +59,7 @@ export const FaqSection: React.FC = () => {
         </div>
 
         {/* Still have questions banner */}
-        <div className="mt-8 p-5 rounded-2xl bg-slate-100 border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+        <div className="mt-8 p-5 rounded-2xl bg-slate-100 border-2 border-amber-400/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left shadow-xs">
           <div>
             <h4 className="font-bold text-sm text-slate-900">Have a custom question or special group request?</h4>
             <p className="text-xs text-slate-600 mt-0.5">Mr. Mir replies within minutes on WhatsApp.</p>

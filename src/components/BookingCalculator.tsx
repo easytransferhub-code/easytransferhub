@@ -462,10 +462,10 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
   return (
     <div
       id="calculator"
-      className="bg-white rounded-2xl shadow-2xl border border-slate-200/90 overflow-hidden transition-all text-slate-900"
+      className="bg-white rounded-2xl shadow-2xl border-2 border-amber-400/80 overflow-hidden transition-all text-slate-900 ring-1 ring-amber-400/30"
     >
       {/* Calculator Header Bar */}
-      <div className="bg-[#0e2438] text-white px-5 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-3 border-b border-slate-700">
+      <div className="bg-[#0e2438] text-white px-5 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-3 border-b-2 border-amber-400/70">
         <div>
           <h2 className="flex items-center gap-2">
             <span className="text-[12px] leading-[15px] font-bold font-display">{t.calcTitle}</span>
@@ -479,7 +479,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
         </div>
 
         {/* Trip Mode Switch */}
-        <div className="flex items-center gap-1 bg-[#112331] p-1 rounded-lg border border-slate-700 text-xs font-semibold">
+        <div className="flex items-center gap-1 bg-[#112331] p-1 rounded-lg border-2 border-amber-400/70 text-xs font-semibold">
           <button
             type="button"
             onClick={() => setIsRoundTrip(false)}
@@ -525,7 +525,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 onChange={(e) => handlePickupChange(e.target.value)}
                 onFocus={() => pickupSuggestions.length > 0 && setShowPickupList(true)}
                 placeholder={t.pickupPlaceholder}
-                className="w-full pl-3.5 pr-10 py-2.5 text-sm font-medium bg-slate-50 hover:bg-white focus:bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#0e5c73] focus:border-[#0e5c73] outline-none transition-all shadow-xs"
+                className="w-full pl-3.5 pr-10 py-2.5 text-sm font-medium bg-slate-50 hover:bg-white focus:bg-white border-2 border-amber-400/70 focus:border-amber-400 rounded-xl focus:ring-2 focus:ring-amber-400/40 outline-none transition-all shadow-xs"
               />
               <span className="absolute right-3 top-3 text-slate-400">
                 <MapPin className="w-4 h-4 text-emerald-500" />
@@ -533,7 +533,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
 
               {/* Suggestions Dropdown */}
               {showPickupList && pickupSuggestions.length > 0 && (
-                <ul className="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-30 max-h-52 overflow-y-auto divide-y divide-slate-100 text-xs">
+                <ul className="absolute left-0 right-0 top-full mt-1 bg-white border-2 border-amber-400/60 rounded-xl shadow-xl z-30 max-h-52 overflow-y-auto divide-y divide-slate-100 text-xs">
                   {pickupSuggestions.map((item, idx) => (
                     <li
                       key={idx}
@@ -542,9 +542,9 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                         setPickupCoords({ lat: item.lat, lon: item.lon });
                         setShowPickupList(false);
                       }}
-                      className="px-3.5 py-2.5 hover:bg-slate-50 cursor-pointer flex items-center gap-2 text-slate-800"
+                      className="px-3.5 py-2.5 hover:bg-amber-50 cursor-pointer flex items-center gap-2 text-slate-800"
                     >
-                      <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <MapPin className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                       <span className="truncate">{item.label}</span>
                     </li>
                   ))}
@@ -554,16 +554,16 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
 
             {/* Quick Pick Chips for Pickup */}
             <div className="flex items-center gap-1.5 flex-wrap mt-2">
-              <span className="text-[11px] font-semibold text-slate-500 mr-1">Quick:</span>
+              <span className="text-[11px] font-bold text-slate-600 mr-1">Quick:</span>
               {QUICK_LOCATIONS.slice(0, 5).map((loc) => (
                 <button
                   key={loc.id}
                   type="button"
                   onClick={() => applyQuickLocation(loc, 'pickup')}
-                  className={`text-[11px] px-2.5 py-1 rounded-lg border font-medium transition-all cursor-pointer ${
+                  className={`text-[11px] px-2.5 py-1 rounded-lg border font-semibold transition-all cursor-pointer ${
                     pickup.toLowerCase().includes(loc.shortLabel.toLowerCase())
-                      ? 'bg-teal-50 border-teal-500 text-teal-800 font-bold'
-                      : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
+                      ? 'bg-amber-400 border-2 border-amber-500 text-slate-950 font-bold shadow-xs'
+                      : 'bg-white hover:bg-amber-50 text-slate-800 border border-amber-400/60 hover:border-amber-400 shadow-xs'
                   }`}
                 >
                   {loc.shortLabel}
@@ -577,11 +577,11 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
             <button
               type="button"
               onClick={handleSwap}
-              className="p-1.5 rounded-full bg-slate-100 hover:bg-amber-100 hover:text-amber-700 text-slate-600 border border-slate-300 transition-transform active:rotate-180 shadow-xs cursor-pointer"
+              className="p-1.5 rounded-full bg-white hover:bg-amber-100 hover:text-amber-700 text-slate-700 border-2 border-amber-400/70 transition-transform active:rotate-180 shadow-xs cursor-pointer"
               title="Swap pickup and drop-off"
               aria-label="Swap pickup and drop-off"
             >
-              <ArrowRightLeft className="w-3.5 h-3.5" />
+              <ArrowRightLeft className="w-3.5 h-3.5 text-amber-600" />
             </button>
           </div>
 
@@ -602,7 +602,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 onChange={(e) => handleDropoffChange(e.target.value)}
                 onFocus={() => dropoffSuggestions.length > 0 && setShowDropoffList(true)}
                 placeholder={t.dropoffPlaceholder}
-                className="w-full pl-3.5 pr-10 py-2.5 text-sm font-medium bg-slate-50 hover:bg-white focus:bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#0e5c73] focus:border-[#0e5c73] outline-none transition-all shadow-xs"
+                className="w-full pl-3.5 pr-10 py-2.5 text-sm font-medium bg-slate-50 hover:bg-white focus:bg-white border-2 border-amber-400/70 focus:border-amber-400 rounded-xl focus:ring-2 focus:ring-amber-400/40 outline-none transition-all shadow-xs"
               />
               <span className="absolute right-3 top-3 text-slate-400">
                 <Navigation className="w-4 h-4 text-amber-500" />
@@ -610,7 +610,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
 
               {/* Suggestions Dropdown */}
               {showDropoffList && dropoffSuggestions.length > 0 && (
-                <ul className="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-30 max-h-52 overflow-y-auto divide-y divide-slate-100 text-xs">
+                <ul className="absolute left-0 right-0 top-full mt-1 bg-white border-2 border-amber-400/60 rounded-xl shadow-xl z-30 max-h-52 overflow-y-auto divide-y divide-slate-100 text-xs">
                   {dropoffSuggestions.map((item, idx) => (
                     <li
                       key={idx}
@@ -619,9 +619,9 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                         setDropoffCoords({ lat: item.lat, lon: item.lon });
                         setShowDropoffList(false);
                       }}
-                      className="px-3.5 py-2.5 hover:bg-slate-50 cursor-pointer flex items-center gap-2 text-slate-800"
+                      className="px-3.5 py-2.5 hover:bg-amber-50 cursor-pointer flex items-center gap-2 text-slate-800"
                     >
-                      <Navigation className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <Navigation className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                       <span className="truncate">{item.label}</span>
                     </li>
                   ))}
@@ -631,16 +631,16 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
 
             {/* Quick Pick Chips for Drop-off */}
             <div className="flex items-center gap-1.5 flex-wrap mt-2">
-              <span className="text-[11px] font-semibold text-slate-500 mr-1">Quick:</span>
+              <span className="text-[11px] font-bold text-slate-600 mr-1">Quick:</span>
               {QUICK_LOCATIONS.map((loc) => (
                 <button
                   key={loc.id}
                   type="button"
                   onClick={() => applyQuickLocation(loc, 'dropoff')}
-                  className={`text-[11px] px-2.5 py-1 rounded-lg border font-medium transition-all cursor-pointer ${
+                  className={`text-[11px] px-2.5 py-1 rounded-lg border font-semibold transition-all cursor-pointer ${
                     dropoff.toLowerCase().includes(loc.shortLabel.toLowerCase())
-                      ? 'bg-amber-100 border-amber-400 text-amber-900 font-bold'
-                      : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
+                      ? 'bg-amber-400 border-2 border-amber-500 text-slate-950 font-bold shadow-xs'
+                      : 'bg-white hover:bg-amber-50 text-slate-800 border border-amber-400/60 hover:border-amber-400 shadow-xs'
                   }`}
                 >
                   {loc.shortLabel}
@@ -654,14 +654,14 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2 border-t border-slate-200">
           <div>
             <label className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 mb-1.5">
-              <Calendar className="w-3.5 h-3.5 text-slate-500" />
+              <Calendar className="w-3.5 h-3.5 text-amber-500" />
               <span>{t.dateTimeLabel}</span>
             </label>
             <input
               type="datetime-local"
               value={dateTime}
               onChange={(e) => setDateTime(e.target.value)}
-              className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#0e5c73] outline-none"
+              className="w-full px-3 py-2 text-sm bg-slate-50 hover:bg-white focus:bg-white border-2 border-amber-400/70 focus:border-amber-400 rounded-xl focus:ring-2 focus:ring-amber-400/40 outline-none shadow-xs transition-all"
             />
           </div>
 
@@ -675,13 +675,13 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 type="datetime-local"
                 value={returnDateTime}
                 onChange={(e) => setReturnDateTime(e.target.value)}
-                className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#0e5c73] outline-none"
+                className="w-full px-3 py-2 text-sm bg-slate-50 hover:bg-white focus:bg-white border-2 border-amber-400/70 focus:border-amber-400 rounded-xl focus:ring-2 focus:ring-amber-400/40 outline-none shadow-xs transition-all"
               />
             </div>
           ) : (
             <div>
               <label className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 mb-1.5">
-                <Plane className="w-3.5 h-3.5 text-slate-500" />
+                <Plane className="w-3.5 h-3.5 text-amber-500" />
                 <span>{t.flightLabel}</span>
               </label>
               <input
@@ -689,14 +689,14 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 value={flightNumber}
                 onChange={(e) => setFlightNumber(e.target.value.toUpperCase())}
                 placeholder={t.flightPlaceholder}
-                className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#0e5c73] outline-none"
+                className="w-full px-3 py-2 text-sm bg-slate-50 hover:bg-white focus:bg-white border-2 border-amber-400/70 focus:border-amber-400 rounded-xl focus:ring-2 focus:ring-amber-400/40 outline-none shadow-xs transition-all"
               />
             </div>
           )}
 
           <div className="sm:col-span-2">
             <label className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 mb-1.5">
-              <User className="w-3.5 h-3.5 text-slate-500" />
+              <User className="w-3.5 h-3.5 text-amber-500" />
               <span>Greeting Signboard Name</span>
             </label>
             <input
@@ -704,7 +704,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
               value={passengerName}
               onChange={(e) => setPassengerName(e.target.value)}
               placeholder="Driver holds sign with this name at arrivals (e.g. John Smith)"
-              className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-[#0e5c73] outline-none"
+              className="w-full px-3 py-2 text-sm bg-slate-50 hover:bg-white focus:bg-white border-2 border-amber-400/70 focus:border-amber-400 rounded-xl focus:ring-2 focus:ring-amber-400/40 outline-none shadow-xs transition-all"
             />
           </div>
         </div>
@@ -712,7 +712,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
         {/* Responsive Options: Passengers, Luggage, Child Seats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-3 border-t border-slate-200">
           {/* Box 1: Passengers (Adults & Children + Child Age Selector) */}
-          <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col justify-between">
+          <div className="bg-slate-50 border border-amber-400/60 hover:border-amber-400 rounded-xl p-3 flex flex-col justify-between shadow-xs transition-colors">
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
@@ -832,7 +832,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
           </div>
 
           {/* Box 2: Luggage & 1-Click Size Guide */}
-          <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col justify-between">
+          <div className="bg-slate-50 border border-amber-400/60 hover:border-amber-400 rounded-xl p-3 flex flex-col justify-between shadow-xs transition-colors">
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
@@ -981,7 +981,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
           </div>
 
           {/* Box 3: Child Seats by Age (Baby Seat 0-2y vs Booster 3+y) */}
-          <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col justify-between">
+          <div className="bg-slate-50 border border-amber-400/60 hover:border-amber-400 rounded-xl p-3 flex flex-col justify-between shadow-xs transition-colors">
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
@@ -1074,7 +1074,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
         </div>
 
         {/* Calculate & Route info banner */}
-        <div className="flex flex-wrap items-center justify-between gap-2 px-3.5 py-2.5 bg-slate-100 rounded-xl text-xs text-slate-700">
+        <div className="flex flex-wrap items-center justify-between gap-2 px-3.5 py-2.5 bg-amber-500/10 border-2 border-amber-400/80 rounded-xl text-xs text-slate-800 shadow-xs">
           <div className="flex items-center gap-2">
             {calculating ? (
               <span className="flex items-center gap-1.5 text-teal-700 font-medium">
@@ -1116,7 +1116,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
             <button
               type="button"
               onClick={() => setShowMap(!showMap)}
-              className="text-xs font-semibold text-slate-600 hover:text-slate-900 cursor-pointer flex items-center gap-1"
+              className="text-xs font-bold text-amber-950 bg-amber-200 hover:bg-amber-300 border border-amber-400 px-2 py-0.5 rounded-lg cursor-pointer flex items-center gap-1 shadow-xs transition-colors"
             >
               <span>{showMap ? 'Hide Map' : 'Preview Route Map'}</span>
             </button>
@@ -1125,20 +1125,20 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
 
         {/* Embedded Map Section */}
         {showMap && (
-          <div className="rounded-xl overflow-hidden border border-slate-200 bg-slate-50 p-2 space-y-2">
+          <div className="rounded-xl overflow-hidden border-2 border-amber-400/80 bg-slate-50 p-2 space-y-2 shadow-md">
             <iframe
               src={googleMapsEmbedUrl}
               title="Route map"
-              className="w-full h-56 rounded-lg border-0 shadow-inner"
+              className="w-full h-56 rounded-lg border border-amber-400/40 shadow-inner"
               loading="lazy"
             />
             <div className="flex items-center justify-between text-xs px-1">
-              <span className="text-slate-500">Live navigation preview</span>
+              <span className="text-slate-500 font-medium">Live navigation preview</span>
               <a
                 href={googleMapsExternalUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#0e5c73] hover:underline font-semibold flex items-center gap-1"
+                className="text-[#0e5c73] hover:underline font-bold flex items-center gap-1"
               >
                 <span>Open in Google Maps App</span>
                 <ExternalLink className="w-3 h-3" />
@@ -1155,16 +1155,16 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
             </div>
           )}
 
-          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
+          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 bg-gradient-to-r from-amber-50 to-white p-4 rounded-xl border-2 border-amber-400/80 shadow-xs ring-1 ring-amber-400/30">
             <div>
-              <span className="text-xs uppercase tracking-wider font-bold text-slate-500 block">
+              <span className="text-xs uppercase tracking-wider font-bold text-amber-900 block">
                 {quote ? `Total Fixed Fare ${isRoundTrip ? '(Round Trip)' : '(One Way)'}` : 'Fixed Fare Guide'}
               </span>
               <div className="flex items-baseline gap-2 mt-0.5">
                 <span className="text-3xl font-extrabold text-slate-950 font-display">
                   {quote ? `€${finalQuotedPrice}` : 'From €39'}
                 </span>
-                <span className="text-xs text-slate-500">
+                <span className="text-xs text-slate-600 font-medium">
                   {quote
                     ? `${activeVehicleData.name} · All tolls & parking included`
                     : 'Select pickup & destination to calculate exact fare'}
@@ -1172,7 +1172,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
               </div>
             </div>
 
-            <div className="flex items-center gap-1.5 text-xs text-emerald-700 font-semibold">
+            <div className="flex items-center gap-1.5 text-xs text-emerald-800 font-bold bg-emerald-100/70 border border-emerald-300 px-2.5 py-1 rounded-lg">
               <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
               <span>Zero cancellation fee up to 24h</span>
             </div>
@@ -1227,12 +1227,12 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                   onClick={() => setSelectedVehicleId(v.id)}
                   className={`relative p-3.5 rounded-xl border-2 cursor-pointer transition-all ${
                     isSelected
-                      ? 'border-[#0e5c73] bg-teal-50/40 shadow-md ring-1 ring-[#0e5c73]'
-                      : 'border-slate-200 hover:border-slate-300 bg-white'
+                      ? 'border-amber-500 bg-amber-50/70 shadow-lg ring-2 ring-amber-400'
+                      : 'border-amber-400/60 hover:border-amber-400 bg-white hover:shadow-md'
                   }`}
                 >
                   {isRec && (
-                    <span className="absolute -top-2.5 right-3 text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">
+                    <span className="absolute -top-2.5 right-3 text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs border border-amber-500">
                       Best Match
                     </span>
                   )}
@@ -1246,7 +1246,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                     </span>
                   </div>
 
-                  <div className="w-full h-24 rounded-lg overflow-hidden bg-slate-100 mb-2.5 relative border border-slate-200">
+                  <div className="w-full h-24 rounded-lg overflow-hidden bg-slate-100 mb-2.5 relative border border-amber-400/40">
                     <img
                       src={v.photos[0]}
                       alt={v.name}

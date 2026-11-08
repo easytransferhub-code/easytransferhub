@@ -41,8 +41,8 @@ export const PricingTable: React.FC = () => {
         </div>
 
         {/* Popular Destination Routes Table */}
-        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs mb-10">
-          <div className="px-5 py-3.5 bg-slate-100 border-b border-slate-200 font-bold text-xs uppercase tracking-wider text-slate-700">
+        <div className="bg-white rounded-2xl border-2 border-amber-400/70 overflow-hidden shadow-xs mb-10">
+          <div className="px-5 py-3.5 bg-slate-900 text-amber-400 border-b-2 border-amber-400/60 font-bold text-xs uppercase tracking-wider">
             Popular Fixed-Fare Routes from Barcelona
           </div>
 
@@ -95,8 +95,8 @@ export const PricingTable: React.FC = () => {
         </div>
 
         {/* Distance Tiers Table */}
-        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
-          <div className="px-5 py-3.5 bg-slate-100 border-b border-slate-200 font-bold text-xs uppercase tracking-wider text-slate-700">
+        <div className="bg-white rounded-2xl border-2 border-amber-400/70 overflow-hidden shadow-xs">
+          <div className="px-5 py-3.5 bg-slate-900 text-amber-400 border-b-2 border-amber-400/60 font-bold text-xs uppercase tracking-wider">
             Distance-Based Rates (For All Other Destinations)
           </div>
 

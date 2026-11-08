@@ -37,10 +37,10 @@ export const PopularRoutes: React.FC<PopularRoutesProps> = ({ onSelectRoute }) =
           {POPULAR_ROUTES.map((route) => (
             <div
               key={route.id}
-              className={`bg-white rounded-2xl border p-5 transition-all hover:shadow-lg flex flex-col justify-between ${
+              className={`bg-white rounded-2xl border-2 p-5 transition-all hover:shadow-lg flex flex-col justify-between ${
                 route.highlight
-                  ? 'border-amber-300 shadow-sm relative'
-                  : 'border-slate-200 shadow-xs'
+                  ? 'border-amber-400 shadow-md relative ring-1 ring-amber-400/50'
+                  : 'border-amber-400/50 hover:border-amber-400 shadow-xs'
               }`}
             >
               {route.highlight && (

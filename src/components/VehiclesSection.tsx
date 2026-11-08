@@ -48,7 +48,7 @@ export const VehiclesSection: React.FC = () => {
             return (
               <div
                 key={vehicle.id}
-                className="bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden shadow-xs hover:shadow-lg transition-all flex flex-col justify-between"
+                className="bg-slate-50 border-2 border-amber-400/60 hover:border-amber-400 rounded-2xl overflow-hidden shadow-xs hover:shadow-lg transition-all flex flex-col justify-between"
               >
                 <div>
                   {/* Vehicle Photo Container */}

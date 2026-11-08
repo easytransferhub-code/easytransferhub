@@ -55,7 +55,7 @@ export const Hero: React.FC<HeroProps> = ({
 
             {/* 4 Guarantees Grid (Flight Tracking, 60 Min Waiting, Fixed Price, Meet & Greet) */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
-              <div className="bg-[#112331]/90 border border-slate-700/80 rounded-xl p-2.5">
+              <div className="bg-[#112331]/90 border border-amber-400/60 hover:border-amber-400 rounded-xl p-2.5 shadow-xs transition-all">
                 <div className="flex items-center gap-1.5 text-amber-400 mb-0.5">
                   <Radar className="w-3.5 h-3.5 shrink-0" />
                   <span className="text-xs font-bold text-white">Flight Tracking</span>
@@ -65,7 +65,7 @@ export const Hero: React.FC<HeroProps> = ({
                 </p>
               </div>
 
-              <div className="bg-[#112331]/90 border border-slate-700/80 rounded-xl p-2.5">
+              <div className="bg-[#112331]/90 border border-amber-400/60 hover:border-amber-400 rounded-xl p-2.5 shadow-xs transition-all">
                 <div className="flex items-center gap-1.5 text-amber-400 mb-0.5">
                   <Clock className="w-3.5 h-3.5 shrink-0" />
                   <span className="text-xs font-bold text-white">60 Min Free Waiting</span>
@@ -75,7 +75,7 @@ export const Hero: React.FC<HeroProps> = ({
                 </p>
               </div>
 
-              <div className="bg-[#112331]/90 border border-slate-700/80 rounded-xl p-2.5">
+              <div className="bg-[#112331]/90 border border-amber-400/60 hover:border-amber-400 rounded-xl p-2.5 shadow-xs transition-all">
                 <div className="flex items-center gap-1.5 text-amber-400 mb-0.5">
                   <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
                   <span className="text-xs font-bold text-white">Fixed Price Guarantee</span>
@@ -85,7 +85,7 @@ export const Hero: React.FC<HeroProps> = ({
                 </p>
               </div>
 
-              <div className="bg-[#112331]/90 border border-slate-700/80 rounded-xl p-2.5">
+              <div className="bg-[#112331]/90 border border-amber-400/60 hover:border-amber-400 rounded-xl p-2.5 shadow-xs transition-all">
                 <div className="flex items-center gap-1.5 text-amber-400 mb-0.5">
                   <Sparkles className="w-3.5 h-3.5 shrink-0" />
                   <span className="text-xs font-bold text-white">Meet & Greet</span>
@@ -98,7 +98,7 @@ export const Hero: React.FC<HeroProps> = ({
 
             {/* Chauffeur Vehicle Banner & Direct Contact Row */}
             <div className="grid grid-cols-1 md:grid-cols-12 gap-3.5 pt-1 items-center">
-              <div className="md:col-span-8 relative rounded-xl overflow-hidden border border-slate-700/80 shadow-md group h-36 sm:h-44">
+              <div className="md:col-span-8 relative rounded-xl overflow-hidden border-2 border-amber-400/80 shadow-md group h-36 sm:h-44">
                 <img
                   src="/images/hero.jpg"
                   alt="EasyTransferHub executive chauffeur van in Barcelona"
@@ -115,7 +115,7 @@ export const Hero: React.FC<HeroProps> = ({
                 </div>
               </div>
 
-              <div className="md:col-span-4 bg-[#112331] border border-slate-700/80 rounded-xl p-3.5 space-y-1.5 text-xs">
+              <div className="md:col-span-4 bg-[#112331] border border-amber-400/60 hover:border-amber-400 rounded-xl p-3.5 space-y-1.5 text-xs shadow-xs transition-all">
                 <div className="flex items-center justify-between text-white font-bold">
                   <span>Personal Dispatcher</span>
                   <span className="text-amber-400 font-extrabold">{BUSINESS_INFO.owner}</span>

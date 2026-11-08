@@ -41,7 +41,7 @@ export const ContactSection: React.FC = () => {
             </div>
 
             <div className="space-y-4 pt-2">
-              <div className="flex items-start gap-3.5 bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+              <div className="flex items-start gap-3.5 bg-white p-4 rounded-xl border-2 border-amber-400/50 hover:border-amber-400 shadow-xs transition-all">
                 <div className="w-10 h-10 rounded-lg bg-teal-50 text-[#0e5c73] flex items-center justify-center shrink-0">
                   <Phone className="w-5 h-5" />
                 </div>
@@ -64,7 +64,7 @@ export const ContactSection: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex items-start gap-3.5 bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+              <div className="flex items-start gap-3.5 bg-white p-4 rounded-xl border-2 border-amber-400/50 hover:border-amber-400 shadow-xs transition-all">
                 <div className="w-10 h-10 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center shrink-0">
                   <Mail className="w-5 h-5" />
                 </div>
@@ -82,7 +82,7 @@ export const ContactSection: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex items-start gap-3.5 bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+              <div className="flex items-start gap-3.5 bg-white p-4 rounded-xl border-2 border-amber-400/50 hover:border-amber-400 shadow-xs transition-all">
                 <div className="w-10 h-10 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center shrink-0">
                   <MapPin className="w-5 h-5" />
                 </div>
@@ -101,7 +101,7 @@ export const ContactSection: React.FC = () => {
 
           {/* Right form column */}
           <div className="lg:col-span-7">
-            <div className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm">
+            <div className="bg-white p-6 sm:p-8 rounded-2xl border-2 border-amber-400/80 shadow-md">
               <h3 className="font-display font-bold text-lg text-slate-900 mb-1">
                 Send a Fast Inquiry
               </h3>
