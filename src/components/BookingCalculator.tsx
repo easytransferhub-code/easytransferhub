@@ -1308,18 +1308,18 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
           onClick={() => setShowSizeChart(false)}
         >
           <div
-            className="bg-white rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl border border-slate-200 overflow-hidden text-slate-900"
+            className="bg-white rounded-2xl max-w-xl w-full p-4 sm:p-5 shadow-2xl border border-slate-200 overflow-hidden text-slate-900 max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+            <div className="flex items-center justify-between pb-2.5 border-b border-slate-200">
               <div className="flex items-center gap-2">
                 <span className="text-xl">🧳</span>
                 <div>
                   <h3 className="font-display font-extrabold text-base sm:text-lg text-slate-900">
-                    Luggage Size & Vehicle Guide
+                    Real Luggage Sizes & Vehicle Guide
                   </h3>
                   <p className="text-[11px] text-slate-500">
-                    Standard international airline dimensions & trunk capacities
+                    Real photos & international airline measurements
                   </p>
                 </div>
               </div>
@@ -1333,8 +1333,35 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
               </button>
             </div>
 
+            {/* Real Bags Visual Comparison Photo */}
+            <div className="rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-white my-3">
+              <img
+                src="/images/luggage-guide.jpg"
+                alt="Real luggage types: Backpack, Cabin 55cm, Medium 65cm, Large XXL 80cm"
+                className="w-full h-auto object-cover max-h-56"
+              />
+              <div className="grid grid-cols-4 text-center py-2 bg-slate-900 text-white text-[10px] sm:text-xs font-bold divide-x divide-slate-800">
+                <div className="px-1">
+                  <span className="block text-amber-400">Backpack</span>
+                  <span className="text-[9px] text-slate-300 font-normal">Personal Lap</span>
+                </div>
+                <div className="px-1">
+                  <span className="block text-amber-400">55 cm</span>
+                  <span className="text-[9px] text-slate-300 font-normal">Cabin / Hand</span>
+                </div>
+                <div className="px-1">
+                  <span className="block text-amber-400">65 cm</span>
+                  <span className="text-[9px] text-slate-300 font-normal">Medium Check-in</span>
+                </div>
+                <div className="px-1">
+                  <span className="block text-amber-400">75–80 cm</span>
+                  <span className="text-[9px] text-slate-300 font-normal">Large / XXL</span>
+                </div>
+              </div>
+            </div>
+
             {/* Bag Types List */}
-            <div className="space-y-2.5 py-4 text-xs">
+            <div className="space-y-2 py-2 text-xs">
               <div className="p-2.5 rounded-xl border border-slate-200 bg-slate-50 flex items-start gap-3">
                 <div className="w-8 h-8 rounded-lg bg-sky-100 flex items-center justify-center text-sm font-bold text-[#0e5c73] shrink-0">
                   🎒
