@@ -21,6 +21,9 @@ import {
   Plus,
   X,
   Info,
+  ArrowRight,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import {
   QUICK_LOCATIONS,
@@ -120,8 +123,11 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
   const isDropoffAirport = isDropoffAirportT1 || isDropoffAirportT2 || dropoff.toLowerCase().includes('airport');
 
   const otherQuickLocations = QUICK_LOCATIONS.filter(
-    (loc) => loc.id !== 'bcn_t1' && loc.id !== 'bcn_t2' && loc.id !== 'sitges' && loc.id !== 'montserrat' && loc.id !== 'girona'
+    (loc) => loc.id === 'port' || loc.id === 'sants'
   );
+
+  // Toggle for merged Passengers + Luggage + Child Seats button
+  const [showPassengersLuggageSeats, setShowPassengersLuggageSeats] = useState(false);
 
   // Initialize default date/time (tomorrow at 10:00 AM)
   useEffect(() => {
@@ -709,11 +715,69 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
             {/* Quick Pick Chips for Drop-off */}
             <div className="flex items-center gap-1.5 flex-wrap mt-2">
               <span className="text-[11px] font-bold text-slate-600 mr-1">Quick:</span>
-              {QUICK_LOCATIONS.map((loc) => (
+
+              {/* Unified Airport Button */}
+              <div className="inline-flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => setShowDropoffAirportTerminals((prev) => !prev)}
+                  className={`text-[11px] px-2.5 py-1 rounded-lg border font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                    isDropoffAirport
+                      ? 'bg-amber-400 border-2 border-amber-500 text-slate-950 font-bold shadow-xs'
+                      : 'bg-white hover:bg-amber-50 text-slate-800 border border-amber-400/60 hover:border-amber-400 shadow-xs'
+                  }`}
+                  title="Click to select Airport Terminal 1 or Terminal 2"
+                >
+                  <Plane className="w-3.5 h-3.5 text-slate-900" />
+                  <span>Airport</span>
+                </button>
+
+                {/* Sub-options for Terminal 1 and Terminal 2 */}
+                {(showDropoffAirportTerminals || isDropoffAirport) && (
+                  <div className="inline-flex items-center p-0.5 bg-amber-50 border-2 border-amber-400 rounded-lg gap-1 shadow-xs">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const loc = QUICK_LOCATIONS.find((l) => l.id === 'bcn_t1');
+                        if (loc) applyQuickLocation(loc, 'dropoff');
+                        setShowDropoffAirportTerminals(true);
+                      }}
+                      className={`text-[11px] px-2.5 py-0.5 rounded-md font-bold transition-all cursor-pointer ${
+                        isDropoffAirportT1
+                          ? 'bg-amber-400 text-slate-950 shadow-xs border border-amber-500'
+                          : 'text-slate-700 hover:bg-amber-200/70 hover:text-slate-950 border border-transparent'
+                      }`}
+                    >
+                      Terminal 1
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const loc = QUICK_LOCATIONS.find((l) => l.id === 'bcn_t2');
+                        if (loc) applyQuickLocation(loc, 'dropoff');
+                        setShowDropoffAirportTerminals(true);
+                      }}
+                      className={`text-[11px] px-2.5 py-0.5 rounded-md font-bold transition-all cursor-pointer ${
+                        isDropoffAirportT2
+                          ? 'bg-amber-400 text-slate-950 shadow-xs border border-amber-500'
+                          : 'text-slate-700 hover:bg-amber-200/70 hover:text-slate-950 border border-transparent'
+                      }`}
+                    >
+                      Terminal 2
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Other Quick Locations (Sirf Cruise Port & Sants Station) */}
+              {otherQuickLocations.map((loc) => (
                 <button
                   key={loc.id}
                   type="button"
-                  onClick={() => applyQuickLocation(loc, 'dropoff')}
+                  onClick={() => {
+                    applyQuickLocation(loc, 'dropoff');
+                    setShowDropoffAirportTerminals(false);
+                  }}
                   className={`text-[11px] px-2.5 py-1 rounded-lg border font-semibold transition-all cursor-pointer ${
                     dropoff.toLowerCase().includes(loc.shortLabel.toLowerCase())
                       ? 'bg-amber-400 border-2 border-amber-500 text-slate-950 font-bold shadow-xs'
@@ -786,321 +850,386 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
           </div>
         </div>
 
-        {/* 1-Row Compact Options: Passengers, Luggage, Child Seats */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2.5 pt-2.5 border-t border-slate-200">
-          {/* Box 1: Passengers */}
-          <div className="bg-slate-50 border border-amber-400/60 hover:border-amber-400 rounded-xl p-2.5 flex flex-col justify-between shadow-xs transition-colors">
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1">
-                  <Users className="w-3.5 h-3.5 text-slate-600" />
-                  <span>Passengers</span>
-                </span>
-                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-slate-200 text-slate-800">
-                  {totalPassengers} Pax
-                </span>
+        {/* Merged Option Button: Passengers + Luggage + Child Seat */}
+        <div className="pt-2 border-t border-slate-200">
+          <button
+            type="button"
+            onClick={() => setShowPassengersLuggageSeats((prev) => !prev)}
+            className={`w-full p-2.5 sm:p-3 rounded-xl border-2 transition-all cursor-pointer flex items-center justify-between shadow-xs ${
+              showPassengersLuggageSeats
+                ? 'bg-amber-50 border-amber-500 ring-2 ring-amber-400/30'
+                : 'bg-slate-50 hover:bg-amber-50/60 border-amber-400/70 hover:border-amber-400'
+            }`}
+          >
+            <div className="flex items-center gap-2.5 text-left min-w-0">
+              <div className="w-8 h-8 rounded-lg bg-amber-400/20 border border-amber-500/40 flex items-center justify-center shrink-0 text-amber-700">
+                <Users className="w-4 h-4" />
               </div>
-
-              {/* Adults & Children Steppers */}
-              <div className="space-y-1 text-xs">
-                <div className="flex items-center justify-between py-0.5 border-b border-slate-200/70">
-                  <span className="text-slate-700 font-semibold text-[11px]">Adults (12+y)</span>
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => setAdults((prev) => Math.max(1, prev - 1))}
-                      disabled={adults <= 1}
-                      aria-label="Decrease adults"
-                      className="w-5 h-5 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
-                    >
-                      <Minus className="w-2.5 h-2.5" />
-                    </button>
-                    <span className="w-3.5 text-center font-extrabold text-slate-900 text-xs">{adults}</span>
-                    <button
-                      type="button"
-                      onClick={() => setAdults((prev) => Math.min(8 - children, prev + 1))}
-                      disabled={adults + children >= 8}
-                      aria-label="Increase adults"
-                      className="w-5 h-5 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
-                    >
-                      <Plus className="w-2.5 h-2.5" />
-                    </button>
-                  </div>
+              <div className="truncate">
+                <div className="text-xs sm:text-sm font-bold text-slate-900 tracking-tight flex items-center gap-1.5 flex-wrap">
+                  <span>Passengers + Luggage + Child Seat</span>
                 </div>
-
-                <div className="flex items-center justify-between py-0.5">
-                  <span className="text-slate-700 font-semibold text-[11px]">Children (0–11y)</span>
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const next = Math.max(0, children - 1);
-                        setChildren(next);
-                        if (next === 0) {
-                          setBabySeats(0);
-                          setBoosterSeats(0);
-                        }
-                      }}
-                      disabled={children <= 0}
-                      aria-label="Decrease children"
-                      className="w-5 h-5 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
-                    >
-                      <Minus className="w-2.5 h-2.5" />
-                    </button>
-                    <span className="w-3.5 text-center font-extrabold text-slate-900 text-xs">{children}</span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const next = Math.min(8 - adults, children + 1);
-                        setChildren(next);
-                        if (totalChildSeats === 0) {
-                          if (childAgeGroup === '0-2') setBabySeats(1);
-                          else setBoosterSeats(1);
-                        }
-                      }}
-                      disabled={adults + children >= 8}
-                      aria-label="Increase children"
-                      className="w-5 h-5 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
-                    >
-                      <Plus className="w-2.5 h-2.5" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Age pill if children > 0 */}
-              {children > 0 && (
-                <div className="mt-1.5 pt-1.5 border-t border-slate-200">
-                  <div className="grid grid-cols-3 gap-1">
-                    {[
-                      { id: '0-2', label: '0–2y' },
-                      { id: '3-6', label: '3–6y' },
-                      { id: '7-11', label: '7–11y' },
-                    ].map((ag) => (
-                      <button
-                        key={ag.id}
-                        type="button"
-                        onClick={() => {
-                          setChildAgeGroup(ag.id as any);
-                          if (ag.id === '0-2' && babySeats === 0) {
-                            setBabySeats(1);
-                            setBoosterSeats(0);
-                          } else if ((ag.id === '3-6' || ag.id === '7-11') && boosterSeats === 0) {
-                            setBoosterSeats(1);
-                            setBabySeats(0);
-                          }
-                        }}
-                        className={`py-0.5 rounded text-center text-[9px] font-bold transition-all cursor-pointer ${
-                          childAgeGroup === ag.id
-                            ? 'bg-[#0e5c73] text-white shadow-xs'
-                            : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100'
-                        }`}
-                      >
-                        {ag.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Box 2: Luggage (Compact 2x2 grid) */}
-          <div className="bg-slate-50 border border-amber-400/60 hover:border-amber-400 rounded-xl p-2.5 flex flex-col justify-between shadow-xs transition-colors">
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1">
-                  <Briefcase className="w-3.5 h-3.5 text-slate-600" />
-                  <span>Luggage</span>
-                </span>
-                <div className="flex items-center gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => setShowSizeChart(true)}
-                    className="text-[9px] font-bold text-[#0e5c73] hover:text-[#0b4859] bg-sky-100/80 px-1.5 py-0.5 rounded flex items-center gap-0.5 cursor-pointer"
-                  >
-                    <span>📏 Guide</span>
-                  </button>
-                  <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full bg-slate-200 text-slate-800">
-                    {totalBags} Bags
+                <div className="text-[11px] font-semibold text-slate-600 flex items-center gap-1.5 mt-0.5 truncate">
+                  <span className="text-slate-950 font-bold bg-amber-100 px-1.5 py-0.2 rounded border border-amber-300">
+                    {totalPassengers} Pax
+                  </span>
+                  <span>•</span>
+                  <span className="text-slate-800 font-semibold">{totalBags} Luggage</span>
+                  <span>•</span>
+                  <span className="text-emerald-700 font-bold">
+                    {totalChildSeats > 0 ? `${totalChildSeats} Child Seats` : 'Free Child Seat'}
                   </span>
                 </div>
               </div>
-
-              {/* 4 Luggage types in 2 compact columns */}
-              <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-xs">
-                {/* Large */}
-                <div className="flex items-center justify-between py-0.5 border-b border-slate-200/70">
-                  <span className="text-slate-700 font-semibold text-[10px] leading-tight">Large (75cm)</span>
-                  <div className="flex items-center gap-1">
-                    <button
-                      type="button"
-                      onClick={() => setLargeBags((p) => Math.max(0, p - 1))}
-                      disabled={largeBags <= 0}
-                      className="w-4 h-4 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
-                    >
-                      <Minus className="w-2 h-2" />
-                    </button>
-                    <span className="w-3 text-center font-extrabold text-slate-900 text-[11px]">{largeBags}</span>
-                    <button
-                      type="button"
-                      onClick={() => setLargeBags((p) => Math.min(8, p + 1))}
-                      disabled={checkInSuitcases >= 8}
-                      className="w-4 h-4 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
-                    >
-                      <Plus className="w-2 h-2" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Medium */}
-                <div className="flex items-center justify-between py-0.5 border-b border-slate-200/70">
-                  <span className="text-slate-700 font-semibold text-[10px] leading-tight">Medium (65cm)</span>
-                  <div className="flex items-center gap-1">
-                    <button
-                      type="button"
-                      onClick={() => setMediumBags((p) => Math.max(0, p - 1))}
-                      disabled={mediumBags <= 0}
-                      className="w-4 h-4 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
-                    >
-                      <Minus className="w-2 h-2" />
-                    </button>
-                    <span className="w-3 text-center font-extrabold text-slate-900 text-[11px]">{mediumBags}</span>
-                    <button
-                      type="button"
-                      onClick={() => setMediumBags((p) => Math.min(8, p + 1))}
-                      disabled={checkInSuitcases >= 8}
-                      className="w-4 h-4 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
-                    >
-                      <Plus className="w-2 h-2" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Cabin */}
-                <div className="flex items-center justify-between py-0.5">
-                  <span className="text-slate-700 font-semibold text-[10px] leading-tight">Cabin (55cm)</span>
-                  <div className="flex items-center gap-1">
-                    <button
-                      type="button"
-                      onClick={() => setHandCarryBags((p) => Math.max(0, p - 1))}
-                      disabled={handCarryBags <= 0}
-                      className="w-4 h-4 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
-                    >
-                      <Minus className="w-2 h-2" />
-                    </button>
-                    <span className="w-3 text-center font-extrabold text-slate-900 text-[11px]">{handCarryBags}</span>
-                    <button
-                      type="button"
-                      onClick={() => setHandCarryBags((p) => Math.min(8, p + 1))}
-                      disabled={handCarryBags >= 8}
-                      className="w-4 h-4 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
-                    >
-                      <Plus className="w-2 h-2" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Backpack */}
-                <div className="flex items-center justify-between py-0.5">
-                  <span className="text-slate-700 font-semibold text-[10px] leading-tight">Backpack</span>
-                  <div className="flex items-center gap-1">
-                    <button
-                      type="button"
-                      onClick={() => setShoulderBags((p) => Math.max(0, p - 1))}
-                      disabled={shoulderBags <= 0}
-                      className="w-4 h-4 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
-                    >
-                      <Minus className="w-2 h-2" />
-                    </button>
-                    <span className="w-3 text-center font-extrabold text-slate-900 text-[11px]">{shoulderBags}</span>
-                    <button
-                      type="button"
-                      onClick={() => setShoulderBags((p) => Math.min(8, p + 1))}
-                      disabled={shoulderBags >= 8}
-                      className="w-4 h-4 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
-                    >
-                      <Plus className="w-2 h-2" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Box 3: Child Seats */}
-          <div className="bg-slate-50 border border-amber-400/60 hover:border-amber-400 rounded-xl p-2.5 flex flex-col justify-between shadow-xs transition-colors">
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1">
-                  <Baby className="w-3.5 h-3.5 text-slate-600" />
-                  <span>Child Seats</span>
-                </span>
-                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
-                  Free
-                </span>
-              </div>
-
-              <div className="space-y-1 text-xs">
-                {/* Baby Seat */}
-                <div className="flex items-center justify-between py-0.5 border-b border-slate-200/70">
-                  <div>
-                    <span className="text-slate-800 font-semibold text-[11px] leading-tight block">Baby Seat (0–2y)</span>
-                    <span className="text-[9px] text-slate-400 block">Harness seat</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => setBabySeats((p) => Math.max(0, p - 1))}
-                      disabled={babySeats <= 0}
-                      className="w-5 h-5 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
-                    >
-                      <Minus className="w-2.5 h-2.5" />
-                    </button>
-                    <span className="w-3.5 text-center font-extrabold text-slate-900 text-xs">{babySeats}</span>
-                    <button
-                      type="button"
-                      onClick={() => setBabySeats((p) => Math.min(3, p + 1))}
-                      disabled={totalChildSeats >= 4}
-                      className="w-5 h-5 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
-                    >
-                      <Plus className="w-2.5 h-2.5" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Booster Cushion */}
-                <div className="flex items-center justify-between py-0.5">
-                  <div>
-                    <span className="text-slate-800 font-semibold text-[11px] leading-tight block">Booster (3+y)</span>
-                    <span className="text-[9px] text-slate-400 block">High/low cushion</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => setBoosterSeats((p) => Math.max(0, p - 1))}
-                      disabled={boosterSeats <= 0}
-                      className="w-5 h-5 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
-                    >
-                      <Minus className="w-2.5 h-2.5" />
-                    </button>
-                    <span className="w-3.5 text-center font-extrabold text-slate-900 text-xs">{boosterSeats}</span>
-                    <button
-                      type="button"
-                      onClick={() => setBoosterSeats((p) => Math.min(4, p + 1))}
-                      disabled={totalChildSeats >= 4}
-                      className="w-5 h-5 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
-                    >
-                      <Plus className="w-2.5 h-2.5" />
-                    </button>
-                  </div>
-                </div>
-              </div>
             </div>
 
-            <p className="text-[9px] text-slate-400 mt-1 italic flex items-center gap-1">
-              <CheckCircle2 className="w-2.5 h-2.5 text-emerald-600 shrink-0" />
-              <span>Spanish law compliant · Free</span>
+            <div className="flex items-center gap-1.5 shrink-0 ml-2">
+              <span className="text-[11px] font-bold px-2 py-1 rounded-lg bg-amber-400 text-slate-950 border border-amber-500 shadow-xs flex items-center gap-1">
+                <span>{showPassengersLuggageSeats ? 'Close' : 'Choose / Edit'}</span>
+                {showPassengersLuggageSeats ? (
+                  <ChevronUp className="w-3.5 h-3.5" />
+                ) : (
+                  <ChevronDown className="w-3.5 h-3.5" />
+                )}
+              </span>
+            </div>
+          </button>
+
+          {/* Expandable Panel: Passengers, Luggage, Child Seats */}
+          {showPassengersLuggageSeats && (
+            <div className="mt-2.5 p-2.5 sm:p-3 bg-white border-2 border-amber-400/80 rounded-2xl shadow-lg space-y-2.5 transition-all">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-2.5">
+                {/* Box 1: Passengers */}
+                <div className="bg-slate-50 border border-amber-400/60 hover:border-amber-400 rounded-xl p-2.5 flex flex-col justify-between shadow-xs transition-colors">
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1">
+                        <Users className="w-3.5 h-3.5 text-slate-600" />
+                        <span>Passengers</span>
+                      </span>
+                      <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-slate-200 text-slate-800">
+                        {totalPassengers} Pax
+                      </span>
+                    </div>
+
+                    {/* Adults & Children Steppers */}
+                    <div className="space-y-1 text-xs">
+                      <div className="flex items-center justify-between py-0.5 border-b border-slate-200/70">
+                        <span className="text-slate-700 font-semibold text-[11px]">Adults (12+y)</span>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => setAdults((prev) => Math.max(1, prev - 1))}
+                            disabled={adults <= 1}
+                            aria-label="Decrease adults"
+                            className="w-5 h-5 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
+                          >
+                            <Minus className="w-2.5 h-2.5" />
+                          </button>
+                          <span className="w-3.5 text-center font-extrabold text-slate-900 text-xs">{adults}</span>
+                          <button
+                            type="button"
+                            onClick={() => setAdults((prev) => Math.min(8 - children, prev + 1))}
+                            disabled={adults + children >= 8}
+                            aria-label="Increase adults"
+                            className="w-5 h-5 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
+                          >
+                            <Plus className="w-2.5 h-2.5" />
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between py-0.5">
+                        <span className="text-slate-700 font-semibold text-[11px]">Children (0–11y)</span>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const next = Math.max(0, children - 1);
+                              setChildren(next);
+                              if (next === 0) {
+                                setBabySeats(0);
+                                setBoosterSeats(0);
+                              }
+                            }}
+                            disabled={children <= 0}
+                            aria-label="Decrease children"
+                            className="w-5 h-5 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
+                          >
+                            <Minus className="w-2.5 h-2.5" />
+                          </button>
+                          <span className="w-3.5 text-center font-extrabold text-slate-900 text-xs">{children}</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const next = Math.min(8 - adults, children + 1);
+                              setChildren(next);
+                              if (totalChildSeats === 0) {
+                                if (childAgeGroup === '0-2') setBabySeats(1);
+                                else setBoosterSeats(1);
+                              }
+                            }}
+                            disabled={adults + children >= 8}
+                            aria-label="Increase children"
+                            className="w-5 h-5 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
+                          >
+                            <Plus className="w-2.5 h-2.5" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Age pill if children > 0 */}
+                    {children > 0 && (
+                      <div className="mt-1.5 pt-1.5 border-t border-slate-200">
+                        <div className="grid grid-cols-3 gap-1">
+                          {[
+                            { id: '0-2', label: '0–2y' },
+                            { id: '3-6', label: '3–6y' },
+                            { id: '7-11', label: '7–11y' },
+                          ].map((ag) => (
+                            <button
+                              key={ag.id}
+                              type="button"
+                              onClick={() => {
+                                setChildAgeGroup(ag.id as any);
+                                if (ag.id === '0-2' && babySeats === 0) {
+                                  setBabySeats(1);
+                                  setBoosterSeats(0);
+                                } else if ((ag.id === '3-6' || ag.id === '7-11') && boosterSeats === 0) {
+                                  setBoosterSeats(1);
+                                  setBabySeats(0);
+                                }
+                              }}
+                              className={`py-0.5 rounded text-center text-[9px] font-bold transition-all cursor-pointer ${
+                                childAgeGroup === ag.id
+                                  ? 'bg-[#0e5c73] text-white shadow-xs'
+                                  : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100'
+                              }`}
+                            >
+                              {ag.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Box 2: Luggage (Compact 2x2 grid) */}
+                <div className="bg-slate-50 border border-amber-400/60 hover:border-amber-400 rounded-xl p-2.5 flex flex-col justify-between shadow-xs transition-colors">
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1">
+                        <Briefcase className="w-3.5 h-3.5 text-slate-600" />
+                        <span>Luggage</span>
+                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => setShowSizeChart(true)}
+                          className="text-[9px] font-bold text-[#0e5c73] hover:text-[#0b4859] bg-sky-100/80 px-1.5 py-0.5 rounded flex items-center gap-0.5 cursor-pointer"
+                        >
+                          <span>📏 Guide</span>
+                        </button>
+                        <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full bg-slate-200 text-slate-800">
+                          {totalBags} Bags
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* 4 Luggage types in 2 compact columns */}
+                    <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-xs">
+                      {/* Large */}
+                      <div className="flex items-center justify-between py-0.5 border-b border-slate-200/70">
+                        <span className="text-slate-700 font-semibold text-[10px] leading-tight">Large (75cm)</span>
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => setLargeBags((p) => Math.max(0, p - 1))}
+                            disabled={largeBags <= 0}
+                            className="w-4 h-4 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
+                          >
+                            <Minus className="w-2 h-2" />
+                          </button>
+                          <span className="w-3 text-center font-extrabold text-slate-900 text-[11px]">{largeBags}</span>
+                          <button
+                            type="button"
+                            onClick={() => setLargeBags((p) => Math.min(8, p + 1))}
+                            disabled={checkInSuitcases >= 8}
+                            className="w-4 h-4 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
+                          >
+                            <Plus className="w-2 h-2" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Medium */}
+                      <div className="flex items-center justify-between py-0.5 border-b border-slate-200/70">
+                        <span className="text-slate-700 font-semibold text-[10px] leading-tight">Medium (65cm)</span>
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => setMediumBags((p) => Math.max(0, p - 1))}
+                            disabled={mediumBags <= 0}
+                            className="w-4 h-4 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
+                          >
+                            <Minus className="w-2 h-2" />
+                          </button>
+                          <span className="w-3 text-center font-extrabold text-slate-900 text-[11px]">{mediumBags}</span>
+                          <button
+                            type="button"
+                            onClick={() => setMediumBags((p) => Math.min(8, p + 1))}
+                            disabled={checkInSuitcases >= 8}
+                            className="w-4 h-4 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
+                          >
+                            <Plus className="w-2 h-2" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Cabin */}
+                      <div className="flex items-center justify-between py-0.5">
+                        <span className="text-slate-700 font-semibold text-[10px] leading-tight">Cabin (55cm)</span>
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => setHandCarryBags((p) => Math.max(0, p - 1))}
+                            disabled={handCarryBags <= 0}
+                            className="w-4 h-4 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
+                          >
+                            <Minus className="w-2 h-2" />
+                          </button>
+                          <span className="w-3 text-center font-extrabold text-slate-900 text-[11px]">{handCarryBags}</span>
+                          <button
+                            type="button"
+                            onClick={() => setHandCarryBags((p) => Math.min(8, p + 1))}
+                            disabled={handCarryBags >= 8}
+                            className="w-4 h-4 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
+                          >
+                            <Plus className="w-2 h-2" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Backpack */}
+                      <div className="flex items-center justify-between py-0.5">
+                        <span className="text-slate-700 font-semibold text-[10px] leading-tight">Backpack</span>
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => setShoulderBags((p) => Math.max(0, p - 1))}
+                            disabled={shoulderBags <= 0}
+                            className="w-4 h-4 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
+                          >
+                            <Minus className="w-2 h-2" />
+                          </button>
+                          <span className="w-3 text-center font-extrabold text-slate-900 text-[11px]">{shoulderBags}</span>
+                          <button
+                            type="button"
+                            onClick={() => setShoulderBags((p) => Math.min(8, p + 1))}
+                            disabled={shoulderBags >= 8}
+                            className="w-4 h-4 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
+                          >
+                            <Plus className="w-2 h-2" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Box 3: Child Seats */}
+                <div className="bg-slate-50 border border-amber-400/60 hover:border-amber-400 rounded-xl p-2.5 flex flex-col justify-between shadow-xs transition-colors">
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1">
+                        <Baby className="w-3.5 h-3.5 text-slate-600" />
+                        <span>Child Seats</span>
+                      </span>
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+                        Free
+                      </span>
+                    </div>
+
+                    <div className="space-y-1 text-xs">
+                      {/* Baby Seat */}
+                      <div className="flex items-center justify-between py-0.5 border-b border-slate-200/70">
+                        <div>
+                          <span className="text-slate-800 font-semibold text-[11px] leading-tight block">Baby Seat (0–2y)</span>
+                          <span className="text-[9px] text-slate-400 block">Harness seat</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => setBabySeats((p) => Math.max(0, p - 1))}
+                            disabled={babySeats <= 0}
+                            className="w-5 h-5 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
+                          >
+                            <Minus className="w-2.5 h-2.5" />
+                          </button>
+                          <span className="w-3.5 text-center font-extrabold text-slate-900 text-xs">{babySeats}</span>
+                          <button
+                            type="button"
+                            onClick={() => setBabySeats((p) => Math.min(3, p + 1))}
+                            disabled={totalChildSeats >= 4}
+                            className="w-5 h-5 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
+                          >
+                            <Plus className="w-2.5 h-2.5" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Booster Cushion */}
+                      <div className="flex items-center justify-between py-0.5">
+                        <div>
+                          <span className="text-slate-800 font-semibold text-[11px] leading-tight block">Booster (3+y)</span>
+                          <span className="text-[9px] text-slate-400 block">High/low cushion</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => setBoosterSeats((p) => Math.max(0, p - 1))}
+                            disabled={boosterSeats <= 0}
+                            className="w-5 h-5 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
+                          >
+                            <Minus className="w-2.5 h-2.5" />
+                          </button>
+                          <span className="w-3.5 text-center font-extrabold text-slate-900 text-xs">{boosterSeats}</span>
+                          <button
+                            type="button"
+                            onClick={() => setBoosterSeats((p) => Math.min(4, p + 1))}
+                            disabled={totalChildSeats >= 4}
+                            className="w-5 h-5 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
+                          >
+                            <Plus className="w-2.5 h-2.5" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <p className="text-[9px] text-slate-400 mt-1 italic flex items-center gap-1">
+                    <CheckCircle2 className="w-2.5 h-2.5 text-emerald-600 shrink-0" />
+                    <span>Spanish law compliant · Free</span>
+                  </p>
+                </div>
+              </div>
+
+              {/* Done / Next button */}
+              <div className="flex justify-end pt-1 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setShowPassengersLuggageSeats(false)}
+                  className="w-full sm:w-auto px-4 py-1.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs border border-amber-500 shadow-xs cursor-pointer flex items-center justify-center gap-1.5 transition-transform active:scale-95"
+                >
+                  <span>Done / Choose Vehicle Below</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
             </p>
           </div>
         </div>
