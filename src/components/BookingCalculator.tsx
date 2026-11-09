@@ -107,6 +107,21 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
   const [calculating, setCalculating] = useState(false);
   const [quote, setQuote] = useState<QuoteResult | null>(null);
   const [priceRevealed, setPriceRevealed] = useState(false);
+  // Airport terminal toggles & matchers for Pickup & Dropoff
+  const [showPickupAirportTerminals, setShowPickupAirportTerminals] = useState(false);
+  const [showDropoffAirportTerminals, setShowDropoffAirportTerminals] = useState(false);
+
+  const isPickupAirportT1 = pickup.toLowerCase().includes('terminal 1') || pickup.toLowerCase().includes('t1');
+  const isPickupAirportT2 = pickup.toLowerCase().includes('terminal 2') || pickup.toLowerCase().includes('t2');
+  const isPickupAirport = isPickupAirportT1 || isPickupAirportT2 || pickup.toLowerCase().includes('airport');
+
+  const isDropoffAirportT1 = dropoff.toLowerCase().includes('terminal 1') || dropoff.toLowerCase().includes('t1');
+  const isDropoffAirportT2 = dropoff.toLowerCase().includes('terminal 2') || dropoff.toLowerCase().includes('t2');
+  const isDropoffAirport = isDropoffAirportT1 || isDropoffAirportT2 || dropoff.toLowerCase().includes('airport');
+
+  const otherQuickLocations = QUICK_LOCATIONS.filter(
+    (loc) => loc.id !== 'bcn_t1' && loc.id !== 'bcn_t2' && loc.id !== 'sitges' && loc.id !== 'montserrat' && loc.id !== 'girona'
+  );
 
   // Initialize default date/time (tomorrow at 10:00 AM)
   useEffect(() => {
@@ -559,11 +574,69 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
             {/* Quick Pick Chips for Pickup */}
             <div className="flex items-center gap-1.5 flex-wrap mt-2">
               <span className="text-[11px] font-bold text-slate-600 mr-1">Quick:</span>
-              {QUICK_LOCATIONS.slice(0, 5).map((loc) => (
+
+              {/* Unified Airport Button */}
+              <div className="inline-flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => setShowPickupAirportTerminals((prev) => !prev)}
+                  className={`text-[11px] px-2.5 py-1 rounded-lg border font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                    isPickupAirport
+                      ? 'bg-amber-400 border-2 border-amber-500 text-slate-950 font-bold shadow-xs'
+                      : 'bg-white hover:bg-amber-50 text-slate-800 border border-amber-400/60 hover:border-amber-400 shadow-xs'
+                  }`}
+                  title="Click to select Airport Terminal 1 or Terminal 2"
+                >
+                  <Plane className="w-3.5 h-3.5 text-slate-900" />
+                  <span>Airport</span>
+                </button>
+
+                {/* Sub-options for Terminal 1 and Terminal 2 */}
+                {(showPickupAirportTerminals || isPickupAirport) && (
+                  <div className="inline-flex items-center p-0.5 bg-amber-50 border-2 border-amber-400 rounded-lg gap-1 shadow-xs">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const loc = QUICK_LOCATIONS.find((l) => l.id === 'bcn_t1');
+                        if (loc) applyQuickLocation(loc, 'pickup');
+                        setShowPickupAirportTerminals(true);
+                      }}
+                      className={`text-[11px] px-2.5 py-0.5 rounded-md font-bold transition-all cursor-pointer ${
+                        isPickupAirportT1
+                          ? 'bg-amber-400 text-slate-950 shadow-xs border border-amber-500'
+                          : 'text-slate-700 hover:bg-amber-200/70 hover:text-slate-950 border border-transparent'
+                      }`}
+                    >
+                      Terminal 1
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const loc = QUICK_LOCATIONS.find((l) => l.id === 'bcn_t2');
+                        if (loc) applyQuickLocation(loc, 'pickup');
+                        setShowPickupAirportTerminals(true);
+                      }}
+                      className={`text-[11px] px-2.5 py-0.5 rounded-md font-bold transition-all cursor-pointer ${
+                        isPickupAirportT2
+                          ? 'bg-amber-400 text-slate-950 shadow-xs border border-amber-500'
+                          : 'text-slate-700 hover:bg-amber-200/70 hover:text-slate-950 border border-transparent'
+                      }`}
+                    >
+                      Terminal 2
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Other Quick Locations */}
+              {otherQuickLocations.map((loc) => (
                 <button
                   key={loc.id}
                   type="button"
-                  onClick={() => applyQuickLocation(loc, 'pickup')}
+                  onClick={() => {
+                    applyQuickLocation(loc, 'pickup');
+                    setShowPickupAirportTerminals(false);
+                  }}
                   className={`text-[11px] px-2.5 py-1 rounded-lg border font-semibold transition-all cursor-pointer ${
                     pickup.toLowerCase().includes(loc.shortLabel.toLowerCase())
                       ? 'bg-amber-400 border-2 border-amber-500 text-slate-950 font-bold shadow-xs'
