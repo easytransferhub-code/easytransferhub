@@ -97,15 +97,7 @@ export const QUICK_LOCATIONS: QuickLocation[] = [
   },
  
  
-  {
-    id: "girona",
-    name: "Girona City / Airport",
-    shortLabel: "Girona",
-    icon: "MapPin",
-    address: "Girona, Catalonia, Spain",
-    lat: 41.9794,
-    lon: 2.8214,
-  },
+
 ];
 
 export const VEHICLES: Vehicle[] = [
