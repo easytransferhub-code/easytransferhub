@@ -95,34 +95,9 @@ export const QUICK_LOCATIONS: QuickLocation[] = [
     lat: 41.3870,
     lon: 2.1700,
   },
-  {
-    id: "sitges",
-    name: "Sitges",
-    shortLabel: "Sitges",
-    icon: "Sun",
-    address: "Sitges, 08870 Barcelona, Spain",
-    lat: 41.2372,
-    lon: 1.8058,
-  },
-  {
-    id: "montserrat",
-    name: "Montserrat Monastery",
-    shortLabel: "Montserrat",
-    icon: "Mountain",
-    address: "Monastery of Montserrat, 08199 Montserrat, Barcelona, Spain",
-    lat: 41.5931,
-    lon: 1.8364,
-  },
-  {
-    id: "girona",
-    name: "Girona City / Airport",
-    shortLabel: "Girona",
-    icon: "MapPin",
-    address: "Girona, Catalonia, Spain",
-    lat: 41.9794,
-    lon: 2.8214,
-  },
-];
+  
+ 
+
 
 export const VEHICLES: Vehicle[] = [
   {
