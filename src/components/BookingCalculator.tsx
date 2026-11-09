@@ -17,7 +17,14 @@ import {
   Navigation,
   Loader2,
   Car,
-  
+  Minus,
+  Plus,
+  X,
+  Info,
+  ArrowRight,
+  ChevronDown,
+  ChevronUp,
+} from 'lucide-react';
 import {
   QUICK_LOCATIONS,
   VEHICLES,
