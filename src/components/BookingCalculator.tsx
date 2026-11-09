@@ -70,13 +70,13 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
   const [passengerName, setPassengerName] = useState('');
 
   // Detailed Passenger State
-  const [adults, setAdults] = useState(2);
+  const [adults, setAdults] = useState(0);
   const [children, setChildren] = useState(0);
   const [childAgeGroup, setChildAgeGroup] = useState<'0-2' | '3-6' | '7-11'>('3-6');
 
   // Detailed Luggage State
-  const [largeBags, setLargeBags] = useState(1); // XXL / Large (75-80cm)
-  const [mediumBags, setMediumBags] = useState(1); // Medium (65cm)
+  const [largeBags, setLargeBags] = useState(0); // XXL / Large (75-80cm)
+  const [mediumBags, setMediumBags] = useState(0); // Medium (65cm)
   const [handCarryBags, setHandCarryBags] = useState(0); // Small / Cabin (55cm)
   const [shoulderBags, setShoulderBags] = useState(0); // Backpack / Shoulder bag
   const [showLuggageDetails, setShowLuggageDetails] = useState(false);
