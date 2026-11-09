@@ -73,11 +73,11 @@ export const Navbar: React.FC<NavbarProps> = ({ language, setLanguage, onOpenAss
               ET
             </div>
           </div>
-          <div>
-            <span className="font-display font-extrabold text-[18px] tracking-tight text-white">
+          <div className="min-w-0">
+            <span className="font-display font-extrabold text-[17px] sm:text-[18px] tracking-tight text-white block leading-tight whitespace-nowrap">
               Easytransfer<span className="text-amber-400">hub</span>
             </span>
-            <span className="block text-[9px] text-slate-400 -mt-0.5 tracking-wider uppercase font-semibold">
+            <span className="block text-[8px] sm:text-[8.5px] text-slate-300 tracking-wider uppercase font-semibold whitespace-nowrap leading-none mt-0.5">
               Chauffeur & Airport Service
             </span>
           </div>

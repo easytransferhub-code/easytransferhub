@@ -32,13 +32,12 @@ export const Hero: React.FC<HeroProps> = ({
             <span>BARCELONA & CATALONIA LICENSED PRIVATE CHAUFFEUR</span>
           </div>
 
-          {/* 2. Main Headline */}
-          <h1 className="text-[21px] sm:text-2xl lg:text-3xl font-display font-extrabold tracking-tight leading-tight text-white m-0">
+          <h1 className="sr-only">
             {t.heroTitle}
           </h1>
 
-          {/* 3. CALCULATOR - COMES DIRECTLY UNDER PRIVATE TRANSFERS HEADLINE */}
-          <div className="pt-1">
+          {/* 2. CALCULATOR - WITH COMPACT TITLE ABOVE ONE WAY / ROUND TRIP */}
+          <div className="pt-0.5">
             <BookingCalculator
               language={language}
               prefilledRoute={prefilledRoute}

@@ -106,7 +106,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
   // Route & Quote calculation state
   const [calculating, setCalculating] = useState(false);
   const [quote, setQuote] = useState<QuoteResult | null>(null);
-  const [showMap, setShowMap] = useState(false);
+  const [priceRevealed, setPriceRevealed] = useState(false);
 
   // Initialize default date/time (tomorrow at 10:00 AM)
   useEffect(() => {
@@ -416,11 +416,13 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
       passengerName,
       distanceKm: quote?.distanceKm,
     });
+    setPriceRevealed(true);
     window.open(waLink, '_blank', 'noopener,noreferrer');
   };
 
   // Open Voucher Modal
   const handleViewVoucher = () => {
+    setPriceRevealed(true);
     if (!pickup.trim() || !dropoff.trim()) {
       setValidationError('Please enter or select both pickup and drop-off locations.');
       return;
@@ -465,21 +467,22 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
       className="bg-white rounded-2xl shadow-2xl border-2 border-amber-400/80 overflow-hidden transition-all text-slate-900 ring-1 ring-amber-400/30"
     >
       {/* Calculator Header Bar */}
-      <div className="bg-[#0e2438] text-white px-5 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-3 border-b-2 border-amber-400/70">
-        <div>
-          <h2 className="flex items-center gap-2">
-            <span className="text-[12px] leading-[15px] font-bold font-display">{t.calcTitle}</span>
-            <span className="text-xs font-semibold px-2 py-0.5 rounded bg-amber-400 text-slate-950">
+      <div className="bg-[#0e2438] text-white px-4 sm:px-6 py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 border-b-2 border-amber-400/70">
+        <div className="flex items-center gap-2">
+          <h2 className="flex items-center gap-2 m-0">
+            <span className="text-[13px] sm:text-sm font-bold font-display">{t.calcTitle}</span>
+            <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-amber-400 text-slate-950">
               Fixed Rates
             </span>
           </h2>
-          <p className="text-xs text-slate-300 mt-0.5">
-            Transparent pricing · All highway tolls & airport waiting included
-          </p>
         </div>
 
-        {/* Trip Mode Switch */}
-        <div className="flex items-center gap-1 bg-[#112331] p-1 rounded-lg border-2 border-amber-400/70 text-xs font-semibold">
+        {/* Trip Mode Switch with 1-line compact "Private transfers from Barcelona to anywhere in Spain" above it */}
+        <div className="flex flex-col sm:items-end gap-1">
+          <span className="text-[11px] sm:text-xs font-semibold text-amber-300 whitespace-nowrap tracking-tight">
+            Private transfers from Barcelona to anywhere in Spain
+          </span>
+          <div className="flex items-center gap-1 bg-[#112331] p-1 rounded-lg border-2 border-amber-400/70 text-xs font-semibold self-start sm:self-end">
           <button
             type="button"
             onClick={() => setIsRoundTrip(false)}
@@ -504,6 +507,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
           </button>
         </div>
       </div>
+    </div>
 
       <div className="p-5 sm:p-7 space-y-5">
         {/* Step 1: Pickup and Drop-off with Quick Chips */}
@@ -709,268 +713,310 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
           </div>
         </div>
 
-        {/* Responsive Options: Passengers, Luggage, Child Seats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-3 border-t border-slate-200">
-          {/* Box 1: Passengers (Adults & Children + Child Age Selector) */}
-          <div className="bg-slate-50 border border-amber-400/60 hover:border-amber-400 rounded-xl p-3 flex flex-col justify-between shadow-xs transition-colors">
+        {/* 1-Row Compact Options: Passengers, Luggage, Child Seats */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2.5 pt-2.5 border-t border-slate-200">
+          {/* Box 1: Passengers */}
+          <div className="bg-slate-50 border border-amber-400/60 hover:border-amber-400 rounded-xl p-2.5 flex flex-col justify-between shadow-xs transition-colors">
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1">
                   <Users className="w-3.5 h-3.5 text-slate-600" />
                   <span>Passengers</span>
                 </span>
-                <span className="text-xs font-extrabold px-2 py-0.5 rounded-full bg-slate-200 text-slate-800">
-                  {totalPassengers} {totalPassengers === 1 ? 'Pax' : 'Pax'}
+                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-slate-200 text-slate-800">
+                  {totalPassengers} Pax
                 </span>
               </div>
 
-              {/* Adults Stepper */}
-              <div className="flex items-center justify-between py-1 border-b border-slate-200/70 text-xs">
-                <span className="text-slate-700 font-semibold">Adults (12+ yrs)</span>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setAdults((prev) => Math.max(1, prev - 1))}
-                    disabled={adults <= 1}
-                    aria-label="Decrease adults"
-                    className="w-6 h-6 rounded-md bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-                  >
-                    <Minus className="w-3 h-3" />
-                  </button>
-                  <span className="w-4 text-center font-extrabold text-slate-900">{adults}</span>
-                  <button
-                    type="button"
-                    onClick={() => setAdults((prev) => Math.min(8 - children, prev + 1))}
-                    disabled={adults + children >= 8}
-                    aria-label="Increase adults"
-                    className="w-6 h-6 rounded-md bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-                  >
-                    <Plus className="w-3 h-3" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Children Stepper */}
-              <div className="flex items-center justify-between py-1 text-xs">
-                <span className="text-slate-700 font-semibold">Children (0–11 yrs)</span>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const next = Math.max(0, children - 1);
-                      setChildren(next);
-                      if (next === 0) {
-                        setBabySeats(0);
-                        setBoosterSeats(0);
-                      }
-                    }}
-                    disabled={children <= 0}
-                    aria-label="Decrease children"
-                    className="w-6 h-6 rounded-md bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-                  >
-                    <Minus className="w-3 h-3" />
-                  </button>
-                  <span className="w-4 text-center font-extrabold text-slate-900">{children}</span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const next = Math.min(8 - adults, children + 1);
-                      setChildren(next);
-                      if (totalChildSeats === 0) {
-                        if (childAgeGroup === '0-2') setBabySeats(1);
-                        else setBoosterSeats(1);
-                      }
-                    }}
-                    disabled={adults + children >= 8}
-                    aria-label="Increase children"
-                    className="w-6 h-6 rounded-md bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-                  >
-                    <Plus className="w-3 h-3" />
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Child Age / Size Selector when children > 0 */}
-            {children > 0 && (
-              <div className="mt-2 pt-2 border-t border-slate-200">
-                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
-                  Child Age & Size (Spanish Law)
-                </label>
-                <div className="grid grid-cols-3 gap-1">
-                  {[
-                    { id: '0-2', label: '0–2 yrs', sub: 'Baby' },
-                    { id: '3-6', label: '3–6 yrs', sub: 'Booster' },
-                    { id: '7-11', label: '7–11 yrs', sub: 'Junior' },
-                  ].map((ag) => (
+              {/* Adults & Children Steppers */}
+              <div className="space-y-1 text-xs">
+                <div className="flex items-center justify-between py-0.5 border-b border-slate-200/70">
+                  <span className="text-slate-700 font-semibold text-[11px]">Adults (12+y)</span>
+                  <div className="flex items-center gap-1.5">
                     <button
-                      key={ag.id}
+                      type="button"
+                      onClick={() => setAdults((prev) => Math.max(1, prev - 1))}
+                      disabled={adults <= 1}
+                      aria-label="Decrease adults"
+                      className="w-5 h-5 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
+                    >
+                      <Minus className="w-2.5 h-2.5" />
+                    </button>
+                    <span className="w-3.5 text-center font-extrabold text-slate-900 text-xs">{adults}</span>
+                    <button
+                      type="button"
+                      onClick={() => setAdults((prev) => Math.min(8 - children, prev + 1))}
+                      disabled={adults + children >= 8}
+                      aria-label="Increase adults"
+                      className="w-5 h-5 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
+                    >
+                      <Plus className="w-2.5 h-2.5" />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between py-0.5">
+                  <span className="text-slate-700 font-semibold text-[11px]">Children (0–11y)</span>
+                  <div className="flex items-center gap-1.5">
+                    <button
                       type="button"
                       onClick={() => {
-                        setChildAgeGroup(ag.id as any);
-                        if (ag.id === '0-2' && babySeats === 0) {
-                          setBabySeats(1);
-                          setBoosterSeats(0);
-                        } else if ((ag.id === '3-6' || ag.id === '7-11') && boosterSeats === 0) {
-                          setBoosterSeats(1);
+                        const next = Math.max(0, children - 1);
+                        setChildren(next);
+                        if (next === 0) {
                           setBabySeats(0);
+                          setBoosterSeats(0);
                         }
                       }}
-                      className={`py-1 px-1.5 rounded-lg text-center text-[10px] font-bold transition-all cursor-pointer ${
-                        childAgeGroup === ag.id
-                          ? 'bg-[#0e5c73] text-white shadow-xs'
-                          : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100'
-                      }`}
+                      disabled={children <= 0}
+                      aria-label="Decrease children"
+                      className="w-5 h-5 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
                     >
-                      <div>{ag.label}</div>
-                      <div className="text-[9px] opacity-80">{ag.sub}</div>
+                      <Minus className="w-2.5 h-2.5" />
                     </button>
-                  ))}
+                    <span className="w-3.5 text-center font-extrabold text-slate-900 text-xs">{children}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const next = Math.min(8 - adults, children + 1);
+                        setChildren(next);
+                        if (totalChildSeats === 0) {
+                          if (childAgeGroup === '0-2') setBabySeats(1);
+                          else setBoosterSeats(1);
+                        }
+                      }}
+                      disabled={adults + children >= 8}
+                      aria-label="Increase children"
+                      className="w-5 h-5 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
+                    >
+                      <Plus className="w-2.5 h-2.5" />
+                    </button>
+                  </div>
                 </div>
               </div>
-            )}
+
+              {/* Age pill if children > 0 */}
+              {children > 0 && (
+                <div className="mt-1.5 pt-1.5 border-t border-slate-200">
+                  <div className="grid grid-cols-3 gap-1">
+                    {[
+                      { id: '0-2', label: '0–2y' },
+                      { id: '3-6', label: '3–6y' },
+                      { id: '7-11', label: '7–11y' },
+                    ].map((ag) => (
+                      <button
+                        key={ag.id}
+                        type="button"
+                        onClick={() => {
+                          setChildAgeGroup(ag.id as any);
+                          if (ag.id === '0-2' && babySeats === 0) {
+                            setBabySeats(1);
+                            setBoosterSeats(0);
+                          } else if ((ag.id === '3-6' || ag.id === '7-11') && boosterSeats === 0) {
+                            setBoosterSeats(1);
+                            setBabySeats(0);
+                          }
+                        }}
+                        className={`py-0.5 rounded text-center text-[9px] font-bold transition-all cursor-pointer ${
+                          childAgeGroup === ag.id
+                            ? 'bg-[#0e5c73] text-white shadow-xs'
+                            : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100'
+                        }`}
+                      >
+                        {ag.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Box 2: Luggage & 1-Click Size Guide */}
-          <div className="bg-slate-50 border border-amber-400/60 hover:border-amber-400 rounded-xl p-3 flex flex-col justify-between shadow-xs transition-colors">
+          {/* Box 2: Luggage (Compact 2x2 grid) */}
+          <div className="bg-slate-50 border border-amber-400/60 hover:border-amber-400 rounded-xl p-2.5 flex flex-col justify-between shadow-xs transition-colors">
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1">
                   <Briefcase className="w-3.5 h-3.5 text-slate-600" />
                   <span>Luggage</span>
                 </span>
-                <button
-                  type="button"
-                  onClick={() => setShowSizeChart(true)}
-                  className="text-[10px] font-bold text-[#0e5c73] hover:text-[#0b4859] bg-sky-100/70 hover:bg-sky-100 px-2 py-0.5 rounded-md flex items-center gap-1 cursor-pointer transition-colors"
-                  title="View bag dimensions & guide"
-                >
-                  <span>📏 Size Chart</span>
-                </button>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setShowSizeChart(true)}
+                    className="text-[9px] font-bold text-[#0e5c73] hover:text-[#0b4859] bg-sky-100/80 px-1.5 py-0.5 rounded flex items-center gap-0.5 cursor-pointer"
+                  >
+                    <span>📏 Guide</span>
+                  </button>
+                  <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full bg-slate-200 text-slate-800">
+                    {totalBags} Bags
+                  </span>
+                </div>
               </div>
 
-              {/* Quick Summary Pill */}
-              <div className="flex items-center justify-between text-xs py-1 border-b border-slate-200/70">
-                <span className="text-slate-600 font-medium">
-                  Check-in: <b className="text-slate-900">{checkInSuitcases}</b> · Cabin: <b className="text-slate-900">{handCarryBags + shoulderBags}</b>
-                </span>
-                <span className="font-extrabold text-xs px-2 py-0.5 rounded-full bg-slate-200 text-slate-800">
-                  {totalBags} {totalBags === 1 ? 'Bag' : 'Bags'}
-                </span>
-              </div>
-
-              {/* Suitcase Types Steppers */}
-              <div className="space-y-1.5 pt-1.5 text-xs">
-                {/* Large / XXL (75-80cm) */}
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-slate-800 font-semibold block text-[11px] leading-tight">Large / XXL (75–80cm)</span>
-                    <span className="text-[9px] text-slate-400 block">Heavy check-in (23–32kg)</span>
-                  </div>
-                  <div className="flex items-center gap-2">
+              {/* 4 Luggage types in 2 compact columns */}
+              <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-xs">
+                {/* Large */}
+                <div className="flex items-center justify-between py-0.5 border-b border-slate-200/70">
+                  <span className="text-slate-700 font-semibold text-[10px] leading-tight">Large (75cm)</span>
+                  <div className="flex items-center gap-1">
                     <button
                       type="button"
                       onClick={() => setLargeBags((p) => Math.max(0, p - 1))}
                       disabled={largeBags <= 0}
-                      aria-label="Decrease large bags"
-                      className="w-5 h-5 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                      className="w-4 h-4 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
                     >
-                      <Minus className="w-2.5 h-2.5" />
+                      <Minus className="w-2 h-2" />
                     </button>
-                    <span className="w-3.5 text-center font-extrabold text-slate-900 text-[11px]">{largeBags}</span>
+                    <span className="w-3 text-center font-extrabold text-slate-900 text-[11px]">{largeBags}</span>
                     <button
                       type="button"
                       onClick={() => setLargeBags((p) => Math.min(8, p + 1))}
                       disabled={checkInSuitcases >= 8}
-                      aria-label="Increase large bags"
-                      className="w-5 h-5 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                      className="w-4 h-4 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
                     >
-                      <Plus className="w-2.5 h-2.5" />
+                      <Plus className="w-2 h-2" />
                     </button>
                   </div>
                 </div>
 
-                {/* Medium (65cm) */}
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-slate-800 font-semibold block text-[11px] leading-tight">Medium (65cm)</span>
-                    <span className="text-[9px] text-slate-400 block">Standard trunk suitcase</span>
-                  </div>
-                  <div className="flex items-center gap-2">
+                {/* Medium */}
+                <div className="flex items-center justify-between py-0.5 border-b border-slate-200/70">
+                  <span className="text-slate-700 font-semibold text-[10px] leading-tight">Medium (65cm)</span>
+                  <div className="flex items-center gap-1">
                     <button
                       type="button"
                       onClick={() => setMediumBags((p) => Math.max(0, p - 1))}
                       disabled={mediumBags <= 0}
-                      aria-label="Decrease medium bags"
-                      className="w-5 h-5 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                      className="w-4 h-4 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
                     >
-                      <Minus className="w-2.5 h-2.5" />
+                      <Minus className="w-2 h-2" />
                     </button>
-                    <span className="w-3.5 text-center font-extrabold text-slate-900 text-[11px]">{mediumBags}</span>
+                    <span className="w-3 text-center font-extrabold text-slate-900 text-[11px]">{mediumBags}</span>
                     <button
                       type="button"
                       onClick={() => setMediumBags((p) => Math.min(8, p + 1))}
                       disabled={checkInSuitcases >= 8}
-                      aria-label="Increase medium bags"
-                      className="w-5 h-5 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                      className="w-4 h-4 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
                     >
-                      <Plus className="w-2.5 h-2.5" />
+                      <Plus className="w-2 h-2" />
                     </button>
                   </div>
                 </div>
 
-                {/* Hand Carry / Cabin (55cm) */}
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-slate-800 font-semibold block text-[11px] leading-tight">Hand Carry (55cm)</span>
-                    <span className="text-[9px] text-slate-400 block">Cabin trolley</span>
-                  </div>
-                  <div className="flex items-center gap-2">
+                {/* Cabin */}
+                <div className="flex items-center justify-between py-0.5">
+                  <span className="text-slate-700 font-semibold text-[10px] leading-tight">Cabin (55cm)</span>
+                  <div className="flex items-center gap-1">
                     <button
                       type="button"
                       onClick={() => setHandCarryBags((p) => Math.max(0, p - 1))}
                       disabled={handCarryBags <= 0}
-                      aria-label="Decrease hand carry bags"
-                      className="w-5 h-5 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                      className="w-4 h-4 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
                     >
-                      <Minus className="w-2.5 h-2.5" />
+                      <Minus className="w-2 h-2" />
                     </button>
-                    <span className="w-3.5 text-center font-extrabold text-slate-900 text-[11px]">{handCarryBags}</span>
+                    <span className="w-3 text-center font-extrabold text-slate-900 text-[11px]">{handCarryBags}</span>
                     <button
                       type="button"
                       onClick={() => setHandCarryBags((p) => Math.min(8, p + 1))}
                       disabled={handCarryBags >= 8}
-                      aria-label="Increase hand carry bags"
-                      className="w-5 h-5 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                      className="w-4 h-4 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
                     >
-                      <Plus className="w-2.5 h-2.5" />
+                      <Plus className="w-2 h-2" />
                     </button>
                   </div>
                 </div>
 
-                {/* Shoulder bag / Backpack */}
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-slate-800 font-semibold block text-[11px] leading-tight">Shoulder / Backpack</span>
-                    <span className="text-[9px] text-slate-400 block">Personal item</span>
-                  </div>
-                  <div className="flex items-center gap-2">
+                {/* Backpack */}
+                <div className="flex items-center justify-between py-0.5">
+                  <span className="text-slate-700 font-semibold text-[10px] leading-tight">Backpack</span>
+                  <div className="flex items-center gap-1">
                     <button
                       type="button"
                       onClick={() => setShoulderBags((p) => Math.max(0, p - 1))}
                       disabled={shoulderBags <= 0}
-                      aria-label="Decrease shoulder bags"
-                      className="w-5 h-5 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                      className="w-4 h-4 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
                     >
-                      <Minus className="w-2.5 h-2.5" />
+                      <Minus className="w-2 h-2" />
                     </button>
-                    <span className="w-3.5 text-center font-extrabold text-slate-900 text-[11px]">{shoulderBags}</span>
+                    <span className="w-3 text-center font-extrabold text-slate-900 text-[11px]">{shoulderBags}</span>
                     <button
                       type="button"
                       onClick={() => setShoulderBags((p) => Math.min(8, p + 1))}
                       disabled={shoulderBags >= 8}
-                      aria-label="Increase shoulder bags"
-                      className="w-5 h-5 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                      className="w-4 h-4 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
+                    >
+                      <Plus className="w-2 h-2" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Box 3: Child Seats */}
+          <div className="bg-slate-50 border border-amber-400/60 hover:border-amber-400 rounded-xl p-2.5 flex flex-col justify-between shadow-xs transition-colors">
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1">
+                  <Baby className="w-3.5 h-3.5 text-slate-600" />
+                  <span>Child Seats</span>
+                </span>
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+                  Free
+                </span>
+              </div>
+
+              <div className="space-y-1 text-xs">
+                {/* Baby Seat */}
+                <div className="flex items-center justify-between py-0.5 border-b border-slate-200/70">
+                  <div>
+                    <span className="text-slate-800 font-semibold text-[11px] leading-tight block">Baby Seat (0–2y)</span>
+                    <span className="text-[9px] text-slate-400 block">Harness seat</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setBabySeats((p) => Math.max(0, p - 1))}
+                      disabled={babySeats <= 0}
+                      className="w-5 h-5 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
+                    >
+                      <Minus className="w-2.5 h-2.5" />
+                    </button>
+                    <span className="w-3.5 text-center font-extrabold text-slate-900 text-xs">{babySeats}</span>
+                    <button
+                      type="button"
+                      onClick={() => setBabySeats((p) => Math.min(3, p + 1))}
+                      disabled={totalChildSeats >= 4}
+                      className="w-5 h-5 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
+                    >
+                      <Plus className="w-2.5 h-2.5" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Booster Cushion */}
+                <div className="flex items-center justify-between py-0.5">
+                  <div>
+                    <span className="text-slate-800 font-semibold text-[11px] leading-tight block">Booster (3+y)</span>
+                    <span className="text-[9px] text-slate-400 block">High/low cushion</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setBoosterSeats((p) => Math.max(0, p - 1))}
+                      disabled={boosterSeats <= 0}
+                      className="w-5 h-5 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
+                    >
+                      <Minus className="w-2.5 h-2.5" />
+                    </button>
+                    <span className="w-3.5 text-center font-extrabold text-slate-900 text-xs">{boosterSeats}</span>
+                    <button
+                      type="button"
+                      onClick={() => setBoosterSeats((p) => Math.min(4, p + 1))}
+                      disabled={totalChildSeats >= 4}
+                      className="w-5 h-5 rounded bg-white border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
                     >
                       <Plus className="w-2.5 h-2.5" />
                     </button>
@@ -978,275 +1024,72 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Box 3: Child Seats by Age (Baby Seat 0-2y vs Booster 3+y) */}
-          <div className="bg-slate-50 border border-amber-400/60 hover:border-amber-400 rounded-xl p-3 flex flex-col justify-between shadow-xs transition-colors">
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                  <Baby className="w-3.5 h-3.5 text-slate-600" />
-                  <span>Child Seats</span>
-                </span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
-                  Free Included
-                </span>
-              </div>
-
-              {/* Baby Seat 0-2 yrs */}
-              <div className="p-2 bg-white rounded-lg border border-slate-200 mb-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-base">👶</span>
-                    <div>
-                      <span className="text-[11px] font-bold text-slate-900 block leading-tight">
-                        Baby Seat (0–2 yrs)
-                      </span>
-                      <span className="text-[9px] text-slate-500 block">Group 0+/1 with harness</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setBabySeats((p) => Math.max(0, p - 1))}
-                      disabled={babySeats <= 0}
-                      aria-label="Decrease baby seats"
-                      className="w-6 h-6 rounded-md bg-slate-100 border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-                    >
-                      <Minus className="w-3 h-3" />
-                    </button>
-                    <span className="w-4 text-center font-extrabold text-slate-900 text-xs">{babySeats}</span>
-                    <button
-                      type="button"
-                      onClick={() => setBabySeats((p) => Math.min(3, p + 1))}
-                      disabled={totalChildSeats >= 4}
-                      aria-label="Increase baby seats"
-                      className="w-6 h-6 rounded-md bg-slate-100 border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-                    >
-                      <Plus className="w-3 h-3" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Booster Seat 3+ yrs */}
-              <div className="p-2 bg-white rounded-lg border border-slate-200">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-base">🧒</span>
-                    <div>
-                      <span className="text-[11px] font-bold text-slate-900 block leading-tight">
-                        Booster Cushion (3+ yrs)
-                      </span>
-                      <span className="text-[9px] text-slate-500 block">Group 2/3 high/low booster</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setBoosterSeats((p) => Math.max(0, p - 1))}
-                      disabled={boosterSeats <= 0}
-                      aria-label="Decrease booster seats"
-                      className="w-6 h-6 rounded-md bg-slate-100 border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-                    >
-                      <Minus className="w-3 h-3" />
-                    </button>
-                    <span className="w-4 text-center font-extrabold text-slate-900 text-xs">{boosterSeats}</span>
-                    <button
-                      type="button"
-                      onClick={() => setBoosterSeats((p) => Math.min(4, p + 1))}
-                      disabled={totalChildSeats >= 4}
-                      aria-label="Increase booster seats"
-                      className="w-6 h-6 rounded-md bg-slate-100 border border-slate-300 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-                    >
-                      <Plus className="w-3 h-3" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <p className="text-[10px] text-slate-500 mt-2 italic flex items-center gap-1">
-              <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
-              <span>Spanish DGT law compliant. Free upon booking.</span>
+            <p className="text-[9px] text-slate-400 mt-1 italic flex items-center gap-1">
+              <CheckCircle2 className="w-2.5 h-2.5 text-emerald-600 shrink-0" />
+              <span>Spanish law compliant · Free</span>
             </p>
           </div>
         </div>
 
-        {/* Calculate & Route info banner */}
-        <div className="flex flex-wrap items-center justify-between gap-2 px-3.5 py-2.5 bg-amber-500/10 border-2 border-amber-400/80 rounded-xl text-xs text-slate-800 shadow-xs">
-          <div className="flex items-center gap-2">
-            {calculating ? (
-              <span className="flex items-center gap-1.5 text-teal-700 font-medium">
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                Calculating road distance...
-              </span>
-            ) : quote ? (
-              <span className="flex items-center gap-2 font-medium">
-                <span className="font-bold text-slate-900">
-                  ≈ {quote.distanceKm} km
-                </span>
-                <span className="text-slate-400">·</span>
-                <span className="text-slate-600">{quote.durationText} drive</span>
-                {quote.isFixedPopularRoute && (
-                  <>
-                    <span className="text-slate-400">·</span>
-                    <span className="text-emerald-700 font-semibold">
-                      Popular Fixed Route Fare
-                    </span>
-                  </>
-                )}
-              </span>
-            ) : (
-              <span className="text-slate-600 font-medium">
-                Select pickup & drop-off (search address or click Quick buttons)
-              </span>
-            )}
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={runRouteCalculation}
-              className="font-bold text-[#0e5c73] hover:underline cursor-pointer flex items-center gap-1"
-            >
-              <span>Recalculate</span>
-            </button>
-            <span className="text-slate-400">·</span>
-            <button
-              type="button"
-              onClick={() => setShowMap(!showMap)}
-              className="text-xs font-bold text-amber-950 bg-amber-200 hover:bg-amber-300 border border-amber-400 px-2 py-0.5 rounded-lg cursor-pointer flex items-center gap-1 shadow-xs transition-colors"
-            >
-              <span>{showMap ? 'Hide Map' : 'Preview Route Map'}</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Embedded Map Section */}
-        {showMap && (
-          <div className="rounded-xl overflow-hidden border-2 border-amber-400/80 bg-slate-50 p-2 space-y-2 shadow-md">
-            <iframe
-              src={googleMapsEmbedUrl}
-              title="Route map"
-              className="w-full h-56 rounded-lg border border-amber-400/40 shadow-inner"
-              loading="lazy"
-            />
-            <div className="flex items-center justify-between text-xs px-1">
-              <span className="text-slate-500 font-medium">Live navigation preview</span>
-              <a
-                href={googleMapsExternalUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#0e5c73] hover:underline font-bold flex items-center gap-1"
-              >
-                <span>Open in Google Maps App</span>
-                <ExternalLink className="w-3 h-3" />
-              </a>
-            </div>
-          </div>
-        )}
-
-        {/* Fixed Fare Guide Summary Box - Placed Above Choose Your Vehicle */}
-        <div className="pt-3 border-t border-slate-200 space-y-2">
-          {validationError && (
-            <div className="p-3 bg-rose-50 border border-rose-300 rounded-xl text-xs font-bold text-rose-700 flex items-center gap-2">
-              <span>⚠️ {validationError}</span>
-            </div>
-          )}
-
-          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 bg-gradient-to-r from-amber-50 to-white p-4 rounded-xl border-2 border-amber-400/80 shadow-xs ring-1 ring-amber-400/30">
-            <div>
-              <span className="text-xs uppercase tracking-wider font-bold text-amber-900 block">
-                {quote ? `Total Fixed Fare ${isRoundTrip ? '(Round Trip)' : '(One Way)'}` : 'Fixed Fare Guide'}
-              </span>
-              <div className="flex items-baseline gap-2 mt-0.5">
-                <span className="text-3xl font-extrabold text-slate-950 font-display">
-                  {quote ? `€${finalQuotedPrice}` : 'From €39'}
-                </span>
-                <span className="text-xs text-slate-600 font-medium">
-                  {quote
-                    ? `${activeVehicleData.name} · All tolls & parking included`
-                    : 'Select pickup & destination to calculate exact fare'}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-1.5 text-xs text-emerald-800 font-bold bg-emerald-100/70 border border-emerald-300 px-2.5 py-1 rounded-lg">
-              <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
-              <span>Zero cancellation fee up to 24h</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Vehicle Selection Cards */}
+        {/* Vehicles Selection: Sedan & Comfort in 1 line (2 folders) + Minivan big card underneath */}
         <div className="space-y-2 pt-1">
-          <div className="flex flex-wrap items-center justify-between gap-1.5">
-            <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-              Choose Your Vehicle Class
+          <div className="flex items-center justify-between text-xs">
+            <label className="font-bold text-slate-700 uppercase tracking-wider block text-[11px]">
+              Choose Vehicle Class
             </label>
             {totalPassengers >= 5 && (
-              <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
-                5+ passengers: 8-seater Minivan selected
+              <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                5+ passengers: Minivan selected
               </span>
             )}
-            {checkInSuitcases === 4 && totalPassengers <= 4 && (
-              <span className="text-[11px] font-semibold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md">
-                4 suitcases: Comfort Executive or Minivan required
-              </span>
-            )}
-            {checkInSuitcases >= 5 && (
-              <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
+            {checkInSuitcases >= 5 && totalPassengers < 5 && (
+              <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                 5+ suitcases: Minivan trunk required
               </span>
             )}
           </div>
 
-          <div
-            className={`grid gap-3 ${
-              availableVehicles.length === 1
-                ? 'grid-cols-1 max-w-sm mx-auto'
-                : availableVehicles.length === 2
-                ? 'grid-cols-1 sm:grid-cols-2 max-w-xl mx-auto'
-                : 'grid-cols-1 md:grid-cols-3'
-            }`}
-          >
-            {availableVehicles.map((v) => {
+          {/* Row 1: Sedan & Comfort Cars in 1 line (2 folders) */}
+          <div className="grid grid-cols-2 gap-2.5">
+            {/* Folder 1: Standard Sedan */}
+            {(() => {
+              const v = VEHICLES.find((item) => item.id === 'standard') || VEHICLES[0];
               const vQuote = quote?.vehicles.find((q) => q.vehicleId === v.id);
               const price = vQuote
                 ? isRoundTrip
                   ? vQuote.roundTripTotal
                   : vQuote.totalPrice
-                : v.id === 'standard' ? 39 : v.id === 'comfort' ? 47 : 59;
-              const isSelected = selectedVehicleId === v.id;
-              const isRec = vQuote?.isRecommended || availableVehicles.length === 1;
+                : 39;
+              const isSelected = selectedVehicleId === 'standard';
+              const isDisabled = totalPassengers > 4 || checkInSuitcases > 3;
 
               return (
                 <div
-                  key={v.id}
-                  onClick={() => setSelectedVehicleId(v.id)}
-                  className={`relative p-3.5 rounded-xl border-2 cursor-pointer transition-all ${
-                    isSelected
-                      ? 'border-amber-500 bg-amber-50/70 shadow-lg ring-2 ring-amber-400'
-                      : 'border-amber-400/60 hover:border-amber-400 bg-white hover:shadow-md'
+                  key="standard"
+                  onClick={() => {
+                    if (!isDisabled) setSelectedVehicleId('standard');
+                  }}
+                  className={`relative p-2.5 rounded-xl border-2 transition-all ${
+                    isDisabled
+                      ? 'opacity-40 cursor-not-allowed bg-slate-100 border-slate-200'
+                      : isSelected
+                      ? 'border-amber-500 bg-amber-50/80 shadow-md ring-2 ring-amber-400 cursor-pointer'
+                      : 'border-amber-400/60 hover:border-amber-400 bg-white hover:shadow-xs cursor-pointer'
                   }`}
                 >
-                  {isRec && (
-                    <span className="absolute -top-2.5 right-3 text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs border border-amber-500">
-                      Best Match
-                    </span>
-                  )}
-
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-display font-bold text-slate-900 text-sm">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-display font-bold text-slate-900 text-xs sm:text-sm truncate">
                       {v.name}
                     </span>
-                    <span className="font-extrabold text-base sm:text-lg text-slate-900">
-                      {quote ? `€${price}` : `from €${price}`}
-                    </span>
+                    {priceRevealed && (
+                      <span className="font-extrabold text-xs sm:text-sm text-slate-950 font-display shrink-0 ml-1">
+                        €{price}
+                      </span>
+                    )}
                   </div>
 
-                  <div className="w-full h-24 rounded-lg overflow-hidden bg-slate-100 mb-2.5 relative border border-amber-400/40">
+                  <div className="w-full h-16 sm:h-20 rounded-lg overflow-hidden bg-slate-100 mb-1.5 relative border border-amber-400/40">
                     <img
                       src={v.photos[0]}
                       alt={v.name}
@@ -1255,31 +1098,181 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                     />
                   </div>
 
-                  <div className="space-y-1 text-xs text-slate-600">
-                    <div className="flex items-center justify-between text-[11px]">
-                      <span>Max {v.maxPassengers} passengers</span>
-                      <span>·</span>
-                      <span>Max {v.maxLuggage} bags</span>
-                    </div>
+                  <div className="flex items-center justify-between text-[10px] text-slate-600 font-medium">
+                    <span>Max 4 Pax</span>
+                    <span>·</span>
+                    <span>Max 3 Bags</span>
                   </div>
                 </div>
               );
-            })}
+            })()}
+
+            {/* Folder 2: Comfort Executive */}
+            {(() => {
+              const v = VEHICLES.find((item) => item.id === 'comfort') || VEHICLES[1];
+              const vQuote = quote?.vehicles.find((q) => q.vehicleId === v.id);
+              const price = vQuote
+                ? isRoundTrip
+                  ? vQuote.roundTripTotal
+                  : vQuote.totalPrice
+                : 47;
+              const isSelected = selectedVehicleId === 'comfort';
+              const isDisabled = totalPassengers > 4 || checkInSuitcases > 4;
+
+              return (
+                <div
+                  key="comfort"
+                  onClick={() => {
+                    if (!isDisabled) setSelectedVehicleId('comfort');
+                  }}
+                  className={`relative p-2.5 rounded-xl border-2 transition-all ${
+                    isDisabled
+                      ? 'opacity-40 cursor-not-allowed bg-slate-100 border-slate-200'
+                      : isSelected
+                      ? 'border-amber-500 bg-amber-50/80 shadow-md ring-2 ring-amber-400 cursor-pointer'
+                      : 'border-amber-400/60 hover:border-amber-400 bg-white hover:shadow-xs cursor-pointer'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-display font-bold text-slate-900 text-xs sm:text-sm truncate">
+                      {v.name}
+                    </span>
+                    {priceRevealed && (
+                      <span className="font-extrabold text-xs sm:text-sm text-slate-950 font-display shrink-0 ml-1">
+                        €{price}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="w-full h-16 sm:h-20 rounded-lg overflow-hidden bg-slate-100 mb-1.5 relative border border-amber-400/40">
+                    <img
+                      src={v.photos[0]}
+                      alt={v.name}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between text-[10px] text-slate-600 font-medium">
+                    <span>Max 4 Pax</span>
+                    <span>·</span>
+                    <span>Max 4 Bags</span>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
+
+          {/* Row 2: Minivan - Un k niche minivan wese hi aae bari (Full-width wide card) */}
+          {(() => {
+            const v = VEHICLES.find((item) => item.id === 'minivan') || VEHICLES[2];
+            const vQuote = quote?.vehicles.find((q) => q.vehicleId === v.id);
+            const price = vQuote
+              ? isRoundTrip
+                ? vQuote.roundTripTotal
+                : vQuote.totalPrice
+              : 59;
+            const isSelected = selectedVehicleId === 'minivan';
+            const isRecommended = totalPassengers >= 5 || checkInSuitcases >= 5;
+
+            return (
+              <div
+                key="minivan"
+                onClick={() => setSelectedVehicleId('minivan')}
+                className={`relative p-3 rounded-xl border-2 cursor-pointer transition-all ${
+                  isSelected
+                    ? 'border-amber-500 bg-amber-50/80 shadow-md ring-2 ring-amber-400'
+                    : 'border-amber-400/60 hover:border-amber-400 bg-white hover:shadow-xs'
+                }`}
+              >
+                {isRecommended && (
+                  <span className="absolute -top-2 right-3 text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs border border-amber-500">
+                    Recommended for your group
+                  </span>
+                )}
+
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                  <div className="w-full sm:w-40 h-20 sm:h-22 rounded-lg overflow-hidden bg-slate-100 relative border border-amber-400/40 shrink-0">
+                    <img
+                      src={v.photos[0]}
+                      alt={v.name}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-display font-extrabold text-slate-900 text-sm sm:text-base">
+                        {v.name} (8-Seater Van)
+                      </span>
+                      {priceRevealed && (
+                        <span className="font-extrabold text-sm sm:text-base text-slate-950 font-display shrink-0 ml-2">
+                          €{price}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-slate-600 mb-1.5 leading-snug">
+                      Spacious luxury van for families, groups, ski gear, cruise port luggage & child seats.
+                    </p>
+                    <div className="flex items-center gap-3 text-[10px] text-slate-700 font-semibold flex-wrap">
+                      <span className="bg-slate-100 px-2 py-0.5 rounded">Max 8 Passengers</span>
+                      <span>·</span>
+                      <span className="bg-slate-100 px-2 py-0.5 rounded">Max 8 Large Bags</span>
+                      <span>·</span>
+                      <span className="text-emerald-700 font-bold">Huge Trunk & Extra Legroom</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
         </div>
 
-        {/* Booking Actions */}
-        <div className="pt-3 border-t border-slate-200 space-y-3">
+        {/* Booking Action Buttons - DIRECTLY BELOW VEHICLE & CHILD SEATS */}
+        <div className="pt-2 border-t border-slate-200 space-y-2.5">
+          {validationError && (
+            <div className="p-2.5 bg-rose-50 border border-rose-300 rounded-xl text-xs font-bold text-rose-700 flex items-center gap-2">
+              <span>⚠️ {validationError}</span>
+            </div>
+          )}
+
+          {/* Price Revealed Highlight Card (Appears as soon as client clicks booking button) */}
+          {priceRevealed && (
+            <div className="p-3 bg-gradient-to-r from-amber-50 to-white border-2 border-amber-400/90 rounded-xl shadow-xs flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <span className="text-[11px] font-bold text-amber-900 uppercase tracking-wider block">
+                  Guaranteed Fixed Fare ({isRoundTrip ? 'Round Trip' : 'One Way'})
+                </span>
+                <div className="flex items-baseline gap-2 mt-0.5">
+                  <span className="text-2xl sm:text-3xl font-extrabold text-slate-950 font-display">
+                    €{finalQuotedPrice}
+                  </span>
+                  <span className="text-xs text-slate-600 font-medium">
+                    {activeVehicleData.name} · All highway tolls & parking included
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5 text-xs text-emerald-800 font-bold bg-emerald-100/70 border border-emerald-300 px-2.5 py-1 rounded-lg">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>Zero Cancellation Fee up to 24h</span>
+              </div>
+            </div>
+          )}
 
           {/* Action Buttons */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <button
               type="button"
               onClick={handleBookWhatsApp}
-              className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl bg-[#f5b301] hover:bg-[#e5a700] text-slate-950 font-extrabold text-sm sm:text-base shadow-md transition-all active:scale-[0.98] cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl bg-[#f5b301] hover:bg-[#e5a700] text-slate-950 font-extrabold text-sm sm:text-base shadow-md transition-all active:scale-[0.98] cursor-pointer border border-amber-500"
             >
               <MessageCircle className="w-5 h-5 fill-slate-950" />
-              <span>{t.bookWhatsApp}</span>
+              <span>
+                {priceRevealed
+                  ? `Book on WhatsApp (€${finalQuotedPrice})`
+                  : 'Book on WhatsApp (Click to see Price & Reserve)'}
+              </span>
             </button>
 
             <button
@@ -1292,16 +1285,17 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
             </button>
           </div>
 
-          <p className="text-[11px] text-center text-slate-500">
-            Need special group assistance or multiple vehicles? Call Mr. Mir at{' '}
-            <a href={`tel:${BUSINESS_INFO.phoneDisplay}`} className="font-bold text-[#0e5c73] underline">
-              {BUSINESS_INFO.phoneDisplay}
-            </a>
+          <p className="text-[10px] text-center text-slate-500 flex items-center justify-center gap-2 flex-wrap">
+            <span>✓ Fixed Price Guarantee</span>
+            <span>·</span>
+            <span>✓ Pay Cash or Card to Chauffeur</span>
+            <span>·</span>
+            <span>✓ Free Cancellation up to 24h</span>
           </p>
         </div>
       </div>
 
-      {/* 1-Click Luggage Size Chart Modal */}
+            {/* 1-Click Luggage Size Chart Modal */}
       {showSizeChart && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/70 backdrop-blur-xs"
