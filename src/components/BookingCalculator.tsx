@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   MapPin,
-  ArrowRightLeft,
   Calendar,
   Clock,
   Users,
@@ -22,6 +21,8 @@ import {
   X,
   Info,
   ArrowRight,
+  ArrowLeft,
+  Sparkles,
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';
@@ -73,13 +74,13 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
   const [passengerName, setPassengerName] = useState('');
 
   // Detailed Passenger State
-  const [adults, setAdults] = useState(0);
+  const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
   const [childAgeGroup, setChildAgeGroup] = useState<'0-2' | '3-6' | '7-11'>('3-6');
 
   // Detailed Luggage State
-  const [largeBags, setLargeBags] = useState(0); // XXL / Large (75-80cm)
-  const [mediumBags, setMediumBags] = useState(0); // Medium (65cm)
+  const [largeBags, setLargeBags] = useState(1); // XXL / Large (75-80cm)
+  const [mediumBags, setMediumBags] = useState(1); // Medium (65cm)
   const [handCarryBags, setHandCarryBags] = useState(0); // Small / Cabin (55cm)
   const [shoulderBags, setShoulderBags] = useState(0); // Backpack / Shoulder bag
   const [showLuggageDetails, setShowLuggageDetails] = useState(false);
@@ -94,6 +95,9 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
   const checkInSuitcases = largeBags + mediumBags;
   const totalBags = checkInSuitcases + handCarryBags + shoulderBags;
   const totalChildSeats = babySeats + boosterSeats;
+
+  // Booking flow step: 'calculator' (initial) or 'booking' (vehicle selection & confirmation page)
+  const [currentStep, setCurrentStep] = useState<'calculator' | 'booking'>('calculator');
 
   // Selected Vehicle
   const [selectedVehicleId, setSelectedVehicleId] = useState<string>('standard');
@@ -110,6 +114,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
   const [calculating, setCalculating] = useState(false);
   const [quote, setQuote] = useState<QuoteResult | null>(null);
   const [priceRevealed, setPriceRevealed] = useState(false);
+
   // Airport terminal toggles & matchers for Pickup & Dropoff
   const [showPickupAirportTerminals, setShowPickupAirportTerminals] = useState(false);
   const [showDropoffAirportTerminals, setShowDropoffAirportTerminals] = useState(false);
@@ -488,51 +493,78 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
       className="bg-white rounded-2xl shadow-2xl border-2 border-amber-400/80 overflow-hidden transition-all text-slate-900 ring-1 ring-amber-400/30"
     >
       {/* Calculator Header Bar */}
-      <div className="bg-[#0e2438] text-white px-4 sm:px-6 py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 border-b-2 border-amber-400/70">
-        <div className="flex items-center gap-2">
-          <h2 className="flex items-center gap-2 m-0">
-            <span className="text-[13px] sm:text-sm font-bold font-display">{t.calcTitle}</span>
-            <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-amber-400 text-slate-950">
-              Fixed Rates
+      {currentStep === 'booking' ? (
+        <div className="bg-[#0e2438] text-white px-4 sm:px-6 py-3.5 flex items-center justify-between gap-2.5 border-b-2 border-amber-400">
+          <button
+            type="button"
+            onClick={() => {
+              setCurrentStep('calculator');
+              const el = document.getElementById('calculator');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="flex items-center gap-2 text-xs sm:text-sm font-bold text-amber-400 hover:text-amber-300 bg-white/10 hover:bg-white/15 px-3 py-1.5 rounded-lg transition-all cursor-pointer border border-amber-400/40"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Modify Route / Back</span>
+          </button>
+
+          <div className="text-right">
+            <span className="text-[10px] sm:text-xs uppercase font-extrabold text-amber-400 tracking-wider block">
+              Step 2 of 2
             </span>
-          </h2>
+            <span className="text-xs sm:text-sm font-bold text-slate-200">
+              Select Vehicle & Confirm
+            </span>
+          </div>
         </div>
+      ) : (
+        <div className="bg-[#0e2438] text-white px-4 sm:px-6 py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 border-b-2 border-amber-400/70">
+          <div className="flex items-center gap-2">
+            <h2 className="flex items-center gap-2 m-0">
+              <span className="text-[13px] sm:text-sm font-bold font-display">{t.calcTitle}</span>
+              <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-amber-400 text-slate-950">
+                Fixed Rates
+              </span>
+            </h2>
+          </div>
 
-        {/* Trip Mode Switch with 1-line compact "Private transfers from Barcelona to anywhere in Spain" above it */}
-        <div className="flex flex-col sm:items-end gap-1">
-          <span className="text-[11px] sm:text-xs font-semibold text-amber-300 whitespace-nowrap tracking-tight">
-            Private transfers from Barcelona to anywhere in Spain
-          </span>
-          <div className="flex items-center gap-1 bg-[#112331] p-1 rounded-lg border-2 border-amber-400/70 text-xs font-semibold self-start sm:self-end">
-          <button
-            type="button"
-            onClick={() => setIsRoundTrip(false)}
-            className={`px-3 py-1.5 rounded-md transition-all cursor-pointer ${
-              !isRoundTrip
-                ? 'bg-amber-400 text-slate-950 shadow-sm font-bold'
-                : 'text-slate-300 hover:text-white'
-            }`}
-          >
-            One Way
-          </button>
-          <button
-            type="button"
-            onClick={() => setIsRoundTrip(true)}
-            className={`px-3 py-1.5 rounded-md transition-all cursor-pointer ${
-              isRoundTrip
-                ? 'bg-amber-400 text-slate-950 shadow-sm font-bold'
-                : 'text-slate-300 hover:text-white'
-            }`}
-          >
-            Round Trip (-5%)
-          </button>
+          {/* Trip Mode Switch with 1-line compact "Private transfers from Barcelona to anywhere in Spain" above it */}
+          <div className="flex flex-col sm:items-end gap-1">
+            <span className="text-[11px] sm:text-xs font-semibold text-amber-300 whitespace-nowrap tracking-tight">
+              Private transfers from Barcelona to anywhere in Spain
+            </span>
+            <div className="flex items-center gap-1 bg-[#112331] p-1 rounded-lg border-2 border-amber-400/70 text-xs font-semibold self-start sm:self-end">
+              <button
+                type="button"
+                onClick={() => setIsRoundTrip(false)}
+                className={`px-3 py-1.5 rounded-md transition-all cursor-pointer ${
+                  !isRoundTrip
+                    ? 'bg-amber-400 text-slate-950 shadow-sm font-bold'
+                    : 'text-slate-300 hover:text-white'
+                }`}
+              >
+                One Way
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsRoundTrip(true)}
+                className={`px-3 py-1.5 rounded-md transition-all cursor-pointer ${
+                  isRoundTrip
+                    ? 'bg-amber-400 text-slate-950 shadow-sm font-bold'
+                    : 'text-slate-300 hover:text-white'
+                }`}
+              >
+                Round Trip (-5%)
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+      )}
 
-      <div className="p-5 sm:p-7 space-y-5">
+      {currentStep === 'calculator' ? (
+        <div className="p-4 sm:p-6 space-y-4">
         {/* Step 1: Pickup and Drop-off with Quick Chips */}
-        <div className="space-y-4">
+        <div className="space-y-2.5">
           {/* Pickup Input */}
           <div className="relative">
             <div className="flex items-center justify-between mb-1.5">
@@ -577,64 +609,76 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
               )}
             </div>
 
-            {/* Quick Pick Chips for Pickup */}
-            <div className="flex items-center gap-1.5 flex-wrap mt-2">
-              <span className="text-[11px] font-bold text-slate-600 mr-1">Quick:</span>
-
-              {/* Unified Airport Button */}
-              <div className="inline-flex items-center gap-1">
-                <button
-                  type="button"
-                  onClick={() => setShowPickupAirportTerminals((prev) => !prev)}
-                  className={`text-[11px] px-2.5 py-1 rounded-lg border font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
-                    isPickupAirport
-                      ? 'bg-amber-400 border-2 border-amber-500 text-slate-950 font-bold shadow-xs'
-                      : 'bg-white hover:bg-amber-50 text-slate-800 border border-amber-400/60 hover:border-amber-400 shadow-xs'
-                  }`}
-                  title="Click to select Airport Terminal 1 or Terminal 2"
-                >
-                  <Plane className="w-3.5 h-3.5 text-slate-900" />
-                  <span>Airport</span>
-                </button>
-
-                {/* Sub-options for Terminal 1 and Terminal 2 */}
-                {(showPickupAirportTerminals || isPickupAirport) && (
-                  <div className="inline-flex items-center p-0.5 bg-amber-50 border-2 border-amber-400 rounded-lg gap-1 shadow-xs">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const loc = QUICK_LOCATIONS.find((l) => l.id === 'bcn_t1');
-                        if (loc) applyQuickLocation(loc, 'pickup');
-                        setShowPickupAirportTerminals(true);
-                      }}
-                      className={`text-[11px] px-2.5 py-0.5 rounded-md font-bold transition-all cursor-pointer ${
-                        isPickupAirportT1
-                          ? 'bg-amber-400 text-slate-950 shadow-xs border border-amber-500'
-                          : 'text-slate-700 hover:bg-amber-200/70 hover:text-slate-950 border border-transparent'
-                      }`}
-                    >
-                      Terminal 1
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const loc = QUICK_LOCATIONS.find((l) => l.id === 'bcn_t2');
-                        if (loc) applyQuickLocation(loc, 'pickup');
-                        setShowPickupAirportTerminals(true);
-                      }}
-                      className={`text-[11px] px-2.5 py-0.5 rounded-md font-bold transition-all cursor-pointer ${
-                        isPickupAirportT2
-                          ? 'bg-amber-400 text-slate-950 shadow-xs border border-amber-500'
-                          : 'text-slate-700 hover:bg-amber-200/70 hover:text-slate-950 border border-transparent'
-                      }`}
-                    >
-                      Terminal 2
-                    </button>
-                  </div>
-                )}
+            {/* Terminal Selector Bar above Quick Chips */}
+            {showPickupAirportTerminals && (
+              <div className="mt-2 p-1.5 bg-amber-50 border-2 border-amber-400 rounded-xl flex items-center justify-between gap-1.5 shadow-xs animate-fadeIn">
+                <span className="text-[11px] font-bold text-slate-800 flex items-center gap-1 pl-1 shrink-0">
+                  <Plane className="w-3.5 h-3.5 text-amber-600" />
+                  <span>Terminal:</span>
+                </span>
+                <div className="flex items-center gap-1.5 flex-1 justify-end">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const loc = QUICK_LOCATIONS.find((l) => l.id === 'bcn_t1');
+                      if (loc) applyQuickLocation(loc, 'pickup');
+                      setShowPickupAirportTerminals(false);
+                    }}
+                    className={`text-[11px] px-3 py-1 rounded-lg font-bold border-2 transition-all cursor-pointer flex items-center gap-1 ${
+                      isPickupAirportT1
+                        ? 'bg-amber-400 border-amber-500 text-slate-950 shadow-xs'
+                        : 'bg-white border-amber-300 hover:bg-amber-100 text-slate-800'
+                    }`}
+                  >
+                    <span>Terminal 1</span>
+                    {isPickupAirportT1 && <span className="text-[10px]">✓</span>}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const loc = QUICK_LOCATIONS.find((l) => l.id === 'bcn_t2');
+                      if (loc) applyQuickLocation(loc, 'pickup');
+                      setShowPickupAirportTerminals(false);
+                    }}
+                    className={`text-[11px] px-3 py-1 rounded-lg font-bold border-2 transition-all cursor-pointer flex items-center gap-1 ${
+                      isPickupAirportT2
+                        ? 'bg-amber-400 border-amber-500 text-slate-950 shadow-xs'
+                        : 'bg-white border-amber-300 hover:bg-amber-100 text-slate-800'
+                    }`}
+                  >
+                    <span>Terminal 2</span>
+                    {isPickupAirportT2 && <span className="text-[10px]">✓</span>}
+                  </button>
+                </div>
               </div>
+            )}
 
-              {/* Other Quick Locations */}
+            {/* Quick Pick Chips for Pickup - 1 Single Row */}
+            <div className="flex items-center gap-1.5 flex-nowrap sm:flex-wrap mt-2 overflow-x-auto pb-0.5 scrollbar-none">
+              <span className="text-[11px] font-bold text-slate-600 mr-1 shrink-0">Quick:</span>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setShowPickupAirportTerminals((prev) => !prev);
+                  if (!isPickupAirport) {
+                    const loc = QUICK_LOCATIONS.find((l) => l.id === 'bcn_t1');
+                    if (loc) applyQuickLocation(loc, 'pickup');
+                  }
+                }}
+                className={`text-[11px] px-2.5 py-1 rounded-lg border font-semibold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                  isPickupAirport
+                    ? 'bg-amber-400 border-2 border-amber-500 text-slate-950 font-bold shadow-xs'
+                    : 'bg-white hover:bg-amber-50 text-slate-800 border border-amber-400/60 hover:border-amber-400 shadow-xs'
+                }`}
+                title="Click to select Airport Terminal 1 or Terminal 2"
+              >
+                <Plane className="w-3.5 h-3.5 text-slate-900" />
+                <span>{isPickupAirportT1 ? 'Airport (T1)' : isPickupAirportT2 ? 'Airport (T2)' : 'Airport'}</span>
+                <ChevronDown className={`w-3 h-3 text-slate-700 transition-transform ${showPickupAirportTerminals ? 'rotate-180' : ''}`} />
+              </button>
+
+              {/* Other Quick Locations (Cruise Port & Sants Station on same 1 row) */}
               {otherQuickLocations.map((loc) => (
                 <button
                   key={loc.id}
@@ -643,7 +687,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                     applyQuickLocation(loc, 'pickup');
                     setShowPickupAirportTerminals(false);
                   }}
-                  className={`text-[11px] px-2.5 py-1 rounded-lg border font-semibold transition-all cursor-pointer ${
+                  className={`text-[11px] px-2.5 py-1 rounded-lg border font-semibold transition-all cursor-pointer shrink-0 ${
                     pickup.toLowerCase().includes(loc.shortLabel.toLowerCase())
                       ? 'bg-amber-400 border-2 border-amber-500 text-slate-950 font-bold shadow-xs'
                       : 'bg-white hover:bg-amber-50 text-slate-800 border border-amber-400/60 hover:border-amber-400 shadow-xs'
@@ -653,19 +697,6 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 </button>
               ))}
             </div>
-          </div>
-
-          {/* Swap Button Divider */}
-          <div className="flex items-center justify-center -my-1">
-            <button
-              type="button"
-              onClick={handleSwap}
-              className="p-1.5 rounded-full bg-white hover:bg-amber-100 hover:text-amber-700 text-slate-700 border-2 border-amber-400/70 transition-transform active:rotate-180 shadow-xs cursor-pointer"
-              title="Swap pickup and drop-off"
-              aria-label="Swap pickup and drop-off"
-            >
-              <ArrowRightLeft className="w-3.5 h-3.5 text-amber-600" />
-            </button>
           </div>
 
           {/* Drop-off Input */}
@@ -712,64 +743,76 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
               )}
             </div>
 
-            {/* Quick Pick Chips for Drop-off */}
-            <div className="flex items-center gap-1.5 flex-wrap mt-2">
-              <span className="text-[11px] font-bold text-slate-600 mr-1">Quick:</span>
-
-              {/* Unified Airport Button */}
-              <div className="inline-flex items-center gap-1">
-                <button
-                  type="button"
-                  onClick={() => setShowDropoffAirportTerminals((prev) => !prev)}
-                  className={`text-[11px] px-2.5 py-1 rounded-lg border font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
-                    isDropoffAirport
-                      ? 'bg-amber-400 border-2 border-amber-500 text-slate-950 font-bold shadow-xs'
-                      : 'bg-white hover:bg-amber-50 text-slate-800 border border-amber-400/60 hover:border-amber-400 shadow-xs'
-                  }`}
-                  title="Click to select Airport Terminal 1 or Terminal 2"
-                >
-                  <Plane className="w-3.5 h-3.5 text-slate-900" />
-                  <span>Airport</span>
-                </button>
-
-                {/* Sub-options for Terminal 1 and Terminal 2 */}
-                {(showDropoffAirportTerminals || isDropoffAirport) && (
-                  <div className="inline-flex items-center p-0.5 bg-amber-50 border-2 border-amber-400 rounded-lg gap-1 shadow-xs">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const loc = QUICK_LOCATIONS.find((l) => l.id === 'bcn_t1');
-                        if (loc) applyQuickLocation(loc, 'dropoff');
-                        setShowDropoffAirportTerminals(true);
-                      }}
-                      className={`text-[11px] px-2.5 py-0.5 rounded-md font-bold transition-all cursor-pointer ${
-                        isDropoffAirportT1
-                          ? 'bg-amber-400 text-slate-950 shadow-xs border border-amber-500'
-                          : 'text-slate-700 hover:bg-amber-200/70 hover:text-slate-950 border border-transparent'
-                      }`}
-                    >
-                      Terminal 1
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const loc = QUICK_LOCATIONS.find((l) => l.id === 'bcn_t2');
-                        if (loc) applyQuickLocation(loc, 'dropoff');
-                        setShowDropoffAirportTerminals(true);
-                      }}
-                      className={`text-[11px] px-2.5 py-0.5 rounded-md font-bold transition-all cursor-pointer ${
-                        isDropoffAirportT2
-                          ? 'bg-amber-400 text-slate-950 shadow-xs border border-amber-500'
-                          : 'text-slate-700 hover:bg-amber-200/70 hover:text-slate-950 border border-transparent'
-                      }`}
-                    >
-                      Terminal 2
-                    </button>
-                  </div>
-                )}
+            {/* Terminal Selector Bar above Quick Chips */}
+            {showDropoffAirportTerminals && (
+              <div className="mt-2 p-1.5 bg-amber-50 border-2 border-amber-400 rounded-xl flex items-center justify-between gap-1.5 shadow-xs animate-fadeIn">
+                <span className="text-[11px] font-bold text-slate-800 flex items-center gap-1 pl-1 shrink-0">
+                  <Plane className="w-3.5 h-3.5 text-amber-600" />
+                  <span>Terminal:</span>
+                </span>
+                <div className="flex items-center gap-1.5 flex-1 justify-end">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const loc = QUICK_LOCATIONS.find((l) => l.id === 'bcn_t1');
+                      if (loc) applyQuickLocation(loc, 'dropoff');
+                      setShowDropoffAirportTerminals(false);
+                    }}
+                    className={`text-[11px] px-3 py-1 rounded-lg font-bold border-2 transition-all cursor-pointer flex items-center gap-1 ${
+                      isDropoffAirportT1
+                        ? 'bg-amber-400 border-amber-500 text-slate-950 shadow-xs'
+                        : 'bg-white border-amber-300 hover:bg-amber-100 text-slate-800'
+                    }`}
+                  >
+                    <span>Terminal 1</span>
+                    {isDropoffAirportT1 && <span className="text-[10px]">✓</span>}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const loc = QUICK_LOCATIONS.find((l) => l.id === 'bcn_t2');
+                      if (loc) applyQuickLocation(loc, 'dropoff');
+                      setShowDropoffAirportTerminals(false);
+                    }}
+                    className={`text-[11px] px-3 py-1 rounded-lg font-bold border-2 transition-all cursor-pointer flex items-center gap-1 ${
+                      isDropoffAirportT2
+                        ? 'bg-amber-400 border-amber-500 text-slate-950 shadow-xs'
+                        : 'bg-white border-amber-300 hover:bg-amber-100 text-slate-800'
+                    }`}
+                  >
+                    <span>Terminal 2</span>
+                    {isDropoffAirportT2 && <span className="text-[10px]">✓</span>}
+                  </button>
+                </div>
               </div>
+            )}
 
-              {/* Other Quick Locations (Sirf Cruise Port & Sants Station) */}
+            {/* Quick Pick Chips for Drop-off - 1 Single Row */}
+            <div className="flex items-center gap-1.5 flex-nowrap sm:flex-wrap mt-2 overflow-x-auto pb-0.5 scrollbar-none">
+              <span className="text-[11px] font-bold text-slate-600 mr-1 shrink-0">Quick:</span>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setShowDropoffAirportTerminals((prev) => !prev);
+                  if (!isDropoffAirport) {
+                    const loc = QUICK_LOCATIONS.find((l) => l.id === 'bcn_t1');
+                    if (loc) applyQuickLocation(loc, 'dropoff');
+                  }
+                }}
+                className={`text-[11px] px-2.5 py-1 rounded-lg border font-semibold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                  isDropoffAirport
+                    ? 'bg-amber-400 border-2 border-amber-500 text-slate-950 font-bold shadow-xs'
+                    : 'bg-white hover:bg-amber-50 text-slate-800 border border-amber-400/60 hover:border-amber-400 shadow-xs'
+                }`}
+                title="Click to select Airport Terminal 1 or Terminal 2"
+              >
+                <Plane className="w-3.5 h-3.5 text-slate-900" />
+                <span>{isDropoffAirportT1 ? 'Airport (T1)' : isDropoffAirportT2 ? 'Airport (T2)' : 'Airport'}</span>
+                <ChevronDown className={`w-3 h-3 text-slate-700 transition-transform ${showDropoffAirportTerminals ? 'rotate-180' : ''}`} />
+              </button>
+
+              {/* Other Quick Locations (Cruise Port & Sants Station on same 1 row) */}
               {otherQuickLocations.map((loc) => (
                 <button
                   key={loc.id}
@@ -778,7 +821,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                     applyQuickLocation(loc, 'dropoff');
                     setShowDropoffAirportTerminals(false);
                   }}
-                  className={`text-[11px] px-2.5 py-1 rounded-lg border font-semibold transition-all cursor-pointer ${
+                  className={`text-[11px] px-2.5 py-1 rounded-lg border font-semibold transition-all cursor-pointer shrink-0 ${
                     dropoff.toLowerCase().includes(loc.shortLabel.toLowerCase())
                       ? 'bg-amber-400 border-2 border-amber-500 text-slate-950 font-bold shadow-xs'
                       : 'bg-white hover:bg-amber-50 text-slate-800 border border-amber-400/60 hover:border-amber-400 shadow-xs'
@@ -791,63 +834,66 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
           </div>
         </div>
 
-        {/* Date, Time, Flight & Sign Info */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2 border-t border-slate-200">
-          <div>
-            <label className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 mb-1.5">
-              <Calendar className="w-3.5 h-3.5 text-amber-500" />
-              <span>{t.dateTimeLabel}</span>
-            </label>
-            <input
-              type="datetime-local"
-              value={dateTime}
-              onChange={(e) => setDateTime(e.target.value)}
-              className="w-full px-3 py-2 text-sm bg-slate-50 hover:bg-white focus:bg-white border-2 border-amber-400/70 focus:border-amber-400 rounded-xl focus:ring-2 focus:ring-amber-400/40 outline-none shadow-xs transition-all"
-            />
-          </div>
-
-          {isRoundTrip ? (
+        {/* Date, Time & Flight Info - 1 Single Row (2 Boxes side by side) */}
+        <div className="pt-2 border-t border-slate-200">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            {/* Box 1: Pickup Date & Time */}
             <div>
-              <label className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 mb-1.5">
-                <Clock className="w-3.5 h-3.5 text-amber-600" />
-                <span>{t.returnDateLabel}</span>
+              <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 mb-1">
+                <Calendar className="w-3.5 h-3.5 text-amber-500" />
+                <span>Pickup Date & Time</span>
               </label>
               <input
                 type="datetime-local"
-                value={returnDateTime}
-                onChange={(e) => setReturnDateTime(e.target.value)}
-                className="w-full px-3 py-2 text-sm bg-slate-50 hover:bg-white focus:bg-white border-2 border-amber-400/70 focus:border-amber-400 rounded-xl focus:ring-2 focus:ring-amber-400/40 outline-none shadow-xs transition-all"
+                value={dateTime}
+                onChange={(e) => setDateTime(e.target.value)}
+                className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 hover:bg-white focus:bg-white border-2 border-amber-400/70 focus:border-amber-400 rounded-xl focus:ring-2 focus:ring-amber-400/40 outline-none shadow-xs transition-all font-medium"
               />
             </div>
-          ) : (
-            <div>
-              <label className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 mb-1.5">
-                <Plane className="w-3.5 h-3.5 text-amber-500" />
-                <span>{t.flightLabel}</span>
-              </label>
+
+            {/* Box 2: Flight Number (or Return Date & Time if Round Trip) */}
+            {isRoundTrip ? (
+              <div>
+                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 mb-1">
+                  <Clock className="w-3.5 h-3.5 text-amber-600" />
+                  <span>Return Date & Time</span>
+                </label>
+                <input
+                  type="datetime-local"
+                  value={returnDateTime}
+                  onChange={(e) => setReturnDateTime(e.target.value)}
+                  className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 hover:bg-white focus:bg-white border-2 border-amber-400/70 focus:border-amber-400 rounded-xl focus:ring-2 focus:ring-amber-400/40 outline-none shadow-xs transition-all font-medium"
+                />
+              </div>
+            ) : (
+              <div>
+                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 mb-1">
+                  <Plane className="w-3.5 h-3.5 text-amber-500" />
+                  <span>Flight Number (Optional)</span>
+                </label>
+                <input
+                  type="text"
+                  value={flightNumber}
+                  onChange={(e) => setFlightNumber(e.target.value.toUpperCase())}
+                  placeholder="e.g. VY6204, BA478"
+                  className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 hover:bg-white focus:bg-white border-2 border-amber-400/70 focus:border-amber-400 rounded-xl focus:ring-2 focus:ring-amber-400/40 outline-none shadow-xs transition-all font-medium"
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Optional flight number if round trip */}
+          {isRoundTrip && (
+            <div className="mt-2">
               <input
                 type="text"
                 value={flightNumber}
                 onChange={(e) => setFlightNumber(e.target.value.toUpperCase())}
-                placeholder={t.flightPlaceholder}
-                className="w-full px-3 py-2 text-sm bg-slate-50 hover:bg-white focus:bg-white border-2 border-amber-400/70 focus:border-amber-400 rounded-xl focus:ring-2 focus:ring-amber-400/40 outline-none shadow-xs transition-all"
+                placeholder="Flight Number (Optional, e.g. VY6204)"
+                className="w-full px-3 py-1.5 text-xs bg-slate-50 hover:bg-white focus:bg-white border border-amber-400/60 rounded-lg outline-none shadow-xs"
               />
             </div>
           )}
-
-          <div className="sm:col-span-2">
-            <label className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 mb-1.5">
-              <User className="w-3.5 h-3.5 text-amber-500" />
-              <span>Greeting Signboard Name</span>
-            </label>
-            <input
-              type="text"
-              value={passengerName}
-              onChange={(e) => setPassengerName(e.target.value)}
-              placeholder="Driver holds sign with this name at arrivals (e.g. John Smith)"
-              className="w-full px-3 py-2 text-sm bg-slate-50 hover:bg-white focus:bg-white border-2 border-amber-400/70 focus:border-amber-400 rounded-xl focus:ring-2 focus:ring-amber-400/40 outline-none shadow-xs transition-all"
-            />
-          </div>
         </div>
 
         {/* Merged Option Button: Passengers + Luggage + Child Seat */}
@@ -861,25 +907,20 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 : 'bg-slate-50 hover:bg-amber-50/60 border-amber-400/70 hover:border-amber-400'
             }`}
           >
-            <div className="flex items-center gap-2.5 text-left min-w-0">
-              <div className="w-8 h-8 rounded-lg bg-amber-400/20 border border-amber-500/40 flex items-center justify-center shrink-0 text-amber-700">
-                <Users className="w-4 h-4" />
+            <div className="text-left min-w-0 pr-2">
+              <div className="text-xs sm:text-sm font-bold text-slate-900 tracking-tight">
+                Passengers + Luggage + Child Seat
               </div>
-              <div className="truncate">
-                <div className="text-xs sm:text-sm font-bold text-slate-900 tracking-tight flex items-center gap-1.5 flex-wrap">
-                  <span>Passengers + Luggage + Child Seat</span>
-                </div>
-                <div className="text-[11px] font-semibold text-slate-600 flex items-center gap-1.5 mt-0.5 truncate">
-                  <span className="text-slate-950 font-bold bg-amber-100 px-1.5 py-0.2 rounded border border-amber-300">
-                    {totalPassengers} Pax
-                  </span>
-                  <span>•</span>
-                  <span className="text-slate-800 font-semibold">{totalBags} Luggage</span>
-                  <span>•</span>
-                  <span className="text-emerald-700 font-bold">
-                    {totalChildSeats > 0 ? `${totalChildSeats} Child Seats` : 'Free Child Seat'}
-                  </span>
-                </div>
+              <div className="text-[11px] font-semibold text-slate-600 flex items-center gap-1.5 mt-0.5 truncate">
+                <span className="text-slate-950 font-bold bg-amber-100 px-1.5 py-0.2 rounded border border-amber-300">
+                  {totalPassengers} Pax
+                </span>
+                <span>•</span>
+                <span className="text-slate-800 font-semibold">{totalBags} Luggage</span>
+                <span>•</span>
+                <span className="text-emerald-700 font-bold">
+                  {totalChildSeats > 0 ? `${totalChildSeats} Child Seats` : 'Free Child Seat'}
+                </span>
               </div>
             </div>
 
@@ -1223,7 +1264,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                   onClick={() => setShowPassengersLuggageSeats(false)}
                   className="w-full sm:w-auto px-4 py-1.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs border border-amber-500 shadow-xs cursor-pointer flex items-center justify-center gap-1.5 transition-transform active:scale-95"
                 >
-                  <span>Done / Choose Vehicle Below</span>
+                  <span>Done</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -1231,268 +1272,484 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
           )}
         </div>
 
-        {/* Vehicles Selection: Sedan & Comfort in 1 line (2 folders) + Minivan big card underneath */}
-        <div className="space-y-2 pt-1">
-          <div className="flex items-center justify-between text-xs">
-            <label className="font-bold text-slate-700 uppercase tracking-wider block text-[11px]">
-              Choose Vehicle Class
-            </label>
-            {totalPassengers >= 5 && (
-              <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                5+ passengers: Minivan selected
-              </span>
-            )}
-            {checkInSuitcases >= 5 && totalPassengers < 5 && (
-              <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                5+ suitcases: Minivan trunk required
-              </span>
-            )}
-          </div>
-
-          {/* Row 1: Sedan & Comfort Cars in 1 line (2 folders) */}
-          <div className="grid grid-cols-2 gap-2.5">
-            {/* Folder 1: Standard Sedan */}
-            {(() => {
-              const v = VEHICLES.find((item) => item.id === 'standard') || VEHICLES[0];
-              const vQuote = quote?.vehicles.find((q) => q.vehicleId === v.id);
-              const price = vQuote
-                ? isRoundTrip
-                  ? vQuote.roundTripTotal
-                  : vQuote.totalPrice
-                : 39;
-              const isSelected = selectedVehicleId === 'standard';
-              const isDisabled = totalPassengers > 4 || checkInSuitcases > 3;
-
-              return (
-                <div
-                  key="standard"
-                  onClick={() => {
-                    if (!isDisabled) setSelectedVehicleId('standard');
-                  }}
-                  className={`relative p-2.5 rounded-xl border-2 transition-all ${
-                    isDisabled
-                      ? 'opacity-40 cursor-not-allowed bg-slate-100 border-slate-200'
-                      : isSelected
-                      ? 'border-amber-500 bg-amber-50/80 shadow-md ring-2 ring-amber-400 cursor-pointer'
-                      : 'border-amber-400/60 hover:border-amber-400 bg-white hover:shadow-xs cursor-pointer'
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-display font-bold text-slate-900 text-xs sm:text-sm truncate">
-                      {v.name}
-                    </span>
-                    {priceRevealed && (
-                      <span className="font-extrabold text-xs sm:text-sm text-slate-950 font-display shrink-0 ml-1">
-                        €{price}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="w-full h-16 sm:h-20 rounded-lg overflow-hidden bg-slate-100 mb-1.5 relative border border-amber-400/40">
-                    <img
-                      src={v.photos[0]}
-                      alt={v.name}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between text-[10px] text-slate-600 font-medium">
-                    <span>Max 4 Pax</span>
-                    <span>·</span>
-                    <span>Max 3 Bags</span>
-                  </div>
-                </div>
-              );
-            })()}
-
-            {/* Folder 2: Comfort Executive */}
-            {(() => {
-              const v = VEHICLES.find((item) => item.id === 'comfort') || VEHICLES[1];
-              const vQuote = quote?.vehicles.find((q) => q.vehicleId === v.id);
-              const price = vQuote
-                ? isRoundTrip
-                  ? vQuote.roundTripTotal
-                  : vQuote.totalPrice
-                : 47;
-              const isSelected = selectedVehicleId === 'comfort';
-              const isDisabled = totalPassengers > 4 || checkInSuitcases > 4;
-
-              return (
-                <div
-                  key="comfort"
-                  onClick={() => {
-                    if (!isDisabled) setSelectedVehicleId('comfort');
-                  }}
-                  className={`relative p-2.5 rounded-xl border-2 transition-all ${
-                    isDisabled
-                      ? 'opacity-40 cursor-not-allowed bg-slate-100 border-slate-200'
-                      : isSelected
-                      ? 'border-amber-500 bg-amber-50/80 shadow-md ring-2 ring-amber-400 cursor-pointer'
-                      : 'border-amber-400/60 hover:border-amber-400 bg-white hover:shadow-xs cursor-pointer'
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-display font-bold text-slate-900 text-xs sm:text-sm truncate">
-                      {v.name}
-                    </span>
-                    {priceRevealed && (
-                      <span className="font-extrabold text-xs sm:text-sm text-slate-950 font-display shrink-0 ml-1">
-                        €{price}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="w-full h-16 sm:h-20 rounded-lg overflow-hidden bg-slate-100 mb-1.5 relative border border-amber-400/40">
-                    <img
-                      src={v.photos[0]}
-                      alt={v.name}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between text-[10px] text-slate-600 font-medium">
-                    <span>Max 4 Pax</span>
-                    <span>·</span>
-                    <span>Max 4 Bags</span>
-                  </div>
-                </div>
-              );
-            })()}
-          </div>
-
-          {/* Row 2: Minivan - Un k niche minivan wese hi aae bari (Full-width wide card) */}
-          {(() => {
-            const v = VEHICLES.find((item) => item.id === 'minivan') || VEHICLES[2];
-            const vQuote = quote?.vehicles.find((q) => q.vehicleId === v.id);
-            const price = vQuote
-              ? isRoundTrip
-                ? vQuote.roundTripTotal
-                : vQuote.totalPrice
-              : 59;
-            const isSelected = selectedVehicleId === 'minivan';
-            const isRecommended = totalPassengers >= 5 || checkInSuitcases >= 5;
-
-            return (
-              <div
-                key="minivan"
-                onClick={() => setSelectedVehicleId('minivan')}
-                className={`relative p-3 rounded-xl border-2 cursor-pointer transition-all ${
-                  isSelected
-                    ? 'border-amber-500 bg-amber-50/80 shadow-md ring-2 ring-amber-400'
-                    : 'border-amber-400/60 hover:border-amber-400 bg-white hover:shadow-xs'
-                }`}
-              >
-                {isRecommended && (
-                  <span className="absolute -top-2 right-3 text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs border border-amber-500">
-                    Recommended for your group
-                  </span>
-                )}
-
-                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                  <div className="w-full sm:w-40 h-20 sm:h-22 rounded-lg overflow-hidden bg-slate-100 relative border border-amber-400/40 shrink-0">
-                    <img
-                      src={v.photos[0]}
-                      alt={v.name}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="font-display font-extrabold text-slate-900 text-sm sm:text-base">
-                        {v.name} (8-Seater Van)
-                      </span>
-                      {priceRevealed && (
-                        <span className="font-extrabold text-sm sm:text-base text-slate-950 font-display shrink-0 ml-2">
-                          €{price}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-[11px] text-slate-600 mb-1.5 leading-snug">
-                      Spacious luxury van for families, groups, ski gear, cruise port luggage & child seats.
-                    </p>
-                    <div className="flex items-center gap-3 text-[10px] text-slate-700 font-semibold flex-wrap">
-                      <span className="bg-slate-100 px-2 py-0.5 rounded">Max 8 Passengers</span>
-                      <span>·</span>
-                      <span className="bg-slate-100 px-2 py-0.5 rounded">Max 8 Large Bags</span>
-                      <span>·</span>
-                      <span className="text-emerald-700 font-bold">Huge Trunk & Extra Legroom</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })()}
-        </div>
-
-        {/* Booking Action Buttons - DIRECTLY BELOW VEHICLE & CHILD SEATS */}
-        <div className="pt-2 border-t border-slate-200 space-y-2.5">
+        {/* Step 1 Action Button: Get Price */}
+        <div className="pt-2 border-t border-slate-200">
           {validationError && (
-            <div className="p-2.5 bg-rose-50 border border-rose-300 rounded-xl text-xs font-bold text-rose-700 flex items-center gap-2">
+            <div className="p-2.5 mb-2.5 bg-rose-50 border border-rose-300 rounded-xl text-xs font-bold text-rose-700 flex items-center gap-2">
               <span>⚠️ {validationError}</span>
             </div>
           )}
 
-          {/* Price Revealed Highlight Card (Appears as soon as client clicks booking button) */}
-          {priceRevealed && (
-            <div className="p-3 bg-gradient-to-r from-amber-50 to-white border-2 border-amber-400/90 rounded-xl shadow-xs flex flex-wrap items-center justify-between gap-2">
-              <div>
-                <span className="text-[11px] font-bold text-amber-900 uppercase tracking-wider block">
-                  Guaranteed Fixed Fare ({isRoundTrip ? 'Round Trip' : 'One Way'})
-                </span>
-                <div className="flex items-baseline gap-2 mt-0.5">
-                  <span className="text-2xl sm:text-3xl font-extrabold text-slate-950 font-display">
-                    €{finalQuotedPrice}
-                  </span>
-                  <span className="text-xs text-slate-600 font-medium">
-                    {activeVehicleData.name} · All highway tolls & parking included
-                  </span>
-                </div>
-              </div>
-              <div className="flex items-center gap-1.5 text-xs text-emerald-800 font-bold bg-emerald-100/70 border border-emerald-300 px-2.5 py-1 rounded-lg">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>Zero Cancellation Fee up to 24h</span>
-              </div>
-            </div>
-          )}
+          <button
+            type="button"
+            onClick={() => {
+              if (!pickup.trim() || !dropoff.trim()) {
+                setValidationError('Please enter or select both pickup and drop-off locations.');
+                return;
+              }
+              setValidationError('');
+              setCurrentStep('booking');
+              const el = document.getElementById('calculator');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="w-full flex items-center justify-center gap-2.5 py-4 px-6 rounded-xl bg-[#f5b301] hover:bg-[#e5a700] text-slate-950 font-extrabold text-base sm:text-lg shadow-lg hover:shadow-xl transition-all active:scale-[0.98] cursor-pointer border-2 border-amber-500 font-display"
+          >
+            <Sparkles className="w-5 h-5 text-slate-950" />
+            <span>Get Price</span>
+            <ArrowRight className="w-5 h-5 text-slate-950" />
+          </button>
 
-          {/* Action Buttons */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            <button
-              type="button"
-              onClick={handleBookWhatsApp}
-              className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl bg-[#f5b301] hover:bg-[#e5a700] text-slate-950 font-extrabold text-sm sm:text-base shadow-md transition-all active:scale-[0.98] cursor-pointer border border-amber-500"
-            >
-              <MessageCircle className="w-5 h-5 fill-slate-950" />
-              <span>
-                {priceRevealed
-                  ? `Book on WhatsApp (€${finalQuotedPrice})`
-                  : 'Book on WhatsApp (Click to see Price & Reserve)'}
-              </span>
-            </button>
-
-            <button
-              type="button"
-              onClick={handleViewVoucher}
-              className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm sm:text-base border border-slate-800 shadow-xs transition-all active:scale-[0.98] cursor-pointer"
-            >
-              <FileText className="w-4 h-4 text-amber-400" />
-              <span>{t.viewSummary}</span>
-            </button>
-          </div>
-
-          <p className="text-[10px] text-center text-slate-500 flex items-center justify-center gap-2 flex-wrap">
-            <span>✓ Fixed Price Guarantee</span>
+          <p className="text-[10px] text-center text-slate-500 flex items-center justify-center gap-2 flex-wrap mt-2">
+            <span>✓ All-Inclusive Fixed Prices</span>
             <span>·</span>
-            <span>✓ Pay Cash or Card to Chauffeur</span>
+            <span>✓ Free Flight Delay Tracking</span>
             <span>·</span>
             <span>✓ Free Cancellation up to 24h</span>
           </p>
         </div>
       </div>
+    ) : (
+      /* Step 2: Available Vehicles & Confirmation (QuickPickups style) */
+      <div className="p-4 sm:p-6 lg:p-7 bg-slate-50">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start">
+          {/* Left Column (lg:col-span-7): Available Vehicles with Prices */}
+          <div className="lg:col-span-7 space-y-3.5">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 pb-1 border-b border-slate-200">
+              <div>
+                <h3 className="font-display font-extrabold text-base sm:text-lg text-slate-900">
+                  Available Vehicles for Your Trip
+                </h3>
+                <p className="text-xs text-slate-500">
+                  {quote?.distanceKm || 18} km · Approx. {quote?.durationText || '30 mins'} · Fixed prices, tolls included
+                </p>
+              </div>
+              <span className="text-[11px] font-bold text-amber-700 bg-amber-100 border border-amber-300 px-2.5 py-1 rounded-full self-start sm:self-auto">
+                {isRoundTrip ? 'Round Trip (-5% off)' : 'One Way'}
+              </span>
+            </div>
+
+            {/* Vehicle Cards List */}
+            <div className="space-y-3">
+              {/* 1. Standard Sedan */}
+              {(() => {
+                const v = VEHICLES.find((item) => item.id === 'standard') || VEHICLES[0];
+                const vQuote = quote?.vehicles.find((q) => q.vehicleId === 'standard');
+                const price = vQuote ? (isRoundTrip ? vQuote.roundTripTotal : vQuote.totalPrice) : (isRoundTrip ? 74 : 39);
+                const isSelected = selectedVehicleId === 'standard';
+                const isDisabled = totalPassengers > 4 || checkInSuitcases > 3;
+
+                return (
+                  <div
+                    key="standard"
+                    onClick={() => {
+                      if (!isDisabled) setSelectedVehicleId('standard');
+                    }}
+                    className={`p-3.5 rounded-2xl border-2 transition-all relative ${
+                      isDisabled
+                        ? 'opacity-40 cursor-not-allowed bg-slate-100 border-slate-200'
+                        : isSelected
+                        ? 'border-amber-500 bg-amber-50/70 shadow-md ring-2 ring-amber-400 cursor-pointer'
+                        : 'border-slate-200 hover:border-amber-400 bg-white hover:shadow-xs cursor-pointer'
+                    }`}
+                  >
+                    <div className="flex flex-col sm:flex-row gap-3.5 sm:items-center">
+                      <div className="w-full sm:w-36 h-24 sm:h-24 rounded-xl overflow-hidden bg-slate-100 relative border border-slate-200 shrink-0">
+                        <img
+                          src={v.photos[0]}
+                          alt={v.name}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2 mb-1">
+                          <div>
+                            <h4 className="font-display font-bold text-sm sm:text-base text-slate-900 leading-tight">
+                              {v.name}
+                            </h4>
+                            <p className="text-[11px] text-slate-500 leading-tight mt-0.5">
+                              Skoda Superb, VW Passat, Toyota Prius+ or equivalent
+                            </p>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <span className="text-lg sm:text-xl font-extrabold text-slate-950 font-display block">
+                              €{price}
+                            </span>
+                            <span className="text-[10px] text-slate-500 font-medium">
+                              {isRoundTrip ? 'Total return' : 'All-inclusive'}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 text-[11px] font-semibold text-slate-700 my-1.5 flex-wrap">
+                          <span className="bg-slate-100 px-2 py-0.5 rounded flex items-center gap-1">
+                            <Users className="w-3 h-3 text-slate-500" />
+                            <span>Max 4 Passengers</span>
+                          </span>
+                          <span className="bg-slate-100 px-2 py-0.5 rounded flex items-center gap-1">
+                            <Briefcase className="w-3 h-3 text-slate-500" />
+                            <span>Max 3 Bags</span>
+                          </span>
+                          <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded text-[10px] font-bold border border-emerald-200">
+                            Free Meet & Greet
+                          </span>
+                        </div>
+
+                        {isDisabled ? (
+                          <p className="text-[11px] font-bold text-rose-600 mt-1">
+                            ⚠️ Your group exceeds sedan capacity (Minivan required for 5+ pax/suitcases)
+                          </p>
+                        ) : (
+                          <div className="flex items-center justify-between pt-1 mt-1 border-t border-slate-100">
+                            <span className="text-[10px] text-slate-500">
+                              Air conditioning · Flight tracking · 60m free waiting
+                            </span>
+                            <span
+                              className={`text-[11px] font-bold px-2.5 py-0.5 rounded-lg transition-all ${
+                                isSelected
+                                  ? 'bg-amber-400 text-slate-950 border border-amber-500'
+                                  : 'text-slate-600 bg-slate-100 hover:bg-slate-200'
+                              }`}
+                            >
+                              {isSelected ? 'Selected ✓' : 'Select'}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* 2. Comfort Executive */}
+              {(() => {
+                const v = VEHICLES.find((item) => item.id === 'comfort') || VEHICLES[1];
+                const vQuote = quote?.vehicles.find((q) => q.vehicleId === 'comfort');
+                const price = vQuote ? (isRoundTrip ? vQuote.roundTripTotal : vQuote.totalPrice) : (isRoundTrip ? 90 : 47);
+                const isSelected = selectedVehicleId === 'comfort';
+                const isDisabled = totalPassengers > 4 || checkInSuitcases > 4;
+
+                return (
+                  <div
+                    key="comfort"
+                    onClick={() => {
+                      if (!isDisabled) setSelectedVehicleId('comfort');
+                    }}
+                    className={`p-3.5 rounded-2xl border-2 transition-all relative ${
+                      isDisabled
+                        ? 'opacity-40 cursor-not-allowed bg-slate-100 border-slate-200'
+                        : isSelected
+                        ? 'border-amber-500 bg-amber-50/70 shadow-md ring-2 ring-amber-400 cursor-pointer'
+                        : 'border-slate-200 hover:border-amber-400 bg-white hover:shadow-xs cursor-pointer'
+                    }`}
+                  >
+                    <div className="flex flex-col sm:flex-row gap-3.5 sm:items-center">
+                      <div className="w-full sm:w-36 h-24 sm:h-24 rounded-xl overflow-hidden bg-slate-100 relative border border-slate-200 shrink-0">
+                        <img
+                          src={v.photos[0]}
+                          alt={v.name}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2 mb-1">
+                          <div>
+                            <h4 className="font-display font-bold text-sm sm:text-base text-slate-900 leading-tight">
+                              {v.name}
+                            </h4>
+                            <p className="text-[11px] text-slate-500 leading-tight mt-0.5">
+                              Mercedes-Benz E-Class, BMW 5 Series, Audi A6 or equivalent
+                            </p>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <span className="text-lg sm:text-xl font-extrabold text-slate-950 font-display block">
+                              €{price}
+                            </span>
+                            <span className="text-[10px] text-slate-500 font-medium">
+                              {isRoundTrip ? 'Total return' : 'All-inclusive'}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 text-[11px] font-semibold text-slate-700 my-1.5 flex-wrap">
+                          <span className="bg-slate-100 px-2 py-0.5 rounded flex items-center gap-1">
+                            <Users className="w-3 h-3 text-slate-500" />
+                            <span>Max 4 Passengers</span>
+                          </span>
+                          <span className="bg-slate-100 px-2 py-0.5 rounded flex items-center gap-1">
+                            <Briefcase className="w-3 h-3 text-slate-500" />
+                            <span>Max 4 Bags</span>
+                          </span>
+                          <span className="text-amber-800 bg-amber-100 px-2 py-0.5 rounded text-[10px] font-bold border border-amber-300">
+                            Executive Chauffeur
+                          </span>
+                        </div>
+
+                        {isDisabled ? (
+                          <p className="text-[11px] font-bold text-rose-600 mt-1">
+                            ⚠️ Your group exceeds capacity (Minivan required for 5+ pax)
+                          </p>
+                        ) : (
+                          <div className="flex items-center justify-between pt-1 mt-1 border-t border-slate-100">
+                            <span className="text-[10px] text-slate-500">
+                              Leather seats · Water & Wi-Fi · Professional suit chauffeur
+                            </span>
+                            <span
+                              className={`text-[11px] font-bold px-2.5 py-0.5 rounded-lg transition-all ${
+                                isSelected
+                                  ? 'bg-amber-400 text-slate-950 border border-amber-500'
+                                  : 'text-slate-600 bg-slate-100 hover:bg-slate-200'
+                              }`}
+                            >
+                              {isSelected ? 'Selected ✓' : 'Select'}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* 3. Minivan (8-Seater) */}
+              {(() => {
+                const v = VEHICLES.find((item) => item.id === 'van') || VEHICLES[2];
+                const vQuote = quote?.vehicles.find((q) => q.vehicleId === 'van');
+                const price = vQuote ? (isRoundTrip ? vQuote.roundTripTotal : vQuote.totalPrice) : (isRoundTrip ? 112 : 59);
+                const isSelected = selectedVehicleId === 'van' || selectedVehicleId === 'minivan';
+                const isRecommended = totalPassengers >= 5 || checkInSuitcases >= 5;
+
+                return (
+                  <div
+                    key="minivan"
+                    onClick={() => setSelectedVehicleId('van')}
+                    className={`p-3.5 rounded-2xl border-2 transition-all relative ${
+                      isSelected
+                        ? 'border-amber-500 bg-amber-50/70 shadow-md ring-2 ring-amber-400 cursor-pointer'
+                        : 'border-slate-200 hover:border-amber-400 bg-white hover:shadow-xs cursor-pointer'
+                    }`}
+                  >
+                    {isRecommended && (
+                      <span className="absolute -top-2.5 right-4 text-[9px] font-extrabold px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs border border-amber-500">
+                        Recommended for your group
+                      </span>
+                    )}
+
+                    <div className="flex flex-col sm:flex-row gap-3.5 sm:items-center">
+                      <div className="w-full sm:w-36 h-24 sm:h-24 rounded-xl overflow-hidden bg-slate-100 relative border border-slate-200 shrink-0">
+                        <img
+                          src={v.photos[0]}
+                          alt={v.name}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2 mb-1">
+                          <div>
+                            <h4 className="font-display font-bold text-sm sm:text-base text-slate-900 leading-tight">
+                              Minivan (8-Seater)
+                            </h4>
+                            <p className="text-[11px] text-slate-500 leading-tight mt-0.5">
+                              Mercedes-Benz V-Class, Vito or equivalent 8-passenger van
+                            </p>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <span className="text-lg sm:text-xl font-extrabold text-slate-950 font-display block">
+                              €{price}
+                            </span>
+                            <span className="text-[10px] text-slate-500 font-medium">
+                              {isRoundTrip ? 'Total return' : 'All-inclusive'}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 text-[11px] font-semibold text-slate-700 my-1.5 flex-wrap">
+                          <span className="bg-slate-100 px-2 py-0.5 rounded flex items-center gap-1">
+                            <Users className="w-3 h-3 text-slate-500" />
+                            <span>Max 8 Passengers</span>
+                          </span>
+                          <span className="bg-slate-100 px-2 py-0.5 rounded flex items-center gap-1">
+                            <Briefcase className="w-3 h-3 text-slate-500" />
+                            <span>Max 8 Large Bags</span>
+                          </span>
+                          <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded text-[10px] font-bold border border-emerald-200">
+                            Huge Trunk & Free Child Seats
+                          </span>
+                        </div>
+
+                        <div className="flex items-center justify-between pt-1 mt-1 border-t border-slate-100">
+                          <span className="text-[10px] text-slate-500">
+                            Dual climate control · Extra legroom · Cruise port luggage capacity
+                          </span>
+                          <span
+                            className={`text-[11px] font-bold px-2.5 py-0.5 rounded-lg transition-all ${
+                              isSelected
+                                ? 'bg-amber-400 text-slate-950 border border-amber-500'
+                                : 'text-slate-600 bg-slate-100 hover:bg-slate-200'
+                            }`}
+                          >
+                            {isSelected ? 'Selected ✓' : 'Select'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+
+          {/* Right Column (lg:col-span-5): Confirmation Details & Trip Summary (Sticky) */}
+          <div className="lg:col-span-5">
+            <div className="bg-white rounded-2xl border-2 border-amber-400 p-4 sm:p-5 shadow-lg space-y-4 sticky top-4">
+              <div className="border-b border-slate-200 pb-3">
+                <span className="text-[11px] font-extrabold uppercase tracking-wider text-amber-700 block">
+                  Confirmation Details
+                </span>
+                <h3 className="font-display font-extrabold text-base text-slate-900">
+                  Your Trip Summary
+                </h3>
+              </div>
+
+              {/* Route Visual Line */}
+              <div className="space-y-2 text-xs">
+                <div className="flex items-start gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 mt-1 shrink-0"></span>
+                  <div className="min-w-0">
+                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Pick-up Location</span>
+                    <span className="font-bold text-slate-800 break-words">{pickup}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-rose-500 mt-1 shrink-0"></span>
+                  <div className="min-w-0">
+                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Drop-off Destination</span>
+                    <span className="font-bold text-slate-800 break-words">{dropoff}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Date, Pax, Luggage Pill Grid */}
+              <div className="grid grid-cols-2 gap-2 text-[11px] bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                <div>
+                  <span className="text-slate-400 block text-[10px]">Date & Time</span>
+                  <span className="font-bold text-slate-800">{dateTime || 'Flexible'}</span>
+                </div>
+                {isRoundTrip && (
+                  <div>
+                    <span className="text-slate-400 block text-[10px]">Return Date</span>
+                    <span className="font-bold text-slate-800">{returnDateTime || 'Flexible'}</span>
+                  </div>
+                )}
+                <div>
+                  <span className="text-slate-400 block text-[10px]">Passengers</span>
+                  <span className="font-bold text-slate-800">{totalPassengers} Pax</span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block text-[10px]">Luggage</span>
+                  <span className="font-bold text-slate-800">{totalBags} Bags</span>
+                </div>
+                {totalChildSeats > 0 && (
+                  <div className="col-span-2">
+                    <span className="text-slate-400 block text-[10px]">Child Seats (Free)</span>
+                    <span className="font-bold text-emerald-700">{getSeatDetailsText()}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Selected Vehicle & Price Breakdown Box */}
+              <div className="bg-amber-50/80 border-2 border-amber-400/90 rounded-xl p-3">
+                <div className="flex items-center justify-between mb-1.5">
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 block">
+                      Selected Vehicle
+                    </span>
+                    <span className="font-display font-extrabold text-sm text-slate-900">
+                      {activeVehicleData.name}
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-2xl font-extrabold text-slate-950 font-display block">
+                      €{finalQuotedPrice}
+                    </span>
+                    <span className="text-[10px] font-bold text-slate-600">
+                      {isRoundTrip ? 'Round Trip Fare' : 'One Way Fixed'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="text-[10px] text-slate-600 border-t border-amber-200/70 pt-1.5 space-y-0.5">
+                  <div className="flex justify-between">
+                    <span>Highway Tolls & Airport Taxes:</span>
+                    <span className="font-bold text-emerald-700">Included (€0)</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Meet & Greet with Name Sign:</span>
+                    <span className="font-bold text-emerald-700">Included (€0)</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Flight Delay Monitoring:</span>
+                    <span className="font-bold text-emerald-700">Included (€0)</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Lead Passenger Name Input */}
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block">
+                  Lead Passenger Name (Arrival Signboard)
+                </label>
+                <input
+                  type="text"
+                  value={passengerName}
+                  onChange={(e) => setPassengerName(e.target.value)}
+                  placeholder="e.g. John Smith"
+                  className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl outline-none focus:border-amber-400 focus:bg-white"
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="space-y-2 pt-1">
+                <button
+                  type="button"
+                  onClick={handleBookWhatsApp}
+                  className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#f5b301] hover:bg-[#e5a700] text-slate-950 font-extrabold text-sm sm:text-base shadow-md transition-all active:scale-[0.98] cursor-pointer border border-amber-500 font-display"
+                >
+                  <MessageCircle className="w-5 h-5 fill-slate-950" />
+                  <span>Confirm Booking on WhatsApp</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleViewVoucher}
+                  className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs border border-slate-800 shadow-xs transition-all active:scale-[0.98] cursor-pointer"
+                >
+                  <FileText className="w-3.5 h-3.5 text-amber-400" />
+                  <span>View Official Printable Voucher</span>
+                </button>
+              </div>
+
+              {/* Trust Badges */}
+              <div className="pt-2 border-t border-slate-200 text-[10px] text-slate-500 space-y-1 text-center">
+                <p className="flex items-center justify-center gap-1.5 font-medium">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Pay driver directly in cash or card · 0 booking fee</span>
+                </p>
+                <p className="text-slate-400">
+                  Free cancellation up to 24 hours before pickup
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
 
             {/* 1-Click Luggage Size Chart Modal */}
       {showSizeChart && (
@@ -1526,14 +1783,14 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
               </button>
             </div>
 
-            {/* Real Bags Visual Comparison Photo */}
-            <div className="rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-white my-3">
+            {/* Real Bags Visual Comparison Photo - Clean Only */}
+            <div className="rounded-xl overflow-hidden border-2 border-amber-400/80 shadow-md bg-white my-3">
               <img
                 src="/images/luggage-guide.jpg"
                 alt="Real luggage types: Backpack, Cabin 55cm, Medium 65cm, Large XXL 80cm"
-                className="w-full h-auto object-cover max-h-56"
+                className="w-full h-auto object-cover max-h-72"
               />
-              <div className="grid grid-cols-4 text-center py-2 bg-slate-900 text-white text-[10px] sm:text-xs font-bold divide-x divide-slate-800">
+              <div className="grid grid-cols-4 text-center py-2.5 bg-slate-900 text-white text-[11px] sm:text-xs font-bold divide-x divide-slate-800">
                 <div className="px-1">
                   <span className="block text-amber-400">Backpack</span>
                   <span className="text-[9px] text-slate-300 font-normal">Personal Lap</span>
@@ -1553,84 +1810,11 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
               </div>
             </div>
 
-            {/* Bag Types List */}
-            <div className="space-y-2 py-2 text-xs">
-              <div className="p-2.5 rounded-xl border border-slate-200 bg-slate-50 flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-sky-100 flex items-center justify-center text-sm font-bold text-[#0e5c73] shrink-0">
-                  🎒
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between font-bold text-slate-900">
-                    <span>Shoulder Bag / Backpack</span>
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-200 text-slate-700">Personal Item</span>
-                  </div>
-                  <p className="text-[11px] text-slate-600 mt-0.5">
-                    Fits on passenger lap or footwell. Handbag, laptop bag, small school bag. Does not occupy trunk space.
-                  </p>
-                </div>
-              </div>
-
-              <div className="p-2.5 rounded-xl border border-slate-200 bg-slate-50 flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center text-sm font-bold text-amber-800 shrink-0">
-                  🧳
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between font-bold text-slate-900">
-                    <span>Hand Carry / Cabin Bag (Small)</span>
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-200 text-amber-900 font-bold">~55 × 40 × 20 cm</span>
-                  </div>
-                  <p className="text-[11px] text-slate-600 mt-0.5">
-                    Up to 10 kg. Standard airline cabin trolley. Fits easily in Sedan trunk or above.
-                  </p>
-                </div>
-              </div>
-
-              <div className="p-2.5 rounded-xl border border-slate-200 bg-slate-50 flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-sm font-bold text-emerald-800 shrink-0">
-                  🧳
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between font-bold text-slate-900">
-                    <span>Medium Suitcase</span>
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-200 text-emerald-900 font-bold">~65 × 45 × 26 cm</span>
-                  </div>
-                  <p className="text-[11px] text-slate-600 mt-0.5">
-                    Standard check-in (15–20 kg). Fits up to 3 bags in Sedan trunk, or 4 in Comfort estate wagon.
-                  </p>
-                </div>
-              </div>
-
-              <div className="p-2.5 rounded-xl border border-slate-200 bg-slate-50 flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center text-sm font-bold text-indigo-800 shrink-0">
-                  🧳
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between font-bold text-slate-900">
-                    <span>Large / XXL Suitcase</span>
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-200 text-indigo-900 font-bold">~75–82 × 52 × 32 cm</span>
-                  </div>
-                  <p className="text-[11px] text-slate-600 mt-0.5">
-                    Long-haul heavy check-in (23–32 kg). Takes substantial trunk space.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Vehicle Capacity Matrix */}
-            <div className="p-3 rounded-xl bg-slate-100 text-[11px] text-slate-700 space-y-1">
-              <span className="font-bold text-slate-900 block text-xs">Vehicle Trunk Capacity Rule:</span>
-              <ul className="space-y-0.5 list-disc list-inside">
-                <li><b>Sedan</b>: Up to 4 passengers & max 3 suitcases.</li>
-                <li><b>Comfort (Ford Mondeo / Skoda Superb)</b>: 4 passengers & 4 suitcases.</li>
-                <li><b>Minivan (Mercedes / Caravelle)</b>: 5 to 8 passengers & 6 to 8 suitcases.</li>
-              </ul>
-            </div>
-
-            <div className="mt-4 pt-3 border-t border-slate-200 flex justify-end">
+            <div className="mt-3 pt-2.5 border-t border-slate-200 flex justify-end">
               <button
                 type="button"
                 onClick={() => setShowSizeChart(false)}
-                className="w-full sm:w-auto px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs cursor-pointer"
+                className="w-full sm:w-auto px-5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs border border-amber-500 shadow-xs cursor-pointer"
               >
                 Got It / Close
               </button>
