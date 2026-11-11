@@ -74,7 +74,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
   const [passengerName, setPassengerName] = useState('');
 
   // Detailed Passenger State
-  const [adults, setAdults] = useState(0);
+  const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
   const [childAgeGroup, setChildAgeGroup] = useState<'0-2' | '3-6' | '7-11'>('3-6');
 
@@ -919,7 +919,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 <span className="text-slate-800 font-semibold">{totalBags} Luggage</span>
                 <span>•</span>
                 <span className="text-emerald-700 font-bold">
-                  {totalChildSeats > 0 ? `${totalChildSeats} Child Seats` : ''}
+                  {totalChildSeats > 0 ? `${totalChildSeats} Child Seats` : 'Free Child Seat'}
                 </span>
               </div>
             </div>
@@ -1328,8 +1328,8 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
               </span>
             </div>
 
-            {/* Vehicle Cards List */}
-            <div className="space-y-3">
+            {/* Compact Vehicle Selection List (Mobile-Optimized, No Photos, Realistic Icons) */}
+            <div className="space-y-2.5">
               {/* 1. Standard Sedan */}
               {(() => {
                 const v = VEHICLES.find((item) => item.id === 'standard') || VEHICLES[0];
@@ -1337,6 +1337,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 const price = vQuote ? (isRoundTrip ? vQuote.roundTripTotal : vQuote.totalPrice) : (isRoundTrip ? 74 : 39);
                 const isSelected = selectedVehicleId === 'standard';
                 const isDisabled = totalPassengers > 4 || checkInSuitcases > 3;
+                const isRecommended = totalPassengers <= 4 && checkInSuitcases <= 3;
 
                 return (
                   <div
@@ -1344,16 +1345,27 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                     onClick={() => {
                       if (!isDisabled) setSelectedVehicleId('standard');
                     }}
-                    className={`p-3.5 rounded-2xl border-2 transition-all relative ${
+                    className={`p-3 sm:p-3.5 rounded-xl border transition-all flex items-center justify-between gap-3 ${
                       isDisabled
-                        ? 'opacity-40 cursor-not-allowed bg-slate-100 border-slate-200'
+                        ? 'opacity-40 cursor-not-allowed bg-slate-50 border-slate-200'
                         : isSelected
-                        ? 'border-amber-500 bg-amber-50/70 shadow-md ring-2 ring-amber-400 cursor-pointer'
-                        : 'border-slate-200 hover:border-amber-400 bg-white hover:shadow-xs cursor-pointer'
+                        ? 'border-amber-500 bg-amber-50/60 shadow-xs ring-2 ring-amber-400/80 cursor-pointer'
+                        : 'border-slate-200 hover:border-amber-300 bg-white hover:bg-slate-50 cursor-pointer shadow-2xs'
                     }`}
                   >
-                    <div className="flex flex-col sm:flex-row gap-3.5 sm:items-center">
-                      <div className="w-full sm:w-36 h-24 sm:h-24 rounded-xl overflow-hidden bg-slate-100 relative border border-slate-200 shrink-0">
+                    {/* Left: Radio indicator + Realistic Vehicle Icon + Details */}
+                    <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                      {/* Radio dot */}
+                      <div
+                        className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
+                          isSelected ? 'border-amber-500 bg-amber-500' : 'border-slate-300 bg-white'
+                        }`}
+                      >
+                        {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-slate-950" />}
+                      </div>
+
+                      {/* Realistic Small Vehicle Thumbnail */}
+                      <div className="w-14 sm:w-16 h-10 sm:h-11 rounded-lg bg-slate-100 overflow-hidden shrink-0 border border-slate-200/90 shadow-2xs">
                         <img
                           src={v.photos[0]}
                           alt={v.name}
@@ -1362,60 +1374,44 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                         />
                       </div>
 
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2 mb-1">
-                          <div>
-                            <h4 className="font-display font-bold text-sm sm:text-base text-slate-900 leading-tight">
-                              {v.name}
-                            </h4>
-                            <p className="text-[11px] text-slate-500 leading-tight mt-0.5">
-                              Skoda Superb, VW Passat, Toyota Prius+ or equivalent
-                            </p>
-                          </div>
-                          <div className="text-right shrink-0">
-                            <span className="text-lg sm:text-xl font-extrabold text-slate-950 font-display block">
-                              €{price}
+                      {/* Vehicle Name, Capacity, and Recommendation */}
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <h4 className="font-display font-bold text-xs sm:text-sm text-slate-900 leading-tight">
+                            {v.name}
+                          </h4>
+                          {isRecommended && !isDisabled && (
+                            <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-sm bg-amber-400 text-slate-950 uppercase tracking-tight">
+                              Recommended
                             </span>
-                            <span className="text-[10px] text-slate-500 font-medium">
-                              {isRoundTrip ? 'Total return' : 'All-inclusive'}
-                            </span>
-                          </div>
+                          )}
                         </div>
 
-                        <div className="flex items-center gap-2 text-[11px] font-semibold text-slate-700 my-1.5 flex-wrap">
-                          <span className="bg-slate-100 px-2 py-0.5 rounded flex items-center gap-1">
-                            <Users className="w-3 h-3 text-slate-500" />
-                            <span>Max 4 Passengers</span>
+                        <div className="flex items-center gap-2 text-[10px] sm:text-[11px] font-medium text-slate-500 mt-0.5">
+                          <span className="flex items-center gap-0.5">
+                            <Users className="w-3 h-3 text-slate-400" /> Max 4 Pax
                           </span>
-                          <span className="bg-slate-100 px-2 py-0.5 rounded flex items-center gap-1">
-                            <Briefcase className="w-3 h-3 text-slate-500" />
-                            <span>Max 3 Bags</span>
-                          </span>
-                          <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded text-[10px] font-bold border border-emerald-200">
-                            Free Meet & Greet
+                          <span>·</span>
+                          <span className="flex items-center gap-0.5">
+                            <Briefcase className="w-3 h-3 text-slate-400" /> Max 3 Bags
                           </span>
                         </div>
 
-                        {isDisabled ? (
-                          <p className="text-[11px] font-bold text-rose-600 mt-1">
-                            ⚠️ Your group exceeds sedan capacity (Minivan required for 5+ pax/suitcases)
+                        {isDisabled && (
+                          <p className="text-[10px] font-bold text-rose-600 mt-0.5">
+                            Exceeds capacity (Max 4 pax / 3 bags)
                           </p>
-                        ) : (
-                          <div className="flex items-center justify-between pt-1 mt-1 border-t border-slate-100">
-                            <span className="text-[10px] text-slate-500">
-                              Air conditioning · Flight tracking · 60m free waiting
-                            </span>
-                            <span
-                              className={`text-[11px] font-bold px-2.5 py-0.5 rounded-lg transition-all ${
-                                isSelected
-                                  ? 'bg-amber-400 text-slate-950 border border-amber-500'
-                                  : 'text-slate-600 bg-slate-100 hover:bg-slate-200'
-                              }`}
-                            >
-                              {isSelected ? 'Selected ✓' : 'Select'}
-                            </span>
-                          </div>
                         )}
+                      </div>
+                    </div>
+
+                    {/* Right: Price & Type */}
+                    <div className="text-right shrink-0">
+                      <div className="font-display font-extrabold text-base sm:text-lg text-slate-950 leading-tight">
+                        €{price}
+                      </div>
+                      <div className="text-[9px] sm:text-[10px] text-slate-500 font-medium">
+                        {isRoundTrip ? 'Total return' : 'All-inclusive'}
                       </div>
                     </div>
                   </div>
@@ -1429,6 +1425,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 const price = vQuote ? (isRoundTrip ? vQuote.roundTripTotal : vQuote.totalPrice) : (isRoundTrip ? 90 : 47);
                 const isSelected = selectedVehicleId === 'comfort';
                 const isDisabled = totalPassengers > 4 || checkInSuitcases > 4;
+                const isRecommended = totalPassengers <= 4 && checkInSuitcases === 4;
 
                 return (
                   <div
@@ -1436,16 +1433,26 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                     onClick={() => {
                       if (!isDisabled) setSelectedVehicleId('comfort');
                     }}
-                    className={`p-3.5 rounded-2xl border-2 transition-all relative ${
+                    className={`p-3 sm:p-3.5 rounded-xl border transition-all flex items-center justify-between gap-3 ${
                       isDisabled
-                        ? 'opacity-40 cursor-not-allowed bg-slate-100 border-slate-200'
+                        ? 'opacity-40 cursor-not-allowed bg-slate-50 border-slate-200'
                         : isSelected
-                        ? 'border-amber-500 bg-amber-50/70 shadow-md ring-2 ring-amber-400 cursor-pointer'
-                        : 'border-slate-200 hover:border-amber-400 bg-white hover:shadow-xs cursor-pointer'
+                        ? 'border-amber-500 bg-amber-50/60 shadow-xs ring-2 ring-amber-400/80 cursor-pointer'
+                        : 'border-slate-200 hover:border-amber-300 bg-white hover:bg-slate-50 cursor-pointer shadow-2xs'
                     }`}
                   >
-                    <div className="flex flex-col sm:flex-row gap-3.5 sm:items-center">
-                      <div className="w-full sm:w-36 h-24 sm:h-24 rounded-xl overflow-hidden bg-slate-100 relative border border-slate-200 shrink-0">
+                    {/* Left: Radio indicator + Realistic Executive SVG Icon + Details */}
+                    <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                      <div
+                        className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
+                          isSelected ? 'border-amber-500 bg-amber-500' : 'border-slate-300 bg-white'
+                        }`}
+                      >
+                        {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-slate-950" />}
+                      </div>
+
+                      {/* Realistic Small Vehicle Thumbnail */}
+                      <div className="w-14 sm:w-16 h-10 sm:h-11 rounded-lg bg-slate-100 overflow-hidden shrink-0 border border-slate-200/90 shadow-2xs">
                         <img
                           src={v.photos[0]}
                           alt={v.name}
@@ -1454,60 +1461,45 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                         />
                       </div>
 
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2 mb-1">
-                          <div>
-                            <h4 className="font-display font-bold text-sm sm:text-base text-slate-900 leading-tight">
-                              {v.name}
-                            </h4>
-                            <p className="text-[11px] text-slate-500 leading-tight mt-0.5">
-                              Mercedes-Benz E-Class, BMW 5 Series, Audi A6 or equivalent
-                            </p>
-                          </div>
-                          <div className="text-right shrink-0">
-                            <span className="text-lg sm:text-xl font-extrabold text-slate-950 font-display block">
-                              €{price}
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <h4 className="font-display font-bold text-xs sm:text-sm text-slate-900 leading-tight">
+                            {v.name}
+                          </h4>
+                          <span className="text-[9px] font-semibold px-1 py-0.2 rounded bg-slate-100 text-slate-600">
+                            Executive
+                          </span>
+                          {isRecommended && !isDisabled && (
+                            <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-sm bg-amber-400 text-slate-950 uppercase tracking-tight">
+                              Recommended
                             </span>
-                            <span className="text-[10px] text-slate-500 font-medium">
-                              {isRoundTrip ? 'Total return' : 'All-inclusive'}
-                            </span>
-                          </div>
+                          )}
                         </div>
 
-                        <div className="flex items-center gap-2 text-[11px] font-semibold text-slate-700 my-1.5 flex-wrap">
-                          <span className="bg-slate-100 px-2 py-0.5 rounded flex items-center gap-1">
-                            <Users className="w-3 h-3 text-slate-500" />
-                            <span>Max 4 Passengers</span>
+                        <div className="flex items-center gap-2 text-[10px] sm:text-[11px] font-medium text-slate-500 mt-0.5">
+                          <span className="flex items-center gap-0.5">
+                            <Users className="w-3 h-3 text-slate-400" /> Max 4 Pax
                           </span>
-                          <span className="bg-slate-100 px-2 py-0.5 rounded flex items-center gap-1">
-                            <Briefcase className="w-3 h-3 text-slate-500" />
-                            <span>Max 4 Bags</span>
-                          </span>
-                          <span className="text-amber-800 bg-amber-100 px-2 py-0.5 rounded text-[10px] font-bold border border-amber-300">
-                            Executive Chauffeur
+                          <span>·</span>
+                          <span className="flex items-center gap-0.5">
+                            <Briefcase className="w-3 h-3 text-slate-400" /> Max 4 Bags
                           </span>
                         </div>
 
-                        {isDisabled ? (
-                          <p className="text-[11px] font-bold text-rose-600 mt-1">
-                            ⚠️ Your group exceeds capacity (Minivan required for 5+ pax)
+                        {isDisabled && (
+                          <p className="text-[10px] font-bold text-rose-600 mt-0.5">
+                            Exceeds capacity (Max 4 pax)
                           </p>
-                        ) : (
-                          <div className="flex items-center justify-between pt-1 mt-1 border-t border-slate-100">
-                            <span className="text-[10px] text-slate-500">
-                              Leather seats · Water & Wi-Fi · Professional suit chauffeur
-                            </span>
-                            <span
-                              className={`text-[11px] font-bold px-2.5 py-0.5 rounded-lg transition-all ${
-                                isSelected
-                                  ? 'bg-amber-400 text-slate-950 border border-amber-500'
-                                  : 'text-slate-600 bg-slate-100 hover:bg-slate-200'
-                              }`}
-                            >
-                              {isSelected ? 'Selected ✓' : 'Select'}
-                            </span>
-                          </div>
                         )}
+                      </div>
+                    </div>
+
+                    <div className="text-right shrink-0">
+                      <div className="font-display font-extrabold text-base sm:text-lg text-slate-950 leading-tight">
+                        €{price}
+                      </div>
+                      <div className="text-[9px] sm:text-[10px] text-slate-500 font-medium">
+                        {isRoundTrip ? 'Total return' : 'All-inclusive'}
                       </div>
                     </div>
                   </div>
@@ -1526,20 +1518,24 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                   <div
                     key="minivan"
                     onClick={() => setSelectedVehicleId('van')}
-                    className={`p-3.5 rounded-2xl border-2 transition-all relative ${
+                    className={`p-3 sm:p-3.5 rounded-xl border transition-all flex items-center justify-between gap-3 ${
                       isSelected
-                        ? 'border-amber-500 bg-amber-50/70 shadow-md ring-2 ring-amber-400 cursor-pointer'
-                        : 'border-slate-200 hover:border-amber-400 bg-white hover:shadow-xs cursor-pointer'
+                        ? 'border-amber-500 bg-amber-50/60 shadow-xs ring-2 ring-amber-400/80 cursor-pointer'
+                        : 'border-slate-200 hover:border-amber-300 bg-white hover:bg-slate-50 cursor-pointer shadow-2xs'
                     }`}
                   >
-                    {isRecommended && (
-                      <span className="absolute -top-2.5 right-4 text-[9px] font-extrabold px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs border border-amber-500">
-                        Recommended for your group
-                      </span>
-                    )}
+                    {/* Left: Radio indicator + Realistic Minivan SVG Icon + Details */}
+                    <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                      <div
+                        className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
+                          isSelected ? 'border-amber-500 bg-amber-500' : 'border-slate-300 bg-white'
+                        }`}
+                      >
+                        {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-slate-950" />}
+                      </div>
 
-                    <div className="flex flex-col sm:flex-row gap-3.5 sm:items-center">
-                      <div className="w-full sm:w-36 h-24 sm:h-24 rounded-xl overflow-hidden bg-slate-100 relative border border-slate-200 shrink-0">
+                      {/* Realistic Small Vehicle Thumbnail */}
+                      <div className="w-14 sm:w-16 h-10 sm:h-11 rounded-lg bg-slate-100 overflow-hidden shrink-0 border border-slate-200/90 shadow-2xs">
                         <img
                           src={v.photos[0]}
                           alt={v.name}
@@ -1548,54 +1544,36 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                         />
                       </div>
 
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2 mb-1">
-                          <div>
-                            <h4 className="font-display font-bold text-sm sm:text-base text-slate-900 leading-tight">
-                              Minivan (8-Seater)
-                            </h4>
-                            <p className="text-[11px] text-slate-500 leading-tight mt-0.5">
-                              Mercedes-Benz V-Class, Vito or equivalent 8-passenger van
-                            </p>
-                          </div>
-                          <div className="text-right shrink-0">
-                            <span className="text-lg sm:text-xl font-extrabold text-slate-950 font-display block">
-                              €{price}
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <h4 className="font-display font-bold text-xs sm:text-sm text-slate-900 leading-tight">
+                            Minivan (8-Seater)
+                          </h4>
+                          {isRecommended && (
+                            <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-sm bg-amber-400 text-slate-950 uppercase tracking-tight">
+                              Recommended for your group
                             </span>
-                            <span className="text-[10px] text-slate-500 font-medium">
-                              {isRoundTrip ? 'Total return' : 'All-inclusive'}
-                            </span>
-                          </div>
+                          )}
                         </div>
 
-                        <div className="flex items-center gap-2 text-[11px] font-semibold text-slate-700 my-1.5 flex-wrap">
-                          <span className="bg-slate-100 px-2 py-0.5 rounded flex items-center gap-1">
-                            <Users className="w-3 h-3 text-slate-500" />
-                            <span>Max 8 Passengers</span>
+                        <div className="flex items-center gap-2 text-[10px] sm:text-[11px] font-medium text-slate-500 mt-0.5">
+                          <span className="flex items-center gap-0.5">
+                            <Users className="w-3 h-3 text-slate-400" /> Max 8 Pax
                           </span>
-                          <span className="bg-slate-100 px-2 py-0.5 rounded flex items-center gap-1">
-                            <Briefcase className="w-3 h-3 text-slate-500" />
-                            <span>Max 8 Large Bags</span>
-                          </span>
-                          <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded text-[10px] font-bold border border-emerald-200">
-                            Huge Trunk & Free Child Seats
+                          <span>·</span>
+                          <span className="flex items-center gap-0.5">
+                            <Briefcase className="w-3 h-3 text-slate-400" /> Max 8 Bags
                           </span>
                         </div>
+                      </div>
+                    </div>
 
-                        <div className="flex items-center justify-between pt-1 mt-1 border-t border-slate-100">
-                          <span className="text-[10px] text-slate-500">
-                            Dual climate control · Extra legroom · Cruise port luggage capacity
-                          </span>
-                          <span
-                            className={`text-[11px] font-bold px-2.5 py-0.5 rounded-lg transition-all ${
-                              isSelected
-                                ? 'bg-amber-400 text-slate-950 border border-amber-500'
-                                : 'text-slate-600 bg-slate-100 hover:bg-slate-200'
-                            }`}
-                          >
-                            {isSelected ? 'Selected ✓' : 'Select'}
-                          </span>
-                        </div>
+                    <div className="text-right shrink-0">
+                      <div className="font-display font-extrabold text-base sm:text-lg text-slate-950 leading-tight">
+                        €{price}
+                      </div>
+                      <div className="text-[9px] sm:text-[10px] text-slate-500 font-medium">
+                        {isRoundTrip ? 'Total return' : 'All-inclusive'}
                       </div>
                     </div>
                   </div>
