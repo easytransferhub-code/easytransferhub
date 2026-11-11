@@ -74,7 +74,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
   const [passengerName, setPassengerName] = useState('');
 
   // Detailed Passenger State
-  const [adults, setAdults] = useState(2);
+  const [adults, setAdults] = useState(0);
   const [children, setChildren] = useState(0);
   const [childAgeGroup, setChildAgeGroup] = useState<'0-2' | '3-6' | '7-11'>('3-6');
 
@@ -919,7 +919,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 <span className="text-slate-800 font-semibold">{totalBags} Luggage</span>
                 <span>•</span>
                 <span className="text-emerald-700 font-bold">
-                  {totalChildSeats > 0 ? `${totalChildSeats} Child Seats` : 'Free Child Seat'}
+                  {totalChildSeats > 0 ? `${totalChildSeats} Child Seats` : ''}
                 </span>
               </div>
             </div>
