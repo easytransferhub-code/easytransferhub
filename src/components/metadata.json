@@ -1,0 +1,6 @@
+{
+  "name": "Easytransferhub - Private Airport & City Transfers Spain",
+  "description": "Fixed-price private transfers, airport pickups, and chauffeur services in Barcelona, Catalonia, and across Spain. Book standard cars, luxury sedans, and minivans with flight tracking and WhatsApp confirmation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
