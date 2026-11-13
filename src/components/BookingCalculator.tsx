@@ -70,7 +70,6 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
   const [dateTime, setDateTime] = useState('');
   const [isRoundTrip, setIsRoundTrip] = useState(false);
   const [returnDateTime, setReturnDateTime] = useState('');
-  const [flightNumber, setFlightNumber] = useState('');
   const [passengerName, setPassengerName] = useState('');
 
   // Detailed Passenger State
@@ -438,7 +437,6 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
       childSeatsDetails: getSeatDetailsText(),
       vehicleName: activeVehicleData.name,
       quotedPrice: finalQuotedPrice,
-      flightNumber,
       passengerName,
       distanceKm: quote?.distanceKm,
     });
@@ -470,7 +468,6 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
       vehicleName: activeVehicleData.name,
       vehicleCategory: activeVehicleData.category,
       quotedPrice: finalQuotedPrice,
-      flightNumber,
       passengerName,
       distanceKm: quote?.distanceKm,
       durationText: quote?.durationText,
@@ -490,11 +487,11 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
   return (
     <div
       id="calculator"
-      className="bg-white rounded-2xl shadow-2xl border-2 border-amber-400/80 overflow-hidden transition-all text-slate-900 ring-1 ring-amber-400/30"
+      className="bg-white rounded-2xl shadow-[0_18px_45px_-12px_rgba(16,185,129,0.14)] border border-emerald-200 overflow-hidden transition-all text-slate-900"
     >
       {/* Calculator Header Bar */}
       {currentStep === 'booking' ? (
-        <div className="bg-[#0e2438] text-white px-4 sm:px-6 py-3.5 flex items-center justify-between gap-2.5 border-b-2 border-amber-400">
+        <div className="bg-[#ecfdf5] text-slate-900 px-4 sm:px-6 py-3.5 flex items-center justify-between gap-2.5 border-b border-emerald-200">
           <button
             type="button"
             onClick={() => {
@@ -502,45 +499,41 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
               const el = document.getElementById('calculator');
               if (el) el.scrollIntoView({ behavior: 'smooth' });
             }}
-            className="flex items-center gap-2 text-xs sm:text-sm font-bold text-amber-400 hover:text-amber-300 bg-white/10 hover:bg-white/15 px-3 py-1.5 rounded-lg transition-all cursor-pointer border border-amber-400/40"
+            className="flex items-center gap-2 text-xs sm:text-sm font-bold text-emerald-900 hover:text-emerald-950 bg-white hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-all cursor-pointer border border-emerald-300 shadow-xs"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-4 h-4 text-emerald-700" />
             <span>Modify Route / Back</span>
           </button>
 
           <div className="text-right">
-            <span className="text-[10px] sm:text-xs uppercase font-extrabold text-amber-400 tracking-wider block">
+            <span className="text-[10px] sm:text-xs uppercase font-extrabold text-emerald-700 tracking-[0.14em] block">
               Step 2 of 2
             </span>
-            <span className="text-xs sm:text-sm font-bold text-slate-200">
+            <span className="text-xs sm:text-sm font-bold text-slate-900">
               Select Vehicle & Confirm
             </span>
           </div>
         </div>
       ) : (
-        <div className="bg-[#0e2438] text-white px-4 sm:px-6 py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 border-b-2 border-amber-400/70">
-          <div className="flex items-center gap-2">
-            <h2 className="flex items-center gap-2 m-0">
-              <span className="text-[13px] sm:text-sm font-bold font-display">{t.calcTitle}</span>
-              <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-amber-400 text-slate-950">
-                Fixed Rates
-              </span>
-            </h2>
-          </div>
+        <div className="bg-[#ecfdf5] text-slate-900 px-3.5 sm:px-5 py-2.5 flex flex-col gap-2 border-b border-emerald-200">
+          {/* Full-width top headline — stays on 1 single line on both mobile & desktop */}
+          <h2
+            className="w-full font-display font-extrabold text-emerald-950 whitespace-nowrap tracking-[-0.03em] sm:tracking-tight leading-tight m-0"
+            style={{ fontSize: 'clamp(10.5px, 2.95vw, 20px)' }}
+          >
+            Private transfers from Barcelona to anywhere in Spain
+          </h2>
 
-          {/* Trip Mode Switch with 1-line compact "Private transfers from Barcelona to anywhere in Spain" above it */}
-          <div className="flex flex-col sm:items-end gap-1">
-            <span className="text-[11px] sm:text-xs font-semibold text-amber-300 whitespace-nowrap tracking-tight">
-              Private transfers from Barcelona to anywhere in Spain
-            </span>
-            <div className="flex items-center gap-1 bg-[#112331] p-1 rounded-lg border-2 border-amber-400/70 text-xs font-semibold self-start sm:self-end">
+          {/* Trip Mode Switch + Fair Price Badge directly next to Round Trip */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-emerald-200 text-xs font-semibold shadow-2xs">
               <button
                 type="button"
                 onClick={() => setIsRoundTrip(false)}
                 className={`px-3 py-1.5 rounded-md transition-all cursor-pointer ${
                   !isRoundTrip
-                    ? 'bg-amber-400 text-slate-950 shadow-sm font-bold'
-                    : 'text-slate-300 hover:text-white'
+                    ? 'bg-emerald-700 text-white shadow-xs font-bold'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 One Way
@@ -550,19 +543,23 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 onClick={() => setIsRoundTrip(true)}
                 className={`px-3 py-1.5 rounded-md transition-all cursor-pointer ${
                   isRoundTrip
-                    ? 'bg-amber-400 text-slate-950 shadow-sm font-bold'
-                    : 'text-slate-300 hover:text-white'
+                    ? 'bg-emerald-700 text-white shadow-xs font-bold'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 Round Trip (-5%)
               </button>
             </div>
+
+            <span className="text-[11px] sm:text-xs font-bold px-2.5 py-1.5 rounded-lg bg-emerald-700 text-white shadow-2xs whitespace-nowrap">
+              Fair Price
+            </span>
           </div>
         </div>
       )}
 
       {currentStep === 'calculator' ? (
-        <div className="p-4 sm:p-6 space-y-4">
+        <div className="p-3.5 sm:p-4 space-y-2.5">
         {/* Step 1: Pickup and Drop-off with Quick Chips */}
         <div className="space-y-2.5">
           {/* Pickup Input */}
@@ -582,15 +579,15 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 onChange={(e) => handlePickupChange(e.target.value)}
                 onFocus={() => pickupSuggestions.length > 0 && setShowPickupList(true)}
                 placeholder={t.pickupPlaceholder}
-                className="w-full pl-3.5 pr-10 py-2.5 text-sm font-medium bg-slate-50 hover:bg-white focus:bg-white border-2 border-amber-400/70 focus:border-amber-400 rounded-xl focus:ring-2 focus:ring-amber-400/40 outline-none transition-all shadow-xs"
+                className="w-full pl-3.5 pr-10 py-2.5 text-sm font-medium bg-[#f8fcf9] hover:bg-white focus:bg-white border border-emerald-200 focus:border-emerald-600 rounded-xl focus:ring-2 focus:ring-emerald-600/20 outline-none transition-all shadow-2xs"
               />
               <span className="absolute right-3 top-3 text-slate-400">
-                <MapPin className="w-4 h-4 text-emerald-500" />
+                <MapPin className="w-4 h-4 text-emerald-600" />
               </span>
 
               {/* Suggestions Dropdown */}
               {showPickupList && pickupSuggestions.length > 0 && (
-                <ul className="absolute left-0 right-0 top-full mt-1 bg-white border-2 border-amber-400/60 rounded-xl shadow-xl z-30 max-h-52 overflow-y-auto divide-y divide-slate-100 text-xs">
+                <ul className="absolute left-0 right-0 top-full mt-1 bg-white border border-emerald-200 rounded-xl shadow-xl z-30 max-h-52 overflow-y-auto divide-y divide-emerald-50 text-xs">
                   {pickupSuggestions.map((item, idx) => (
                     <li
                       key={idx}
@@ -599,9 +596,9 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                         setPickupCoords({ lat: item.lat, lon: item.lon });
                         setShowPickupList(false);
                       }}
-                      className="px-3.5 py-2.5 hover:bg-amber-50 cursor-pointer flex items-center gap-2 text-slate-800"
+                      className="px-3.5 py-2.5 hover:bg-[#ecfdf5] cursor-pointer flex items-center gap-2 text-slate-800"
                     >
-                      <MapPin className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                      <MapPin className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                       <span className="truncate">{item.label}</span>
                     </li>
                   ))}
@@ -611,9 +608,9 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
 
             {/* Terminal Selector Bar above Quick Chips */}
             {showPickupAirportTerminals && (
-              <div className="mt-2 p-1.5 bg-amber-50 border-2 border-amber-400 rounded-xl flex items-center justify-between gap-1.5 shadow-xs animate-fadeIn">
-                <span className="text-[11px] font-bold text-slate-800 flex items-center gap-1 pl-1 shrink-0">
-                  <Plane className="w-3.5 h-3.5 text-amber-600" />
+              <div className="mt-2 p-1.5 bg-[#ecfdf5] border border-emerald-300 rounded-xl flex items-center justify-between gap-1.5 shadow-2xs animate-fadeIn">
+                <span className="text-[11px] font-bold text-emerald-950 flex items-center gap-1 pl-1 shrink-0">
+                  <Plane className="w-3.5 h-3.5 text-emerald-700" />
                   <span>Terminal:</span>
                 </span>
                 <div className="flex items-center gap-1.5 flex-1 justify-end">
@@ -624,10 +621,10 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                       if (loc) applyQuickLocation(loc, 'pickup');
                       setShowPickupAirportTerminals(false);
                     }}
-                    className={`text-[11px] px-3 py-1 rounded-lg font-bold border-2 transition-all cursor-pointer flex items-center gap-1 ${
+                    className={`text-[11px] px-3 py-1 rounded-lg font-bold border transition-all cursor-pointer flex items-center gap-1 ${
                       isPickupAirportT1
-                        ? 'bg-amber-400 border-amber-500 text-slate-950 shadow-xs'
-                        : 'bg-white border-amber-300 hover:bg-amber-100 text-slate-800'
+                        ? 'bg-emerald-700 border-emerald-700 text-white shadow-xs'
+                        : 'bg-white border-emerald-200 hover:bg-emerald-100 text-slate-800'
                     }`}
                   >
                     <span>Terminal 1</span>
@@ -640,10 +637,10 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                       if (loc) applyQuickLocation(loc, 'pickup');
                       setShowPickupAirportTerminals(false);
                     }}
-                    className={`text-[11px] px-3 py-1 rounded-lg font-bold border-2 transition-all cursor-pointer flex items-center gap-1 ${
+                    className={`text-[11px] px-3 py-1 rounded-lg font-bold border transition-all cursor-pointer flex items-center gap-1 ${
                       isPickupAirportT2
-                        ? 'bg-amber-400 border-amber-500 text-slate-950 shadow-xs'
-                        : 'bg-white border-amber-300 hover:bg-amber-100 text-slate-800'
+                        ? 'bg-emerald-700 border-emerald-700 text-white shadow-xs'
+                        : 'bg-white border-emerald-200 hover:bg-emerald-100 text-slate-800'
                     }`}
                   >
                     <span>Terminal 2</span>
@@ -668,14 +665,14 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 }}
                 className={`text-[11px] px-2.5 py-1 rounded-lg border font-semibold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 ${
                   isPickupAirport
-                    ? 'bg-amber-400 border-2 border-amber-500 text-slate-950 font-bold shadow-xs'
-                    : 'bg-white hover:bg-amber-50 text-slate-800 border border-amber-400/60 hover:border-amber-400 shadow-xs'
+                    ? 'bg-emerald-700 border-emerald-700 text-white font-bold shadow-xs'
+                    : 'bg-white hover:bg-[#ecfdf5] text-slate-800 border-emerald-200 hover:border-emerald-400 shadow-2xs'
                 }`}
                 title="Click to select Airport Terminal 1 or Terminal 2"
               >
-                <Plane className="w-3.5 h-3.5 text-slate-900" />
+                <Plane className={`w-3.5 h-3.5 ${isPickupAirport ? 'text-white' : 'text-emerald-700'}`} />
                 <span>{isPickupAirportT1 ? 'Airport (T1)' : isPickupAirportT2 ? 'Airport (T2)' : 'Airport'}</span>
-                <ChevronDown className={`w-3 h-3 text-slate-700 transition-transform ${showPickupAirportTerminals ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-3 h-3 ${isPickupAirport ? 'text-white' : 'text-slate-600'} transition-transform ${showPickupAirportTerminals ? 'rotate-180' : ''}`} />
               </button>
 
               {/* Other Quick Locations (Cruise Port & Sants Station on same 1 row) */}
@@ -689,8 +686,8 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                   }}
                   className={`text-[11px] px-2.5 py-1 rounded-lg border font-semibold transition-all cursor-pointer shrink-0 ${
                     pickup.toLowerCase().includes(loc.shortLabel.toLowerCase())
-                      ? 'bg-amber-400 border-2 border-amber-500 text-slate-950 font-bold shadow-xs'
-                      : 'bg-white hover:bg-amber-50 text-slate-800 border border-amber-400/60 hover:border-amber-400 shadow-xs'
+                      ? 'bg-emerald-700 border-emerald-700 text-white font-bold shadow-xs'
+                      : 'bg-white hover:bg-[#ecfdf5] text-slate-800 border-emerald-200 hover:border-emerald-400 shadow-2xs'
                   }`}
                 >
                   {loc.shortLabel}
@@ -703,7 +700,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
           <div className="relative">
             <div className="flex items-center justify-between mb-1.5">
               <label className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                <Navigation className="w-3.5 h-3.5 text-amber-500" />
+                <Navigation className="w-3.5 h-3.5 text-emerald-700" />
                 <span>{t.dropoffLabel}</span>
               </label>
               <span className="text-[11px] text-slate-500">Destination city or resort</span>
@@ -716,15 +713,15 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 onChange={(e) => handleDropoffChange(e.target.value)}
                 onFocus={() => dropoffSuggestions.length > 0 && setShowDropoffList(true)}
                 placeholder={t.dropoffPlaceholder}
-                className="w-full pl-3.5 pr-10 py-2.5 text-sm font-medium bg-slate-50 hover:bg-white focus:bg-white border-2 border-amber-400/70 focus:border-amber-400 rounded-xl focus:ring-2 focus:ring-amber-400/40 outline-none transition-all shadow-xs"
+                className="w-full pl-3.5 pr-10 py-2.5 text-sm font-medium bg-[#f8fcf9] hover:bg-white focus:bg-white border border-emerald-200 focus:border-emerald-600 rounded-xl focus:ring-2 focus:ring-emerald-600/20 outline-none transition-all shadow-2xs"
               />
               <span className="absolute right-3 top-3 text-slate-400">
-                <Navigation className="w-4 h-4 text-amber-500" />
+                <Navigation className="w-4 h-4 text-emerald-700" />
               </span>
 
               {/* Suggestions Dropdown */}
               {showDropoffList && dropoffSuggestions.length > 0 && (
-                <ul className="absolute left-0 right-0 top-full mt-1 bg-white border-2 border-amber-400/60 rounded-xl shadow-xl z-30 max-h-52 overflow-y-auto divide-y divide-slate-100 text-xs">
+                <ul className="absolute left-0 right-0 top-full mt-1 bg-white border border-emerald-200 rounded-xl shadow-xl z-30 max-h-52 overflow-y-auto divide-y divide-emerald-50 text-xs">
                   {dropoffSuggestions.map((item, idx) => (
                     <li
                       key={idx}
@@ -733,9 +730,9 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                         setDropoffCoords({ lat: item.lat, lon: item.lon });
                         setShowDropoffList(false);
                       }}
-                      className="px-3.5 py-2.5 hover:bg-amber-50 cursor-pointer flex items-center gap-2 text-slate-800"
+                      className="px-3.5 py-2.5 hover:bg-[#ecfdf5] cursor-pointer flex items-center gap-2 text-slate-800"
                     >
-                      <Navigation className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                      <Navigation className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
                       <span className="truncate">{item.label}</span>
                     </li>
                   ))}
@@ -745,9 +742,9 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
 
             {/* Terminal Selector Bar above Quick Chips */}
             {showDropoffAirportTerminals && (
-              <div className="mt-2 p-1.5 bg-amber-50 border-2 border-amber-400 rounded-xl flex items-center justify-between gap-1.5 shadow-xs animate-fadeIn">
-                <span className="text-[11px] font-bold text-slate-800 flex items-center gap-1 pl-1 shrink-0">
-                  <Plane className="w-3.5 h-3.5 text-amber-600" />
+              <div className="mt-2 p-1.5 bg-[#ecfdf5] border border-emerald-300 rounded-xl flex items-center justify-between gap-1.5 shadow-2xs animate-fadeIn">
+                <span className="text-[11px] font-bold text-emerald-950 flex items-center gap-1 pl-1 shrink-0">
+                  <Plane className="w-3.5 h-3.5 text-emerald-700" />
                   <span>Terminal:</span>
                 </span>
                 <div className="flex items-center gap-1.5 flex-1 justify-end">
@@ -758,10 +755,10 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                       if (loc) applyQuickLocation(loc, 'dropoff');
                       setShowDropoffAirportTerminals(false);
                     }}
-                    className={`text-[11px] px-3 py-1 rounded-lg font-bold border-2 transition-all cursor-pointer flex items-center gap-1 ${
+                    className={`text-[11px] px-3 py-1 rounded-lg font-bold border transition-all cursor-pointer flex items-center gap-1 ${
                       isDropoffAirportT1
-                        ? 'bg-amber-400 border-amber-500 text-slate-950 shadow-xs'
-                        : 'bg-white border-amber-300 hover:bg-amber-100 text-slate-800'
+                        ? 'bg-emerald-700 border-emerald-700 text-white shadow-xs'
+                        : 'bg-white border-emerald-200 hover:bg-emerald-100 text-slate-800'
                     }`}
                   >
                     <span>Terminal 1</span>
@@ -774,10 +771,10 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                       if (loc) applyQuickLocation(loc, 'dropoff');
                       setShowDropoffAirportTerminals(false);
                     }}
-                    className={`text-[11px] px-3 py-1 rounded-lg font-bold border-2 transition-all cursor-pointer flex items-center gap-1 ${
+                    className={`text-[11px] px-3 py-1 rounded-lg font-bold border transition-all cursor-pointer flex items-center gap-1 ${
                       isDropoffAirportT2
-                        ? 'bg-amber-400 border-amber-500 text-slate-950 shadow-xs'
-                        : 'bg-white border-amber-300 hover:bg-amber-100 text-slate-800'
+                        ? 'bg-emerald-700 border-emerald-700 text-white shadow-xs'
+                        : 'bg-white border-emerald-200 hover:bg-emerald-100 text-slate-800'
                     }`}
                   >
                     <span>Terminal 2</span>
@@ -802,14 +799,14 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 }}
                 className={`text-[11px] px-2.5 py-1 rounded-lg border font-semibold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 ${
                   isDropoffAirport
-                    ? 'bg-amber-400 border-2 border-amber-500 text-slate-950 font-bold shadow-xs'
-                    : 'bg-white hover:bg-amber-50 text-slate-800 border border-amber-400/60 hover:border-amber-400 shadow-xs'
+                    ? 'bg-emerald-700 border-emerald-700 text-white font-bold shadow-xs'
+                    : 'bg-white hover:bg-[#ecfdf5] text-slate-800 border-emerald-200 hover:border-emerald-400 shadow-2xs'
                 }`}
                 title="Click to select Airport Terminal 1 or Terminal 2"
               >
-                <Plane className="w-3.5 h-3.5 text-slate-900" />
+                <Plane className={`w-3.5 h-3.5 ${isDropoffAirport ? 'text-white' : 'text-emerald-700'}`} />
                 <span>{isDropoffAirportT1 ? 'Airport (T1)' : isDropoffAirportT2 ? 'Airport (T2)' : 'Airport'}</span>
-                <ChevronDown className={`w-3 h-3 text-slate-700 transition-transform ${showDropoffAirportTerminals ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-3 h-3 ${isDropoffAirport ? 'text-white' : 'text-slate-600'} transition-transform ${showDropoffAirportTerminals ? 'rotate-180' : ''}`} />
               </button>
 
               {/* Other Quick Locations (Cruise Port & Sants Station on same 1 row) */}
@@ -823,8 +820,8 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                   }}
                   className={`text-[11px] px-2.5 py-1 rounded-lg border font-semibold transition-all cursor-pointer shrink-0 ${
                     dropoff.toLowerCase().includes(loc.shortLabel.toLowerCase())
-                      ? 'bg-amber-400 border-2 border-amber-500 text-slate-950 font-bold shadow-xs'
-                      : 'bg-white hover:bg-amber-50 text-slate-800 border border-amber-400/60 hover:border-amber-400 shadow-xs'
+                      ? 'bg-emerald-700 border-emerald-700 text-white font-bold shadow-xs'
+                      : 'bg-white hover:bg-[#ecfdf5] text-slate-800 border-emerald-200 hover:border-emerald-400 shadow-2xs'
                   }`}
                 >
                   {loc.shortLabel}
@@ -834,77 +831,50 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
           </div>
         </div>
 
-        {/* Date, Time & Flight Info - 1 Single Row (2 Boxes side by side) */}
-        <div className="pt-2 border-t border-slate-200">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        {/* Date & Time Row (Pickup + Optional Return if Round Trip) */}
+        <div className="pt-2 border-t border-emerald-100">
+          <div className={`grid grid-cols-1 ${isRoundTrip ? 'sm:grid-cols-2' : ''} gap-2.5`}>
             {/* Box 1: Pickup Date & Time */}
             <div>
               <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 mb-1">
-                <Calendar className="w-3.5 h-3.5 text-amber-500" />
+                <Calendar className="w-3.5 h-3.5 text-emerald-700" />
                 <span>Pickup Date & Time</span>
               </label>
               <input
                 type="datetime-local"
                 value={dateTime}
                 onChange={(e) => setDateTime(e.target.value)}
-                className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 hover:bg-white focus:bg-white border-2 border-amber-400/70 focus:border-amber-400 rounded-xl focus:ring-2 focus:ring-amber-400/40 outline-none shadow-xs transition-all font-medium"
+                className="w-full px-3 py-2 text-xs sm:text-sm bg-[#f8fcf9] hover:bg-white focus:bg-white border border-emerald-200 focus:border-emerald-600 rounded-xl focus:ring-2 focus:ring-emerald-600/20 outline-none shadow-2xs transition-all font-medium"
               />
             </div>
 
-            {/* Box 2: Flight Number (or Return Date & Time if Round Trip) */}
-            {isRoundTrip ? (
+            {/* Box 2: Return Date & Time if Round Trip */}
+            {isRoundTrip && (
               <div>
                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 mb-1">
-                  <Clock className="w-3.5 h-3.5 text-amber-600" />
+                  <Clock className="w-3.5 h-3.5 text-emerald-700" />
                   <span>Return Date & Time</span>
                 </label>
                 <input
                   type="datetime-local"
                   value={returnDateTime}
                   onChange={(e) => setReturnDateTime(e.target.value)}
-                  className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 hover:bg-white focus:bg-white border-2 border-amber-400/70 focus:border-amber-400 rounded-xl focus:ring-2 focus:ring-amber-400/40 outline-none shadow-xs transition-all font-medium"
-                />
-              </div>
-            ) : (
-              <div>
-                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 mb-1">
-                  <Plane className="w-3.5 h-3.5 text-amber-500" />
-                  <span>Flight Number (Optional)</span>
-                </label>
-                <input
-                  type="text"
-                  value={flightNumber}
-                  onChange={(e) => setFlightNumber(e.target.value.toUpperCase())}
-                  placeholder="e.g. VY6204, BA478"
-                  className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 hover:bg-white focus:bg-white border-2 border-amber-400/70 focus:border-amber-400 rounded-xl focus:ring-2 focus:ring-amber-400/40 outline-none shadow-xs transition-all font-medium"
+                  className="w-full px-3 py-2 text-xs sm:text-sm bg-[#f8fcf9] hover:bg-white focus:bg-white border border-emerald-200 focus:border-emerald-600 rounded-xl focus:ring-2 focus:ring-emerald-600/20 outline-none shadow-2xs transition-all font-medium"
                 />
               </div>
             )}
           </div>
-
-          {/* Optional flight number if round trip */}
-          {isRoundTrip && (
-            <div className="mt-2">
-              <input
-                type="text"
-                value={flightNumber}
-                onChange={(e) => setFlightNumber(e.target.value.toUpperCase())}
-                placeholder="Flight Number (Optional, e.g. VY6204)"
-                className="w-full px-3 py-1.5 text-xs bg-slate-50 hover:bg-white focus:bg-white border border-amber-400/60 rounded-lg outline-none shadow-xs"
-              />
-            </div>
-          )}
         </div>
 
         {/* Merged Option Button: Passengers + Luggage + Child Seat */}
-        <div className="pt-2 border-t border-slate-200">
+        <div className="pt-2 border-t border-emerald-100">
           <button
             type="button"
             onClick={() => setShowPassengersLuggageSeats((prev) => !prev)}
-            className={`w-full p-2.5 sm:p-3 rounded-xl border-2 transition-all cursor-pointer flex items-center justify-between shadow-xs ${
+            className={`w-full p-2.5 sm:p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-between shadow-2xs ${
               showPassengersLuggageSeats
-                ? 'bg-amber-50 border-amber-500 ring-2 ring-amber-400/30'
-                : 'bg-slate-50 hover:bg-amber-50/60 border-amber-400/70 hover:border-amber-400'
+                ? 'bg-[#ecfdf5] border-emerald-500 ring-2 ring-emerald-500/20'
+                : 'bg-[#f8fcf9] hover:bg-[#ecfdf5] border-emerald-200 hover:border-emerald-400'
             }`}
           >
             <div className="text-left min-w-0 pr-2">
@@ -912,7 +882,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 Passengers + Luggage + Child Seat
               </div>
               <div className="text-[11px] font-semibold text-slate-600 flex items-center gap-1.5 mt-0.5 truncate">
-                <span className="text-slate-950 font-bold bg-amber-100 px-1.5 py-0.2 rounded border border-amber-300">
+                <span className="text-emerald-950 font-bold bg-[#ecfdf5] px-1.5 py-0.2 rounded border border-emerald-300">
                   {totalPassengers} Pax
                 </span>
                 <span>•</span>
@@ -925,7 +895,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
             </div>
 
             <div className="flex items-center gap-1.5 shrink-0 ml-2">
-              <span className="text-[11px] font-bold px-2 py-1 rounded-lg bg-amber-400 text-slate-950 border border-amber-500 shadow-xs flex items-center gap-1">
+              <span className="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-emerald-700 text-white shadow-xs flex items-center gap-1">
                 <span>{showPassengersLuggageSeats ? 'Close' : 'Choose / Edit'}</span>
                 {showPassengersLuggageSeats ? (
                   <ChevronUp className="w-3.5 h-3.5" />
@@ -938,10 +908,10 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
 
           {/* Expandable Panel: Passengers, Luggage, Child Seats */}
           {showPassengersLuggageSeats && (
-            <div className="mt-2.5 p-2.5 sm:p-3 bg-white border-2 border-amber-400/80 rounded-2xl shadow-lg space-y-2.5 transition-all">
+            <div className="mt-2.5 p-2.5 sm:p-3 bg-white border border-emerald-300 rounded-2xl shadow-md space-y-2.5 transition-all">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-2.5">
                 {/* Box 1: Passengers */}
-                <div className="bg-slate-50 border border-amber-400/60 hover:border-amber-400 rounded-xl p-2.5 flex flex-col justify-between shadow-xs transition-colors">
+                <div className="bg-[#f8fcf9] border border-emerald-200/80 hover:border-emerald-400 rounded-xl p-2.5 flex flex-col justify-between shadow-2xs transition-colors">
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
                       <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1">
@@ -1044,7 +1014,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                               }}
                               className={`py-0.5 rounded text-center text-[9px] font-bold transition-all cursor-pointer ${
                                 childAgeGroup === ag.id
-                                  ? 'bg-[#0e5c73] text-white shadow-xs'
+                                  ? 'bg-emerald-700 text-white shadow-xs'
                                   : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100'
                               }`}
                             >
@@ -1058,22 +1028,22 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 </div>
 
                 {/* Box 2: Luggage (Compact 2x2 grid) */}
-                <div className="bg-slate-50 border border-amber-400/60 hover:border-amber-400 rounded-xl p-2.5 flex flex-col justify-between shadow-xs transition-colors">
+                <div className="bg-[#f8fcf9] border border-emerald-200/80 hover:border-emerald-400 rounded-xl p-2.5 flex flex-col justify-between shadow-2xs transition-colors">
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
                       <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1">
-                        <Briefcase className="w-3.5 h-3.5 text-slate-600" />
+                        <Briefcase className="w-3.5 h-3.5 text-emerald-700" />
                         <span>Luggage</span>
                       </span>
                       <div className="flex items-center gap-1.5">
                         <button
                           type="button"
                           onClick={() => setShowSizeChart(true)}
-                          className="text-[9px] font-bold text-[#0e5c73] hover:text-[#0b4859] bg-sky-100/80 px-1.5 py-0.5 rounded flex items-center gap-0.5 cursor-pointer"
+                          className="text-[9px] font-bold text-emerald-800 hover:text-emerald-950 bg-[#ecfdf5] border border-emerald-200 px-1.5 py-0.5 rounded flex items-center gap-0.5 cursor-pointer transition-colors"
                         >
                           <span>📏 Guide</span>
                         </button>
-                        <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full bg-slate-200 text-slate-800">
+                        <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900">
                           {totalBags} Bags
                         </span>
                       </div>
@@ -1181,11 +1151,11 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 </div>
 
                 {/* Box 3: Child Seats */}
-                <div className="bg-slate-50 border border-amber-400/60 hover:border-amber-400 rounded-xl p-2.5 flex flex-col justify-between shadow-xs transition-colors">
+                <div className="bg-[#f8fcf9] border border-emerald-200/80 hover:border-emerald-400 rounded-xl p-2.5 flex flex-col justify-between shadow-2xs transition-colors">
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
                       <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1">
-                        <Baby className="w-3.5 h-3.5 text-slate-600" />
+                        <Baby className="w-3.5 h-3.5 text-emerald-700" />
                         <span>Child Seats</span>
                       </span>
                       <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
@@ -1258,11 +1228,11 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
               </div>
 
               {/* Done / Next button */}
-              <div className="flex justify-end pt-1 border-t border-slate-100">
+              <div className="flex justify-end pt-1 border-t border-emerald-100">
                 <button
                   type="button"
                   onClick={() => setShowPassengersLuggageSeats(false)}
-                  className="w-full sm:w-auto px-4 py-1.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs border border-amber-500 shadow-xs cursor-pointer flex items-center justify-center gap-1.5 transition-transform active:scale-95"
+                  className="w-full sm:w-auto px-4 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-xs cursor-pointer flex items-center justify-center gap-1.5 transition-transform active:scale-95"
                 >
                   <span>Done</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -1273,7 +1243,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
         </div>
 
         {/* Step 1 Action Button: Get Price */}
-        <div className="pt-2 border-t border-slate-200">
+        <div className="pt-2 border-t border-emerald-100">
           {validationError && (
             <div className="p-2.5 mb-2.5 bg-rose-50 border border-rose-300 rounded-xl text-xs font-bold text-rose-700 flex items-center gap-2">
               <span>⚠️ {validationError}</span>
@@ -1292,11 +1262,11 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
               const el = document.getElementById('calculator');
               if (el) el.scrollIntoView({ behavior: 'smooth' });
             }}
-            className="w-full flex items-center justify-center gap-2.5 py-4 px-6 rounded-xl bg-[#f5b301] hover:bg-[#e5a700] text-slate-950 font-extrabold text-base sm:text-lg shadow-lg hover:shadow-xl transition-all active:scale-[0.98] cursor-pointer border-2 border-amber-500 font-display"
+            className="w-full flex items-center justify-center gap-2.5 py-3 px-6 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-base sm:text-lg shadow-md hover:shadow-lg transition-all active:scale-[0.98] cursor-pointer font-display"
           >
-            <Sparkles className="w-5 h-5 text-slate-950" />
+            <Sparkles className="w-5 h-5 text-emerald-100" />
             <span>Get Price</span>
-            <ArrowRight className="w-5 h-5 text-slate-950" />
+            <ArrowRight className="w-5 h-5 text-white" />
           </button>
 
           <p className="text-[10px] text-center text-slate-500 flex items-center justify-center gap-2 flex-wrap mt-2">
@@ -1310,11 +1280,11 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
       </div>
     ) : (
       /* Step 2: Available Vehicles & Confirmation (QuickPickups style) */
-      <div className="p-4 sm:p-6 lg:p-7 bg-slate-50">
+      <div className="p-4 sm:p-6 lg:p-7 bg-[#f8fcf9]">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start">
           {/* Left Column (lg:col-span-7): Available Vehicles with Prices */}
           <div className="lg:col-span-7 space-y-3.5">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 pb-1 border-b border-slate-200">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 pb-1 border-b border-emerald-200/70">
               <div>
                 <h3 className="font-display font-extrabold text-base sm:text-lg text-slate-900">
                   Available Vehicles for Your Trip
@@ -1323,12 +1293,12 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                   {quote?.distanceKm || 18} km · Approx. {quote?.durationText || '30 mins'} · Fixed prices, tolls included
                 </p>
               </div>
-              <span className="text-[11px] font-bold text-amber-700 bg-amber-100 border border-amber-300 px-2.5 py-1 rounded-full self-start sm:self-auto">
+              <span className="text-[11px] font-bold text-emerald-800 bg-[#ecfdf5] border border-emerald-200 px-2.5 py-1 rounded-full self-start sm:self-auto">
                 {isRoundTrip ? 'Round Trip (-5% off)' : 'One Way'}
               </span>
             </div>
 
-            {/* Compact Vehicle Selection List (Mobile-Optimized, No Photos, Realistic Icons) */}
+            {/* Compact Vehicle Selection List (Mobile-Optimized, Real Miniature Thumbnails) */}
             <div className="space-y-2.5">
               {/* 1. Standard Sedan */}
               {(() => {
@@ -1349,23 +1319,23 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                       isDisabled
                         ? 'opacity-40 cursor-not-allowed bg-slate-50 border-slate-200'
                         : isSelected
-                        ? 'border-amber-500 bg-amber-50/60 shadow-xs ring-2 ring-amber-400/80 cursor-pointer'
-                        : 'border-slate-200 hover:border-amber-300 bg-white hover:bg-slate-50 cursor-pointer shadow-2xs'
+                        ? 'border-emerald-600 bg-[#ecfdf5] shadow-xs ring-1 ring-emerald-600 cursor-pointer'
+                        : 'border-emerald-200/70 hover:border-emerald-400 bg-white hover:bg-[#f2fbf6] cursor-pointer shadow-2xs'
                     }`}
                   >
-                    {/* Left: Radio indicator + Realistic Vehicle Icon + Details */}
+                    {/* Left: Radio indicator + Realistic Vehicle Thumbnail + Details */}
                     <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
                       {/* Radio dot */}
                       <div
                         className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
-                          isSelected ? 'border-amber-500 bg-amber-500' : 'border-slate-300 bg-white'
+                          isSelected ? 'border-emerald-700 bg-emerald-700' : 'border-slate-300 bg-white'
                         }`}
                       >
-                        {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-slate-950" />}
+                        {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
                       </div>
 
                       {/* Realistic Small Vehicle Thumbnail */}
-                      <div className="w-14 sm:w-16 h-10 sm:h-11 rounded-lg bg-slate-100 overflow-hidden shrink-0 border border-slate-200/90 shadow-2xs">
+                      <div className="w-14 sm:w-16 h-10 sm:h-11 rounded-lg bg-slate-100 overflow-hidden shrink-0 border border-emerald-200/70 shadow-2xs">
                         <img
                           src={v.photos[0]}
                           alt={v.name}
@@ -1381,7 +1351,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                             {v.name}
                           </h4>
                           {isRecommended && !isDisabled && (
-                            <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-sm bg-amber-400 text-slate-950 uppercase tracking-tight">
+                            <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-sm bg-emerald-700 text-white uppercase tracking-tight">
                               Recommended
                             </span>
                           )}
@@ -1407,7 +1377,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
 
                     {/* Right: Price & Type */}
                     <div className="text-right shrink-0">
-                      <div className="font-display font-extrabold text-base sm:text-lg text-slate-950 leading-tight">
+                      <div className="font-display font-extrabold text-base sm:text-lg text-slate-950 leading-tight tabular-nums">
                         €{price}
                       </div>
                       <div className="text-[9px] sm:text-[10px] text-slate-500 font-medium">
@@ -1437,22 +1407,22 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                       isDisabled
                         ? 'opacity-40 cursor-not-allowed bg-slate-50 border-slate-200'
                         : isSelected
-                        ? 'border-amber-500 bg-amber-50/60 shadow-xs ring-2 ring-amber-400/80 cursor-pointer'
-                        : 'border-slate-200 hover:border-amber-300 bg-white hover:bg-slate-50 cursor-pointer shadow-2xs'
+                        ? 'border-emerald-600 bg-[#ecfdf5] shadow-xs ring-1 ring-emerald-600 cursor-pointer'
+                        : 'border-emerald-200/70 hover:border-emerald-400 bg-white hover:bg-[#f2fbf6] cursor-pointer shadow-2xs'
                     }`}
                   >
-                    {/* Left: Radio indicator + Realistic Executive SVG Icon + Details */}
+                    {/* Left: Radio indicator + Realistic Executive Thumbnail + Details */}
                     <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
                       <div
                         className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
-                          isSelected ? 'border-amber-500 bg-amber-500' : 'border-slate-300 bg-white'
+                          isSelected ? 'border-emerald-700 bg-emerald-700' : 'border-slate-300 bg-white'
                         }`}
                       >
-                        {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-slate-950" />}
+                        {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
                       </div>
 
                       {/* Realistic Small Vehicle Thumbnail */}
-                      <div className="w-14 sm:w-16 h-10 sm:h-11 rounded-lg bg-slate-100 overflow-hidden shrink-0 border border-slate-200/90 shadow-2xs">
+                      <div className="w-14 sm:w-16 h-10 sm:h-11 rounded-lg bg-slate-100 overflow-hidden shrink-0 border border-emerald-200/70 shadow-2xs">
                         <img
                           src={v.photos[0]}
                           alt={v.name}
@@ -1466,11 +1436,11 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                           <h4 className="font-display font-bold text-xs sm:text-sm text-slate-900 leading-tight">
                             {v.name}
                           </h4>
-                          <span className="text-[9px] font-semibold px-1 py-0.2 rounded bg-slate-100 text-slate-600">
+                          <span className="text-[9px] font-semibold px-1 py-0.2 rounded bg-emerald-50 text-emerald-800 border border-emerald-200">
                             Executive
                           </span>
                           {isRecommended && !isDisabled && (
-                            <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-sm bg-amber-400 text-slate-950 uppercase tracking-tight">
+                            <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-sm bg-emerald-700 text-white uppercase tracking-tight">
                               Recommended
                             </span>
                           )}
@@ -1495,7 +1465,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                     </div>
 
                     <div className="text-right shrink-0">
-                      <div className="font-display font-extrabold text-base sm:text-lg text-slate-950 leading-tight">
+                      <div className="font-display font-extrabold text-base sm:text-lg text-slate-950 leading-tight tabular-nums">
                         €{price}
                       </div>
                       <div className="text-[9px] sm:text-[10px] text-slate-500 font-medium">
@@ -1520,22 +1490,22 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                     onClick={() => setSelectedVehicleId('van')}
                     className={`p-3 sm:p-3.5 rounded-xl border transition-all flex items-center justify-between gap-3 ${
                       isSelected
-                        ? 'border-amber-500 bg-amber-50/60 shadow-xs ring-2 ring-amber-400/80 cursor-pointer'
-                        : 'border-slate-200 hover:border-amber-300 bg-white hover:bg-slate-50 cursor-pointer shadow-2xs'
+                        ? 'border-emerald-600 bg-[#ecfdf5] shadow-xs ring-1 ring-emerald-600 cursor-pointer'
+                        : 'border-emerald-200/70 hover:border-emerald-400 bg-white hover:bg-[#f2fbf6] cursor-pointer shadow-2xs'
                     }`}
                   >
-                    {/* Left: Radio indicator + Realistic Minivan SVG Icon + Details */}
+                    {/* Left: Radio indicator + Realistic Minivan Thumbnail + Details */}
                     <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
                       <div
                         className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
-                          isSelected ? 'border-amber-500 bg-amber-500' : 'border-slate-300 bg-white'
+                          isSelected ? 'border-emerald-700 bg-emerald-700' : 'border-slate-300 bg-white'
                         }`}
                       >
-                        {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-slate-950" />}
+                        {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
                       </div>
 
                       {/* Realistic Small Vehicle Thumbnail */}
-                      <div className="w-14 sm:w-16 h-10 sm:h-11 rounded-lg bg-slate-100 overflow-hidden shrink-0 border border-slate-200/90 shadow-2xs">
+                      <div className="w-14 sm:w-16 h-10 sm:h-11 rounded-lg bg-slate-100 overflow-hidden shrink-0 border border-emerald-200/70 shadow-2xs">
                         <img
                           src={v.photos[0]}
                           alt={v.name}
@@ -1550,7 +1520,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                             Minivan (8-Seater)
                           </h4>
                           {isRecommended && (
-                            <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-sm bg-amber-400 text-slate-950 uppercase tracking-tight">
+                            <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-sm bg-emerald-700 text-white uppercase tracking-tight">
                               Recommended for your group
                             </span>
                           )}
@@ -1569,7 +1539,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                     </div>
 
                     <div className="text-right shrink-0">
-                      <div className="font-display font-extrabold text-base sm:text-lg text-slate-950 leading-tight">
+                      <div className="font-display font-extrabold text-base sm:text-lg text-slate-950 leading-tight tabular-nums">
                         €{price}
                       </div>
                       <div className="text-[9px] sm:text-[10px] text-slate-500 font-medium">
@@ -1584,9 +1554,9 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
 
           {/* Right Column (lg:col-span-5): Confirmation Details & Trip Summary (Sticky) */}
           <div className="lg:col-span-5">
-            <div className="bg-white rounded-2xl border-2 border-amber-400 p-4 sm:p-5 shadow-lg space-y-4 sticky top-4">
-              <div className="border-b border-slate-200 pb-3">
-                <span className="text-[11px] font-extrabold uppercase tracking-wider text-amber-700 block">
+            <div className="bg-white rounded-2xl border border-emerald-200 p-4 sm:p-5 shadow-md space-y-4 sticky top-4">
+              <div className="border-b border-emerald-100 pb-3">
+                <span className="text-[11px] font-extrabold uppercase tracking-wider text-emerald-700 block">
                   Confirmation Details
                 </span>
                 <h3 className="font-display font-extrabold text-base text-slate-900">
@@ -1614,7 +1584,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
               </div>
 
               {/* Date, Pax, Luggage Pill Grid */}
-              <div className="grid grid-cols-2 gap-2 text-[11px] bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+              <div className="grid grid-cols-2 gap-2 text-[11px] bg-[#f8fcf9] p-2.5 rounded-xl border border-emerald-100">
                 <div>
                   <span className="text-slate-400 block text-[10px]">Date & Time</span>
                   <span className="font-bold text-slate-800">{dateTime || 'Flexible'}</span>
@@ -1642,10 +1612,10 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
               </div>
 
               {/* Selected Vehicle & Price Breakdown Box */}
-              <div className="bg-amber-50/80 border-2 border-amber-400/90 rounded-xl p-3">
+              <div className="bg-[#ecfdf5] border border-emerald-300 rounded-xl p-3">
                 <div className="flex items-center justify-between mb-1.5">
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 block">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 block">
                       Selected Vehicle
                     </span>
                     <span className="font-display font-extrabold text-sm text-slate-900">
@@ -1653,7 +1623,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                     </span>
                   </div>
                   <div className="text-right">
-                    <span className="text-2xl font-extrabold text-slate-950 font-display block">
+                    <span className="text-2xl font-extrabold text-emerald-800 font-display block tabular-nums">
                       €{finalQuotedPrice}
                     </span>
                     <span className="text-[10px] font-bold text-slate-600">
@@ -1662,7 +1632,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                   </div>
                 </div>
 
-                <div className="text-[10px] text-slate-600 border-t border-amber-200/70 pt-1.5 space-y-0.5">
+                <div className="text-[10px] text-slate-600 border-t border-emerald-200 pt-1.5 space-y-0.5">
                   <div className="flex justify-between">
                     <span>Highway Tolls & Airport Taxes:</span>
                     <span className="font-bold text-emerald-700">Included (€0)</span>
@@ -1688,7 +1658,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                   value={passengerName}
                   onChange={(e) => setPassengerName(e.target.value)}
                   placeholder="e.g. John Smith"
-                  className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl outline-none focus:border-amber-400 focus:bg-white"
+                  className="w-full px-3 py-2 text-xs bg-[#f8fcf9] border border-emerald-200 rounded-xl outline-none focus:border-emerald-600 focus:bg-white"
                 />
               </div>
 
@@ -1697,24 +1667,24 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 <button
                   type="button"
                   onClick={handleBookWhatsApp}
-                  className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#f5b301] hover:bg-[#e5a700] text-slate-950 font-extrabold text-sm sm:text-base shadow-md transition-all active:scale-[0.98] cursor-pointer border border-amber-500 font-display"
+                  className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-sm sm:text-base shadow-md transition-all active:scale-[0.98] cursor-pointer font-display"
                 >
-                  <MessageCircle className="w-5 h-5 fill-slate-950" />
+                  <MessageCircle className="w-5 h-5 fill-white" />
                   <span>Confirm Booking on WhatsApp</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={handleViewVoucher}
-                  className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs border border-slate-800 shadow-xs transition-all active:scale-[0.98] cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-[#ecfdf5] hover:bg-emerald-100 text-emerald-900 font-bold text-xs border border-emerald-200 shadow-2xs transition-all active:scale-[0.98] cursor-pointer"
                 >
-                  <FileText className="w-3.5 h-3.5 text-amber-400" />
+                  <FileText className="w-3.5 h-3.5 text-emerald-700" />
                   <span>View Official Printable Voucher</span>
                 </button>
               </div>
 
               {/* Trust Badges */}
-              <div className="pt-2 border-t border-slate-200 text-[10px] text-slate-500 space-y-1 text-center">
+              <div className="pt-2 border-t border-emerald-100 text-[10px] text-slate-500 space-y-1 text-center">
                 <p className="flex items-center justify-center gap-1.5 font-medium">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                   <span>Pay driver directly in cash or card · 0 booking fee</span>
@@ -1732,14 +1702,14 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
             {/* 1-Click Luggage Size Chart Modal */}
       {showSizeChart && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/70 backdrop-blur-xs"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/50 backdrop-blur-xs"
           onClick={() => setShowSizeChart(false)}
         >
           <div
-            className="bg-white rounded-2xl max-w-xl w-full p-4 sm:p-5 shadow-2xl border border-slate-200 overflow-hidden text-slate-900 max-h-[90vh] overflow-y-auto"
+            className="bg-white rounded-2xl max-w-xl w-full p-4 sm:p-5 shadow-2xl border border-emerald-200 overflow-hidden text-slate-900 max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between pb-2.5 border-b border-slate-200">
+            <div className="flex items-center justify-between pb-2.5 border-b border-emerald-100">
               <div className="flex items-center gap-2">
                 <span className="text-xl">🧳</span>
                 <div>
@@ -1754,7 +1724,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
               <button
                 type="button"
                 onClick={() => setShowSizeChart(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-emerald-50 transition-colors cursor-pointer"
                 aria-label="Close size chart"
               >
                 <X className="w-5 h-5" />
@@ -1762,37 +1732,37 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
             </div>
 
             {/* Real Bags Visual Comparison Photo - Clean Only */}
-            <div className="rounded-xl overflow-hidden border-2 border-amber-400/80 shadow-md bg-white my-3">
+            <div className="rounded-xl overflow-hidden border border-emerald-200 shadow-sm bg-white my-3">
               <img
                 src="/images/luggage-guide.jpg"
                 alt="Real luggage types: Backpack, Cabin 55cm, Medium 65cm, Large XXL 80cm"
                 className="w-full h-auto object-cover max-h-72"
               />
-              <div className="grid grid-cols-4 text-center py-2.5 bg-slate-900 text-white text-[11px] sm:text-xs font-bold divide-x divide-slate-800">
+              <div className="grid grid-cols-4 text-center py-2.5 bg-[#ecfdf5] text-slate-900 text-[11px] sm:text-xs font-bold divide-x divide-emerald-200 border-t border-emerald-200">
                 <div className="px-1">
-                  <span className="block text-amber-400">Backpack</span>
-                  <span className="text-[9px] text-slate-300 font-normal">Personal Lap</span>
+                  <span className="block text-emerald-800">Backpack</span>
+                  <span className="text-[9px] text-slate-500 font-normal">Personal Lap</span>
                 </div>
                 <div className="px-1">
-                  <span className="block text-amber-400">55 cm</span>
-                  <span className="text-[9px] text-slate-300 font-normal">Cabin / Hand</span>
+                  <span className="block text-emerald-800">55 cm</span>
+                  <span className="text-[9px] text-slate-500 font-normal">Cabin / Hand</span>
                 </div>
                 <div className="px-1">
-                  <span className="block text-amber-400">65 cm</span>
-                  <span className="text-[9px] text-slate-300 font-normal">Medium Check-in</span>
+                  <span className="block text-emerald-800">65 cm</span>
+                  <span className="text-[9px] text-slate-500 font-normal">Medium Check-in</span>
                 </div>
                 <div className="px-1">
-                  <span className="block text-amber-400">75–80 cm</span>
-                  <span className="text-[9px] text-slate-300 font-normal">Large / XXL</span>
+                  <span className="block text-emerald-800">75–80 cm</span>
+                  <span className="text-[9px] text-slate-500 font-normal">Large / XXL</span>
                 </div>
               </div>
             </div>
 
-            <div className="mt-3 pt-2.5 border-t border-slate-200 flex justify-end">
+            <div className="mt-3 pt-2.5 border-t border-emerald-100 flex justify-end">
               <button
                 type="button"
                 onClick={() => setShowSizeChart(false)}
-                className="w-full sm:w-auto px-5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs border border-amber-500 shadow-xs cursor-pointer"
+                className="w-full sm:w-auto px-5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-xs cursor-pointer transition-colors"
               >
                 Got It / Close
               </button>
