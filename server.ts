@@ -9,14 +9,55 @@ dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
-const PORT = Number(process.env.PORT) || 3000;
+const PORT = 3000;
 
 app.use(express.json());
 
-// Direct download endpoint for Netlify deployment zip
+// Direct endpoints for code export & downloads
+app.get('/BookingCalculator.txt', (req, res) => {
+  const filePath = path.resolve(__dirname, 'src/components/BookingCalculator.tsx');
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  res.sendFile(filePath);
+});
+
+app.get('/BookingCalculator.tsx', (req, res) => {
+  const filePath = path.resolve(__dirname, 'src/components/BookingCalculator.tsx');
+  res.download(filePath, 'BookingCalculator.tsx');
+});
+
+app.get('/easytransferhub-source-code.zip', (req, res) => {
+  const zipPath = path.resolve(__dirname, 'public/easytransferhub-source-code.zip');
+  res.download(zipPath, 'easytransferhub-source-code.zip');
+});
+
 app.get('/easytransferhub-netlify.zip', (req, res) => {
   const zipPath = path.resolve(__dirname, 'public/easytransferhub-netlify.zip');
   res.download(zipPath, 'easytransferhub-netlify.zip');
+});
+
+app.get('/easytransferhub-white-green-theme.zip', (req, res) => {
+  const zipPath = path.resolve(__dirname, 'public/easytransferhub-white-green-theme.zip');
+  res.download(zipPath, 'easytransferhub-white-green-theme.zip');
+});
+
+app.get('/easytransferhub-ocean-blue-theme.zip', (req, res) => {
+  const zipPath = path.resolve(__dirname, 'public/easytransferhub-ocean-blue-theme.zip');
+  res.download(zipPath, 'easytransferhub-ocean-blue-theme.zip');
+});
+
+app.get('/easytransferhub-lagoon-water-theme.zip', (req, res) => {
+  const zipPath = path.resolve(__dirname, 'public/easytransferhub-lagoon-water-theme.zip');
+  res.download(zipPath, 'easytransferhub-lagoon-water-theme.zip');
+});
+
+app.get('/easytransferhub-vercel.zip', (req, res) => {
+  const zipPath = path.resolve(__dirname, 'public/easytransferhub-vercel.zip');
+  res.download(zipPath, 'easytransferhub-vercel.zip');
+});
+
+app.get('/easytransferhub-white-green-animated-theme.zip', (req, res) => {
+  const zipPath = path.resolve(__dirname, 'public/easytransferhub-white-green-animated-theme.zip');
+  res.download(zipPath, 'easytransferhub-white-green-animated-theme.zip');
 });
 
 const SYSTEM_INSTRUCTION = `You are the friendly, professional virtual concierge for EasyTransferHub (owned and managed by Mr. Mir in Barcelona, Spain).

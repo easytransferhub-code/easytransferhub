@@ -7,14 +7,14 @@ export const HowItWorks: React.FC = () => {
       title: 'Calculate Your Trip & Fixed Price',
       desc: 'Enter your pickup point, destination, date and group size. Select your preferred vehicle (Standard Sedan, Comfort Executive, or 8-Seater Minivan).',
       icon: Calculator,
-      color: 'bg-amber-100 text-amber-800',
+      color: 'bg-emerald-100 text-emerald-800',
     },
     {
       step: '02',
       title: 'Instant WhatsApp or Email Confirmation',
       desc: 'One tap sends your reservation directly to Mr. Mir on WhatsApp. We confirm your chauffeur, vehicle license plate, and pickup details within minutes.',
       icon: MessageSquare,
-      color: 'bg-teal-100 text-teal-800',
+      color: 'bg-emerald-100 text-emerald-800',
     },
     {
       step: '03',
@@ -26,10 +26,10 @@ export const HowItWorks: React.FC = () => {
   ];
 
   return (
-    <section id="how" className="py-16 bg-white border-b border-slate-200">
+    <section id="how" className="py-16 bg-white border-b border-emerald-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="text-xs font-bold uppercase tracking-wider text-[#0e5c73] block mb-1">
+          <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-emerald-700 block mb-1">
             Simple & Transparent
           </span>
           <h2 className="text-2xl sm:text-3xl font-display font-extrabold text-slate-900 tracking-tight">
@@ -46,13 +46,13 @@ export const HowItWorks: React.FC = () => {
             return (
               <div
                 key={idx}
-                className="relative bg-slate-50 border-2 border-amber-400/60 hover:border-amber-400 rounded-2xl p-6 hover:shadow-lg transition-all"
+                className="relative bg-[#f8fcf9] border border-emerald-200/70 hover:border-emerald-400 rounded-2xl p-6 hover:shadow-md transition-all"
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${s.color}`}>
                     <Icon className="w-6 h-6" />
                   </div>
-                  <span className="font-display font-black text-3xl text-slate-300">
+                  <span className="font-display font-black text-3xl text-emerald-200">
                     {s.step}
                   </span>
                 </div>

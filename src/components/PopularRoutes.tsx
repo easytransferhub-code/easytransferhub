@@ -8,11 +8,11 @@ interface PopularRoutesProps {
 
 export const PopularRoutes: React.FC<PopularRoutesProps> = ({ onSelectRoute }) => {
   return (
-    <section id="routes" className="py-16 bg-slate-50 border-b border-slate-200">
+    <section id="routes" className="py-16 bg-[#f2fbf6] border-b border-emerald-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-[#0e5c73] block mb-1">
+            <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-emerald-700 block mb-1">
               Top Pickups & City Transfers
             </span>
             <h2 className="text-2xl sm:text-3xl font-display font-extrabold text-slate-900 tracking-tight">
@@ -37,15 +37,15 @@ export const PopularRoutes: React.FC<PopularRoutesProps> = ({ onSelectRoute }) =
           {POPULAR_ROUTES.map((route) => (
             <div
               key={route.id}
-              className={`bg-white rounded-2xl border-2 p-5 transition-all hover:shadow-lg flex flex-col justify-between ${
+              className={`bg-white rounded-2xl border p-5 transition-all hover:shadow-md flex flex-col justify-between ${
                 route.highlight
-                  ? 'border-amber-400 shadow-md relative ring-1 ring-amber-400/50'
-                  : 'border-amber-400/50 hover:border-amber-400 shadow-xs'
+                  ? 'border-emerald-500 shadow-sm relative ring-1 ring-emerald-500/20'
+                  : 'border-emerald-200/70 hover:border-emerald-400 shadow-xs'
               }`}
             >
               {route.highlight && (
                 <div className="absolute -top-3 left-5">
-                  <span className="bg-amber-400 text-slate-950 font-extrabold text-[10px] uppercase tracking-wider px-2.5 py-0.5 rounded-full shadow-xs">
+                  <span className="bg-emerald-700 text-white font-bold text-[10px] uppercase tracking-wider px-2.5 py-0.5 rounded-full shadow-xs">
                     Most Popular
                   </span>
                 </div>
@@ -68,22 +68,22 @@ export const PopularRoutes: React.FC<PopularRoutesProps> = ({ onSelectRoute }) =
                 </div>
 
                 {/* Pricing comparison per vehicle */}
-                <div className="grid grid-cols-3 gap-2 bg-slate-50 rounded-xl p-2.5 border border-slate-100 mb-4 text-center">
+                <div className="grid grid-cols-3 gap-2 bg-[#f8fcf9] rounded-xl p-2.5 border border-emerald-100 mb-4 text-center">
                   <div>
                     <span className="text-[10px] text-slate-500 block uppercase font-semibold">Standard</span>
-                    <span className="text-sm font-extrabold text-slate-900">€{route.prices.standard}</span>
+                    <span className="text-sm font-extrabold text-slate-900 tabular-nums">€{route.prices.standard}</span>
                     <span className="text-[10px] text-slate-400 block">1-4 pax</span>
                   </div>
 
-                  <div className="border-x border-slate-200">
+                  <div className="border-x border-emerald-100">
                     <span className="text-[10px] text-slate-500 block uppercase font-semibold">Comfort</span>
-                    <span className="text-sm font-extrabold text-[#0e5c73]">€{route.prices.comfort}</span>
+                    <span className="text-sm font-extrabold text-emerald-700 tabular-nums">€{route.prices.comfort}</span>
                     <span className="text-[10px] text-slate-400 block">Exec</span>
                   </div>
 
                   <div>
                     <span className="text-[10px] text-slate-500 block uppercase font-semibold">Minivan</span>
-                    <span className="text-sm font-extrabold text-slate-900">€{route.prices.van}</span>
+                    <span className="text-sm font-extrabold text-slate-900 tabular-nums">€{route.prices.van}</span>
                     <span className="text-[10px] text-slate-400 block">Up to 8</span>
                   </div>
                 </div>
@@ -93,7 +93,7 @@ export const PopularRoutes: React.FC<PopularRoutesProps> = ({ onSelectRoute }) =
               <button
                 type="button"
                 onClick={() => onSelectRoute(route)}
-                className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-slate-100 hover:bg-[#f5b301] hover:text-slate-950 text-slate-800 font-bold text-xs transition-colors cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-[#ecfdf5] hover:bg-emerald-700 hover:text-white text-emerald-900 border border-emerald-200 font-bold text-xs transition-all cursor-pointer"
               >
                 <span>Select & Calculate Booking</span>
                 <ArrowRight className="w-3.5 h-3.5" />

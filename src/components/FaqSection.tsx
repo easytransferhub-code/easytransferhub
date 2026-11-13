@@ -10,10 +10,10 @@ export const FaqSection: React.FC = () => {
   };
 
   return (
-    <section id="faq" className="py-16 bg-white border-b border-slate-200">
+    <section id="faq" className="py-16 bg-white border-b border-emerald-100">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-12">
-          <span className="text-xs font-bold uppercase tracking-wider text-[#0e5c73] block mb-1">
+          <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-emerald-700 block mb-1">
             Got Questions?
           </span>
           <h2 className="text-2xl sm:text-3xl font-display font-extrabold text-slate-900 tracking-tight">
@@ -30,7 +30,7 @@ export const FaqSection: React.FC = () => {
             return (
               <div
                 key={idx}
-                className="border-2 border-amber-400/50 hover:border-amber-400 rounded-2xl overflow-hidden transition-all bg-slate-50/50 hover:bg-slate-50 shadow-xs"
+                className="border border-emerald-200/70 hover:border-emerald-400 rounded-2xl overflow-hidden transition-all bg-[#f8fcf9] hover:bg-[#f2fbf6] shadow-xs"
               >
                 <button
                   type="button"
@@ -43,13 +43,13 @@ export const FaqSection: React.FC = () => {
                   </span>
                   <ChevronDown
                     className={`w-4 h-4 text-slate-500 transition-transform duration-200 shrink-0 ${
-                      isOpen ? 'rotate-180 text-[#0e5c73]' : ''
+                      isOpen ? 'rotate-180 text-emerald-700' : ''
                     }`}
                   />
                 </button>
 
                 {isOpen && (
-                  <div className="px-5 pb-5 pt-1 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-100 bg-white">
+                  <div className="px-5 pb-5 pt-1 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-emerald-100 bg-white">
                     {faq.answer}
                   </div>
                 )}
@@ -59,7 +59,7 @@ export const FaqSection: React.FC = () => {
         </div>
 
         {/* Still have questions banner */}
-        <div className="mt-8 p-5 rounded-2xl bg-slate-100 border-2 border-amber-400/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left shadow-xs">
+        <div className="mt-8 p-5 rounded-2xl bg-[#ecfdf5] text-slate-900 border border-emerald-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left shadow-xs">
           <div>
             <h4 className="font-bold text-sm text-slate-900">Have a custom question or special group request?</h4>
             <p className="text-xs text-slate-600 mt-0.5">Mr. Mir replies within minutes on WhatsApp.</p>
@@ -68,9 +68,9 @@ export const FaqSection: React.FC = () => {
             href={`https://wa.me/${BUSINESS_INFO.whatsappNumber}?text=${encodeURIComponent('Hello Easytransferhub, I have a question about a transfer.')}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 py-2.5 px-4 rounded-xl bg-[#f5b301] hover:bg-[#e5a700] text-slate-950 font-bold text-xs shadow-xs"
+            className="inline-flex items-center gap-2 py-2.5 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-xs transition-colors"
           >
-            <MessageCircle className="w-4 h-4 fill-slate-950" />
+            <MessageCircle className="w-4 h-4 fill-white" />
             <span>Chat on WhatsApp</span>
           </a>
         </div>

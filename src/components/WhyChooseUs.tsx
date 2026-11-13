@@ -36,17 +36,17 @@ export const WhyChooseUs: React.FC = () => {
   ];
 
   return (
-    <section className="py-16 bg-[#0e2438] text-white">
+    <section className="py-16 bg-[#ecfdf5] text-slate-900 border-y border-emerald-200/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="text-xs font-bold uppercase tracking-wider text-amber-400 block mb-1">
+          <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-700 block mb-2">
             Service Excellence
           </span>
-          <h2 className="text-2xl sm:text-3xl font-display font-extrabold text-white tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-display font-extrabold text-slate-900 tracking-tight">
             Why Travelers Choose EasyTransferHub
           </h2>
-          <p className="text-sm text-slate-300 mt-2">
-            The reliable alternative to crowded taxi queues and unreliable rideshare apps at Barcelona Airport.
+          <p className="text-sm text-slate-600 mt-2">
+            The refined alternative to crowded taxi queues and unpredictable rideshare apps at Barcelona Airport.
           </p>
         </div>
 
@@ -56,15 +56,15 @@ export const WhyChooseUs: React.FC = () => {
             return (
               <div
                 key={idx}
-                className="bg-[#112331] border border-amber-400/50 hover:border-amber-400 rounded-2xl p-6 transition-all hover:shadow-md"
+                className="bg-white border border-emerald-200/80 hover:border-emerald-400 rounded-2xl p-6 transition-all shadow-xs hover:shadow-md"
               >
-                <div className="w-10 h-10 rounded-xl bg-amber-400/10 border border-amber-400/20 text-amber-400 flex items-center justify-center mb-4">
+                <div className="w-10 h-10 rounded-xl bg-emerald-100/80 border border-emerald-200 text-emerald-700 flex items-center justify-center mb-4">
                   <Icon className="w-5 h-5" />
                 </div>
-                <h3 className="font-display font-bold text-base text-white mb-2">
+                <h3 className="font-display font-bold text-base text-slate-900 mb-2">
                   {p.title}
                 </h3>
-                <p className="text-xs text-slate-300 leading-relaxed">
+                <p className="text-xs text-slate-600 leading-relaxed">
                   {p.desc}
                 </p>
               </div>

@@ -12,10 +12,10 @@ export const FloatingActions: React.FC<FloatingActionsProps> = ({ onOpenAssistan
       {/* 24/7 AI Concierge Floating Button */}
       <button
         onClick={onOpenAssistant}
-        className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-[#0e5c73] hover:bg-[#187793] text-white text-xs font-bold shadow-lg border border-teal-400/30 transition-all hover:scale-105 active:scale-95 cursor-pointer group"
+        className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-white hover:bg-[#ecfdf5] text-emerald-950 text-xs font-bold shadow-lg border border-emerald-200 transition-all hover:scale-105 active:scale-95 cursor-pointer group"
         title="Ask 24/7 AI Transfer Concierge"
       >
-        <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-spin" style={{ animationDuration: '6s' }} />
+        <Sparkles className="w-3.5 h-3.5 text-emerald-700" />
         <span className="hidden sm:inline">Ask AI Concierge</span>
         <span className="sm:hidden">AI Concierge</span>
       </button>
