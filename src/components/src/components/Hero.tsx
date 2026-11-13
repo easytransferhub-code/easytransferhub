@@ -94,26 +94,6 @@ export const Hero: React.FC<HeroProps> = ({
               </p>
             </div>
           </div>
-
-          {/* Chauffeur Vehicle Showcase Banner */}
-          <div className="pt-1">
-            <div className="relative rounded-xl overflow-hidden border border-emerald-200 shadow-sm group h-36 sm:h-44">
-              <img
-                src="/images/hero.jpg"
-                alt="EasyTransferHub executive chauffeur van in Barcelona"
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/35 to-transparent flex flex-col justify-end p-4">
-                <span className="font-bold text-emerald-300 text-xs block tracking-wide uppercase">
-                  Executive Sedans & Minivans
-                </span>
-                <span className="text-[11px] text-white mt-0.5">
-                  Barcelona Airport, Cruise Port & Intercity Transfers across Spain
-                </span>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </section>
