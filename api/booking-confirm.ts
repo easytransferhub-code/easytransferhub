@@ -298,23 +298,7 @@ async function sendEmailNotifications(
     try {
       const fromAddress =
         process.env.RESEND_FROM_EMAIL || 'Easytransferhub <onboarding@resend.dev>';
-      const res = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${resendKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          from: fromAddress,
-          to: [data.email],
-          reply_to: ownerEmail,
-          subject,
-          html,
-          text,
-        }),
-      });
-
-      if (ownerEmail) {
+      const requests: Promise<Response>[] = [
         fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: {
@@ -323,19 +307,42 @@ async function sendEmailNotifications(
           },
           body: JSON.stringify({
             from: fromAddress,
-            to: [ownerEmail],
-            reply_to: data.email,
-            subject: ownerSubject,
-            html: ownerHtml,
+            to: [data.email],
+            reply_to: ownerEmail,
+            subject,
+            html,
             text,
           }),
-        }).catch(() => {});
+        }),
+      ];
+
+      if (ownerEmail) {
+        requests.push(
+          fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${resendKey}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              from: fromAddress,
+              to: [ownerEmail],
+              reply_to: data.email,
+              subject: ownerSubject,
+              html: ownerHtml,
+              text,
+            }),
+          })
+        );
       }
 
-      if (res.ok) {
+      const [clientSettled] = await Promise.allSettled(requests);
+      if (clientSettled.status === 'fulfilled' && clientSettled.value.ok) {
         return { sent: true, provider: 'resend' };
       }
-      console.warn('Resend email API returned non-OK:', await res.text());
+      if (clientSettled.status === 'fulfilled') {
+        console.warn('Resend email API returned non-OK:', await clientSettled.value.text());
+      }
     } catch (err) {
       console.warn('Resend email error:', err);
     }
@@ -396,36 +403,43 @@ async function sendWhatsAppNotifications(
         };
       };
 
-      const clientRes = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${waToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(buildMetaPayload(clientDigits)),
-      });
-
-      // Notify owner in parallel (best effort)
-      if (ownerDigits && ownerDigits !== clientDigits) {
+      const metaRequests: Promise<Response>[] = [
         fetch(endpoint, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${waToken}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            messaging_product: 'whatsapp',
-            to: ownerDigits,
-            type: 'text',
-            text: { body: `NEW BOOKING ALERT (${bookingRef})\nClient: ${data.passengerName} (+${clientDigits})\nEmail: ${data.email}\n\n${messageBody}` },
-          }),
-        }).catch(() => {});
+          body: JSON.stringify(buildMetaPayload(clientDigits)),
+        }),
+      ];
+
+      // Notify owner in parallel (awaited so Vercel completes delivery even if client isn't on WhatsApp)
+      if (ownerDigits && ownerDigits !== clientDigits) {
+        metaRequests.push(
+          fetch(endpoint, {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${waToken}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              messaging_product: 'whatsapp',
+              to: ownerDigits,
+              type: 'text',
+              text: { body: `NEW BOOKING ALERT (${bookingRef})\nClient: ${data.passengerName} (+${clientDigits})\nEmail: ${data.email}\n\n${messageBody}` },
+            }),
+          })
+        );
       }
 
-      if (clientRes.ok) {
+      const [clientSettled] = await Promise.allSettled(metaRequests);
+      if (clientSettled.status === 'fulfilled' && clientSettled.value.ok) {
         return { sent: true, provider: 'whatsapp-cloud' };
       }
-      console.warn('Meta WhatsApp Cloud API returned non-OK:', await clientRes.text());
+      if (clientSettled.status === 'fulfilled') {
+        console.warn('Meta WhatsApp Cloud API returned non-OK:', await clientSettled.value.text());
+      }
     } catch (err) {
       console.warn('Meta WhatsApp Cloud error:', err);
     }
@@ -448,14 +462,16 @@ async function sendWhatsAppNotifications(
         Body: messageBody,
       });
 
-      const clientRes = await fetch(twilioUrl, {
-        method: 'POST',
-        headers: {
-          Authorization: authHeader,
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: params.toString(),
-      });
+      const twilioRequests: Promise<Response>[] = [
+        fetch(twilioUrl, {
+          method: 'POST',
+          headers: {
+            Authorization: authHeader,
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: params.toString(),
+        }),
+      ];
 
       if (ownerDigits && ownerDigits !== clientDigits) {
         const ownerParams = new URLSearchParams({
@@ -463,20 +479,25 @@ async function sendWhatsAppNotifications(
           To: `whatsapp:+${ownerDigits}`,
           Body: `NEW BOOKING ALERT (${bookingRef})\nClient: ${data.passengerName} (+${clientDigits})\nEmail: ${data.email}\n\n${messageBody}`,
         });
-        fetch(twilioUrl, {
-          method: 'POST',
-          headers: {
-            Authorization: authHeader,
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: ownerParams.toString(),
-        }).catch(() => {});
+        twilioRequests.push(
+          fetch(twilioUrl, {
+            method: 'POST',
+            headers: {
+              Authorization: authHeader,
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: ownerParams.toString(),
+          })
+        );
       }
 
-      if (clientRes.ok) {
+      const [clientSettled] = await Promise.allSettled(twilioRequests);
+      if (clientSettled.status === 'fulfilled' && clientSettled.value.ok) {
         return { sent: true, provider: 'twilio' };
       }
-      console.warn('Twilio WhatsApp API returned non-OK:', await clientRes.text());
+      if (clientSettled.status === 'fulfilled') {
+        console.warn('Twilio WhatsApp API returned non-OK:', await clientSettled.value.text());
+      }
     } catch (err) {
       console.warn('Twilio WhatsApp error:', err);
     }
