@@ -22,7 +22,7 @@ export default function App() {
   const [voucherData, setVoucherData] = useState<any>(null);
 
   return (
-    <div className={`min-h-screen flex flex-col bg-white text-slate-900 ${language === 'ur' ? 'font-sans' : ''}`}>
+    <div id="top" className={`min-h-screen flex flex-col bg-white text-slate-900 ${language === 'ur' ? 'font-sans' : ''}`}>
       {/* Top Navigation */}
       <Navbar
         language={language}

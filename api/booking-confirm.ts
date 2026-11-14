@@ -372,8 +372,25 @@ async function sendWhatsAppNotifications(
     try {
       const endpoint = `https://graph.facebook.com/v21.0/${waPhoneId}/messages`;
 
-      const buildMetaPayload = (toDigits: string) => {
+      const cleanParam = (val: string) =>
+        val.replace(/[\r\n\t]+/g, ' ').replace(/\s{2,}/g, ' ').trim().slice(0, 180) || '-';
+
+      const buildMetaPayload = (toDigits: string, isOwner: boolean) => {
         if (waTemplate) {
+          const params = isOwner
+            ? [
+                cleanParam(`NEW BOOKING: ${data.passengerName} (+${clientDigits})`),
+                cleanParam(`${bookingRef} | ${data.email}`),
+                cleanParam(`${data.pickup} -> ${data.dropoff} (${data.dateTime || 'TBC'})`),
+                cleanParam(`€${data.quotedPrice} (${data.paymentMethod || 'Card/Cash'})`),
+              ]
+            : [
+                cleanParam(data.passengerName),
+                cleanParam(bookingRef),
+                cleanParam(`${data.pickup} -> ${data.dropoff}`),
+                cleanParam(`€${data.quotedPrice}`),
+              ];
+
           return {
             messaging_product: 'whatsapp',
             to: toDigits,
@@ -384,12 +401,7 @@ async function sendWhatsAppNotifications(
               components: [
                 {
                   type: 'body',
-                  parameters: [
-                    { type: 'text', text: data.passengerName },
-                    { type: 'text', text: bookingRef },
-                    { type: 'text', text: `${data.pickup} -> ${data.dropoff}` },
-                    { type: 'text', text: `€${data.quotedPrice}` },
-                  ],
+                  parameters: params.map((text) => ({ type: 'text', text })),
                 },
               ],
             },
@@ -399,7 +411,11 @@ async function sendWhatsAppNotifications(
           messaging_product: 'whatsapp',
           to: toDigits,
           type: 'text',
-          text: { body: messageBody },
+          text: {
+            body: isOwner
+              ? `NEW BOOKING ALERT (${bookingRef})\nClient: ${data.passengerName} (+${clientDigits})\nEmail: ${data.email}\n\n${messageBody}`
+              : messageBody,
+          },
         };
       };
 
@@ -410,11 +426,11 @@ async function sendWhatsAppNotifications(
             Authorization: `Bearer ${waToken}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(buildMetaPayload(clientDigits)),
+          body: JSON.stringify(buildMetaPayload(clientDigits, false)),
         }),
       ];
 
-      // Notify owner in parallel (awaited so Vercel completes delivery even if client isn't on WhatsApp)
+      // Notify owner in parallel using template too (so it delivers 24/7 even outside 24h window)
       if (ownerDigits && ownerDigits !== clientDigits) {
         metaRequests.push(
           fetch(endpoint, {
@@ -423,12 +439,7 @@ async function sendWhatsAppNotifications(
               Authorization: `Bearer ${waToken}`,
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-              messaging_product: 'whatsapp',
-              to: ownerDigits,
-              type: 'text',
-              text: { body: `NEW BOOKING ALERT (${bookingRef})\nClient: ${data.passengerName} (+${clientDigits})\nEmail: ${data.email}\n\n${messageBody}` },
-            }),
+            body: JSON.stringify(buildMetaPayload(ownerDigits, true)),
           })
         );
       }

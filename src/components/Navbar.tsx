@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Phone, MessageCircle, Menu, X, Globe, Sparkles, Copy, Check, Download } from 'lucide-react';
+import { Phone, MessageCircle, Menu, X, Globe, Sparkles } from 'lucide-react';
 import { BUSINESS_INFO, TRANSLATIONS } from '../data/transferData';
 
 interface NavbarProps {
@@ -10,7 +10,6 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ language, setLanguage, onOpenAssistant }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [copiedCode, setCopiedCode] = useState(false);
   const t = TRANSLATIONS[language];
 
   const languages = [
@@ -34,52 +33,6 @@ export const Navbar: React.FC<NavbarProps> = ({ language, setLanguage, onOpenAss
           </div>
 
           <div className="flex items-center gap-4 text-xs">
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={async () => {
-                  try {
-                    const res = await fetch('/BookingCalculator.txt');
-                    const text = await res.text();
-                    await navigator.clipboard.writeText(text);
-                    setCopiedCode(true);
-                    setTimeout(() => setCopiedCode(false), 3000);
-                  } catch (e) {
-                    window.location.href = '/BookingCalculator.tsx';
-                  }
-                }}
-                className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded font-semibold transition-all cursor-pointer ${
-                  copiedCode
-                    ? 'bg-[#00f0ff] text-slate-950 font-bold'
-                    : 'bg-white text-[#042f40] border border-[#67efff] hover:bg-[#d8fbff]'
-                }`}
-                title="Click to copy entire BookingCalculator.tsx code to clipboard"
-              >
-                {copiedCode ? (
-                  <>
-                    <Check className="w-3.5 h-3.5 text-slate-950" />
-                    <span>✓ Code Copied!</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-3.5 h-3.5 text-[#008da1]" />
-                    <span>📋 Copy Calculator Code</span>
-                  </>
-                )}
-              </button>
-
-              <a
-                href="/BookingCalculator.tsx"
-                download="BookingCalculator.tsx"
-                className="hidden md:inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white text-[#042f40] border border-[#9beeff] hover:bg-[#d8fbff] text-[11px] font-medium transition-colors"
-                title="Direct download BookingCalculator.tsx"
-              >
-                <Download className="w-3 h-3 text-[#008da1]" />
-                <span>Download File</span>
-              </a>
-            </div>
-
-            <span className="text-[#67efff] hidden sm:inline">·</span>
             <a
               href={`tel:${BUSINESS_INFO.phoneDisplay.replace(/\s+/g, '')}`}
               className="hidden sm:flex items-center gap-1.5 text-slate-700 hover:text-[#008da1] transition-colors"
