@@ -33,15 +33,41 @@ Your Role:
 - Answer customer questions promptly, warmly, and clearly in English, Spanish, Catalan, Urdu, or Hindi.
 - Recommend clicking "Get Price" or contacting Mr. Mir directly on WhatsApp at +34 663 958 889.`;
 
+const CHAT_RATE_MAP = new Map<string, number[]>();
+
+function checkChatRateLimit(req: any, maxRequests = 25, windowMs = 5 * 60 * 1000): boolean {
+  const forwarded = String(req?.headers?.['x-forwarded-for'] || '');
+  const ip = (forwarded.split(',')[0] || req?.socket?.remoteAddress || 'unknown').trim();
+  const now = Date.now();
+  const history = (CHAT_RATE_MAP.get(ip) || []).filter((ts) => now - ts < windowMs);
+  if (history.length >= maxRequests) return false;
+  history.push(now);
+  if (CHAT_RATE_MAP.size > 500) CHAT_RATE_MAP.clear();
+  CHAT_RATE_MAP.set(ip, history);
+  return true;
+}
+
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  if (!checkChatRateLimit(req)) {
+    return res.status(429).json({
+      reply: 'Please wait a moment before sending another message, or contact Mr. Mir directly on WhatsApp at +34 663 958 889.',
+    });
+  }
+
   try {
-    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body || {};
+    const body =
+      typeof req.body === 'string'
+        ? req.body.length <= 20000
+          ? JSON.parse(req.body)
+          : {}
+        : req.body || {};
     const { messages, userMessage } = body;
-    const query = userMessage || (messages && messages[messages.length - 1]?.content) || '';
+    const rawQuery = userMessage || (messages && messages[messages.length - 1]?.content) || '';
+    const query = String(rawQuery).replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '').trim().slice(0, 1000);
 
     if (!query) {
       return res.status(400).json({ error: 'Message is required' });

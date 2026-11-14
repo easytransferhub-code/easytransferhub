@@ -27,12 +27,77 @@ export interface BookingConfirmPayload {
   durationText?: string;
 }
 
+const EMAIL_REGEX = /^[^\s@<>()[\]\\,;:"']+@[^\s@<>()[\]\\,;:"']+\.[^\s@<>()[\]\\,;:"']{2,}$/;
+const RATE_LIMIT_MAP = new Map<string, number[]>();
+
+export function checkBookingRateLimit(req: any, maxRequests = 12, windowMs = 10 * 60 * 1000): boolean {
+  const forwarded = String(req?.headers?.['x-forwarded-for'] || '');
+  const ip = (forwarded.split(',')[0] || req?.socket?.remoteAddress || 'unknown').trim();
+  const now = Date.now();
+  const history = (RATE_LIMIT_MAP.get(ip) || []).filter((ts) => now - ts < windowMs);
+  if (history.length >= maxRequests) {
+    return false;
+  }
+  history.push(now);
+  if (RATE_LIMIT_MAP.size > 500) {
+    RATE_LIMIT_MAP.clear();
+  }
+  RATE_LIMIT_MAP.set(ip, history);
+  return true;
+}
+
+function sanitizeLine(value: unknown, maxLen = 200): string {
+  if (typeof value !== 'string') return '';
+  return value.replace(/[\r\n\0\x00-\x1F\x7F]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, maxLen);
+}
+
+export function isValidEmailAddress(email: string): boolean {
+  return EMAIL_REGEX.test(email) && email.length <= 160;
+}
+
+function sanitizeBookingPayload(raw: BookingConfirmPayload): BookingConfirmPayload {
+  const cleanRef = sanitizeLine(raw.bookingRef, 20);
+  const safePrice = Number(raw.quotedPrice);
+  const safePax = Math.min(30, Math.max(1, Number(raw.passengers) || 1));
+  const safeBags = Math.min(30, Math.max(0, Number(raw.luggage) || 0));
+  const safeSeats = Math.min(10, Math.max(0, Number(raw.childSeats) || 0));
+
+  return {
+    bookingRef: /^ETH-\d{6}$/.test(cleanRef)
+      ? cleanRef
+      : `ETH-${Math.floor(100000 + Math.random() * 900000)}`,
+    pickup: sanitizeLine(raw.pickup, 220),
+    dropoff: sanitizeLine(raw.dropoff, 220),
+    dateTime: sanitizeLine(raw.dateTime, 60),
+    isRoundTrip: Boolean(raw.isRoundTrip),
+    returnDateTime: sanitizeLine(raw.returnDateTime, 60),
+    passengers: safePax,
+    adults: Math.min(30, Math.max(1, Number(raw.adults) || safePax)),
+    children: Math.min(20, Math.max(0, Number(raw.children) || 0)),
+    childAge: sanitizeLine(raw.childAge, 80),
+    luggage: safeBags,
+    luggageDetails: sanitizeLine(raw.luggageDetails, 160),
+    childSeats: safeSeats,
+    childSeatsDetails: sanitizeLine(raw.childSeatsDetails, 160),
+    vehicleName: sanitizeLine(raw.vehicleName, 100) || 'Standard Sedan',
+    quotedPrice: Number.isFinite(safePrice) && safePrice > 0 && safePrice <= 50000 ? Math.round(safePrice) : 39,
+    flightNumber: sanitizeLine(raw.flightNumber, 40),
+    passengerName: sanitizeLine(raw.passengerName, 120),
+    email: sanitizeLine(raw.email, 160).toLowerCase(),
+    phone: sanitizeLine(raw.phone, 40),
+    paymentMethod: sanitizeLine(raw.paymentMethod, 120),
+    driverNotes: sanitizeLine(raw.driverNotes, 400),
+    distanceKm: typeof raw.distanceKm === 'number' && Number.isFinite(raw.distanceKm) ? raw.distanceKm : undefined,
+    durationText: sanitizeLine(raw.durationText, 60),
+  };
+}
+
 function normalizePhoneDigits(phone: string): string {
-  return phone.replace(/[^\d]/g, '');
+  return phone.replace(/[^\d]/g, '').slice(0, 16);
 }
 
 function escapeHtml(str: string): string {
-  return str
+  return String(str || '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
@@ -517,9 +582,9 @@ async function sendWhatsAppNotifications(
   return { sent: false, provider: null };
 }
 
-export async function processBookingConfirmation(payload: BookingConfirmPayload) {
-  const bookingRef =
-    payload.bookingRef || `ETH-${Math.floor(100000 + Math.random() * 900000)}`;
+export async function processBookingConfirmation(rawPayload: BookingConfirmPayload) {
+  const payload = sanitizeBookingPayload(rawPayload);
+  const bookingRef = payload.bookingRef as string;
 
   const [emailResult, whatsappResult] = await Promise.all([
     sendEmailNotifications(payload, bookingRef),
@@ -541,19 +606,43 @@ export default async function handler(req: any, res: any) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  if (!checkBookingRateLimit(req)) {
+    return res.status(429).json({
+      error: 'Too many booking attempts. Please wait a few minutes and try again.',
+    });
+  }
+
   try {
-    const body: BookingConfirmPayload =
-      typeof req.body === 'string' ? JSON.parse(req.body) : req.body || {};
+    const rawBody =
+      typeof req.body === 'string'
+        ? req.body.length <= 50000
+          ? JSON.parse(req.body)
+          : {}
+        : req.body || {};
+
+    const body = sanitizeBookingPayload(rawBody);
 
     if (
-      !body.pickup?.trim() ||
-      !body.dropoff?.trim() ||
-      !body.passengerName?.trim() ||
-      !body.email?.trim() ||
-      !body.phone?.trim()
+      !body.pickup ||
+      !body.dropoff ||
+      !body.passengerName ||
+      !body.email ||
+      !body.phone
     ) {
       return res.status(400).json({
         error: 'Pickup, drop-off, full name, email, and phone number are required.',
+      });
+    }
+
+    if (!isValidEmailAddress(body.email)) {
+      return res.status(400).json({
+        error: 'Please enter a valid email address.',
+      });
+    }
+
+    if (normalizePhoneDigits(body.phone).length < 6) {
+      return res.status(400).json({
+        error: 'Please enter a valid phone / WhatsApp number.',
       });
     }
 

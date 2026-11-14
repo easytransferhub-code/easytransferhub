@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Phone, MessageCircle, Menu, X, Globe, Sparkles } from 'lucide-react';
+import { MessageCircle, Menu, X, Globe, Sparkles } from 'lucide-react';
 import { BUSINESS_INFO, TRANSLATIONS } from '../data/transferData';
 
 interface NavbarProps {
@@ -20,42 +20,9 @@ export const Navbar: React.FC<NavbarProps> = ({ language, setLanguage, onOpenAss
   ] as const;
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 text-slate-900 border-b border-[#8ceeff]/80 shadow-xs backdrop-blur-md">
-      {/* Top micro bar for quick direct contact */}
-      <div className="bg-[#e6fdff] px-4 py-1.5 text-xs text-[#042f40] border-b border-[#9beeff]/70">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1.5">
-              <span className="font-bold text-[#007c91]">Available 24/7</span>
-            </span>
-            <span className="hidden sm:inline text-[#67efff]">|</span>
-            <span className="hidden sm:inline text-slate-700">Barcelona Airport & All Spain Chauffeur</span>
-          </div>
-
-          <div className="flex items-center gap-4 text-xs">
-            <a
-              href={`tel:${BUSINESS_INFO.phoneDisplay.replace(/\s+/g, '')}`}
-              className="hidden sm:flex items-center gap-1.5 text-slate-700 hover:text-[#008da1] transition-colors"
-            >
-              <Phone className="w-3.5 h-3.5 text-[#008da1]" />
-              <span>{BUSINESS_INFO.phoneDisplay}</span>
-            </a>
-            <span className="text-[#67efff]">·</span>
-            <a
-              href={`https://wa.me/${BUSINESS_INFO.whatsappNumber}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 text-[#007c91] hover:text-slate-950 font-bold transition-colors"
-            >
-              <MessageCircle className="w-3.5 h-3.5" />
-              <span>WhatsApp Direct</span>
-            </a>
-          </div>
-        </div>
-      </div>
-
+    <header className="relative lg:sticky lg:top-0 z-40 bg-white/95 text-slate-900 border-b border-[#8ceeff]/80 shadow-xs backdrop-blur-md">
       {/* Main Nav */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between">
         {/* Brand Logo */}
         <a href="#top" className="flex items-center gap-2.5 group">
           <div className="w-9 h-9 rounded-lg bg-[#00f0ff] border border-[#00c8e8] flex items-center justify-center shadow-[0_4px_14px_-4px_rgba(0,240,255,0.6)] font-display font-extrabold text-slate-950 text-base tracking-tight">

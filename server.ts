@@ -4,7 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import { GoogleGenAI } from '@google/genai';
-import { processBookingConfirmation } from './api/booking-confirm';
+import { checkBookingRateLimit, isValidEmailAddress, processBookingConfirmation } from './api/booking-confirm';
 
 dotenv.config();
 
@@ -12,7 +12,13 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = 3000;
 
-app.use(express.json());
+app.disable('x-powered-by');
+app.use((_req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  next();
+});
+app.use(express.json({ limit: '50kb' }));
 
 // Direct endpoints for code export & downloads
 app.get('/BookingCalculator.txt', (req, res) => {
@@ -166,17 +172,38 @@ app.post('/api/chat', async (req, res) => {
 
 // Automated Booking Confirmation Endpoint (Email + WhatsApp)
 app.post('/api/booking-confirm', async (req, res) => {
+  if (!checkBookingRateLimit(req)) {
+    return res.status(429).json({
+      error: 'Too many booking attempts. Please wait a few minutes and try again.',
+    });
+  }
+
   try {
     const body = req.body || {};
+    const email = String(body.email || '').trim();
+    const phoneDigits = String(body.phone || '').replace(/[^\d]/g, '');
+
     if (
-      !body.pickup?.trim() ||
-      !body.dropoff?.trim() ||
-      !body.passengerName?.trim() ||
-      !body.email?.trim() ||
-      !body.phone?.trim()
+      !String(body.pickup || '').trim() ||
+      !String(body.dropoff || '').trim() ||
+      !String(body.passengerName || '').trim() ||
+      !email ||
+      !phoneDigits
     ) {
       return res.status(400).json({
         error: 'Pickup, drop-off, full name, email, and phone number are required.',
+      });
+    }
+
+    if (!isValidEmailAddress(email)) {
+      return res.status(400).json({
+        error: 'Please enter a valid email address.',
+      });
+    }
+
+    if (phoneDigits.length < 6) {
+      return res.status(400).json({
+        error: 'Please enter a valid phone / WhatsApp number.',
       });
     }
 
