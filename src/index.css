@@ -2,12 +2,12 @@
 
 @layer base {
   :root {
-    --brand-navy: #065f46;
-    --brand-navy-deep: #064e3b;
-    --brand-teal: #047857;
-    --brand-teal-light: #10b981;
-    --brand-amber: #059669;
-    --brand-amber-hover: #047857;
+    --brand-navy: #042f40;
+    --brand-navy-deep: #021d28;
+    --brand-teal: #00b8cc;
+    --brand-teal-light: #00f0ff;
+    --brand-amber: #00f0ff;
+    --brand-amber-hover: #00d8eb;
   }
 
   body {
@@ -27,14 +27,14 @@
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #f0fdf4;
+  background: #e6fdff;
 }
 ::-webkit-scrollbar-thumb {
-  background: #a7f3d0;
+  background: #67efff;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #6ee7b7;
+  background: #00f0ff;
 }
 
 /* Smooth GPU-accelerated travel scene animations */

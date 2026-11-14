@@ -151,6 +151,10 @@ export function generateWhatsAppLink(details: {
   quotedPrice: number;
   flightNumber?: string;
   passengerName?: string;
+  email?: string;
+  phone?: string;
+  paymentMethod?: string;
+  driverNotes?: string;
   distanceKm?: number;
 }): string {
   const lines = [
@@ -171,7 +175,15 @@ export function generateWhatsAppLink(details: {
   }
 
   if (details.passengerName) {
-    lines.push(`👤 *Passenger Name (Greeting Sign):* ${details.passengerName}`);
+    lines.push(`👤 *Client Name (Signboard):* ${details.passengerName}`);
+  }
+
+  if (details.phone) {
+    lines.push(`📞 *Phone / WhatsApp:* ${details.phone}`);
+  }
+
+  if (details.email) {
+    lines.push(`📧 *Email:* ${details.email}`);
   }
 
   const paxText = details.adults !== undefined && details.children !== undefined
@@ -196,6 +208,14 @@ export function generateWhatsAppLink(details: {
     `🚗 *Vehicle:* ${details.vehicleName}`,
     `💰 *Quoted Price:* €${details.quotedPrice} ${details.isRoundTrip ? '(Round Trip)' : '(One Way)'}`
   );
+
+  if (details.paymentMethod) {
+    lines.push(`💳 *Preferred Payment:* ${details.paymentMethod}`);
+  }
+
+  if (details.driverNotes) {
+    lines.push(`📝 *Driver Notes:* ${details.driverNotes}`);
+  }
 
   if (details.distanceKm) {
     lines.push(`📏 *Approx Distance:* ~${details.distanceKm} km`);

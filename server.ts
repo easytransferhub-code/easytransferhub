@@ -4,6 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import { GoogleGenAI } from '@google/genai';
+import { processBookingConfirmation } from './api/booking-confirm';
 
 dotenv.config();
 
@@ -159,6 +160,32 @@ app.post('/api/chat', async (req, res) => {
     console.error('Chat API Error:', error);
     return res.status(500).json({
       reply: "Thank you for reaching out! You can reach Mr. Mir directly on WhatsApp at +34 663 958 889 or email easytransferhub@gmail.com for instant transfer quotes."
+    });
+  }
+});
+
+// Automated Booking Confirmation Endpoint (Email + WhatsApp)
+app.post('/api/booking-confirm', async (req, res) => {
+  try {
+    const body = req.body || {};
+    if (
+      !body.pickup?.trim() ||
+      !body.dropoff?.trim() ||
+      !body.passengerName?.trim() ||
+      !body.email?.trim() ||
+      !body.phone?.trim()
+    ) {
+      return res.status(400).json({
+        error: 'Pickup, drop-off, full name, email, and phone number are required.',
+      });
+    }
+
+    const result = await processBookingConfirmation(body);
+    return res.status(200).json(result);
+  } catch (error) {
+    console.error('Booking Confirm API Error:', error);
+    return res.status(500).json({
+      error: 'Unable to send automated notifications right now.',
     });
   }
 });

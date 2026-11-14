@@ -6,9 +6,7 @@
 import React, { useState } from 'react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
-import { PopularRoutes } from './components/PopularRoutes';
 import { VehiclesSection } from './components/VehiclesSection';
-import { PricingTable } from './components/PricingTable';
 import { HowItWorks } from './components/HowItWorks';
 import { WhyChooseUs } from './components/WhyChooseUs';
 import { FaqSection } from './components/FaqSection';
@@ -17,25 +15,11 @@ import { Footer } from './components/Footer';
 import { FloatingActions } from './components/FloatingWhatsAppButton';
 import { AIAssistantModal } from './components/AIAssistantModal';
 import { BookingVoucherModal } from './components/BookingVoucherModal';
-import { FixedRoute } from './data/transferData';
 
 export default function App() {
   const [language, setLanguage] = useState<'en' | 'es' | 'ca' | 'ur'>('en');
-  const [prefilledRoute, setPrefilledRoute] = useState<{ pickup: string; dropoff: string } | null>(null);
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
   const [voucherData, setVoucherData] = useState<any>(null);
-
-  const handleSelectPopularRoute = (route: FixedRoute) => {
-    setPrefilledRoute({
-      pickup: route.from,
-      dropoff: route.to,
-    });
-
-    const calcEl = document.getElementById('calculator');
-    if (calcEl) {
-      calcEl.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
 
   return (
     <div className={`min-h-screen flex flex-col bg-white text-slate-900 ${language === 'ur' ? 'font-sans' : ''}`}>
@@ -50,18 +34,11 @@ export default function App() {
         {/* Hero & Interactive Calculator */}
         <Hero
           language={language}
-          prefilledRoute={prefilledRoute}
           onOpenVoucher={(data) => setVoucherData(data)}
           onOpenAssistant={() => setIsAssistantOpen(true)}
         />
 
-        {/* Popular Fixed Routes Section */}
-        <PopularRoutes onSelectRoute={handleSelectPopularRoute} />
-
-        {/* Transparent Fixed Price Guide */}
-        <PricingTable />
-
-        {/* Vehicle Fleet Showcase */}
+        {/* Vehicle Fleet Showcase - Directly below Hero Meet & Greet */}
         <VehiclesSection />
 
         {/* How It Works */}
