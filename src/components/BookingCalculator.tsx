@@ -34,6 +34,8 @@ import {
   Lock,
   Copy,
   RotateCcw,
+  Anchor,
+  Train,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import {
@@ -188,6 +190,43 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
 
   // Toggle for merged Passengers + Luggage + Child Seats button
   const [showPassengersLuggageSeats, setShowPassengersLuggageSeats] = useState(false);
+
+  // Quick Terminal 1 / Terminal 2 popover for Pickup or Drop-off Airport chip
+  const [airportDropdownField, setAirportDropdownField] = useState<'pickup' | 'dropoff' | null>(null);
+  const pickupAirportRef = useRef<HTMLDivElement>(null);
+  const dropoffAirportRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleAirportOutside = (e: MouseEvent) => {
+      const target = e.target as Node;
+      if (
+        pickupAirportRef.current &&
+        !pickupAirportRef.current.contains(target) &&
+        dropoffAirportRef.current &&
+        !dropoffAirportRef.current.contains(target)
+      ) {
+        setAirportDropdownField(null);
+      }
+    };
+    document.addEventListener('mousedown', handleAirportOutside);
+    return () => document.removeEventListener('mousedown', handleAirportOutside);
+  }, []);
+
+  const applyQuickLocation = (field: 'pickup' | 'dropoff', quickId: string) => {
+    const loc = QUICK_LOCATIONS.find((q) => q.id === quickId);
+    if (!loc) return;
+    if (field === 'pickup') {
+      setPickup(loc.address);
+      setPickupCoords({ lat: loc.lat, lon: loc.lon });
+    } else {
+      setDropoff(loc.address);
+      setDropoffCoords({ lat: loc.lat, lon: loc.lon });
+    }
+    setRouteDistanceKm(null);
+    setRouteDurationMinutes(null);
+    setValidationError('');
+    setAirportDropdownField(null);
+  };
 
   // Close country picker dropdown on outside click
   useEffect(() => {
@@ -763,11 +802,76 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
         <div className="space-y-2.5">
           {/* Pickup Input */}
           <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label htmlFor="pickup-input" className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-[#008da1]" />
+            <div className="flex items-center justify-between gap-1.5 mb-1.5">
+              <label htmlFor="pickup-input" className="text-[11px] sm:text-xs font-bold text-slate-700 uppercase tracking-tight sm:tracking-wider flex items-center gap-1 whitespace-nowrap shrink-0">
+                <MapPin className="w-3.5 h-3.5 text-[#008da1] shrink-0" />
                 <span>{t.pickupLabel}</span>
               </label>
+
+              <div ref={pickupAirportRef} className="relative flex items-center gap-1 shrink-0">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setAirportDropdownField((prev) => (prev === 'pickup' ? null : 'pickup'))
+                  }
+                  className={`inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold border transition-all cursor-pointer whitespace-nowrap ${
+                    pickup.toLowerCase().includes('airport')
+                      ? 'bg-[#00f0ff] border-[#00c8e8] text-slate-950'
+                      : 'bg-[#e6fdff] hover:bg-[#ccfbff] border-[#8ceeff] text-[#042f40]'
+                  }`}
+                >
+                  <Plane className="w-2.5 h-2.5 shrink-0" />
+                  <span>Airport</span>
+                  <ChevronDown className="w-2.5 h-2.5 shrink-0" />
+                </button>
+
+                {airportDropdownField === 'pickup' && (
+                  <div className="absolute right-0 top-full mt-1 w-52 bg-white border border-[#67efff] rounded-xl shadow-xl z-50 overflow-hidden divide-y divide-[#e6fdff]">
+                    <button
+                      type="button"
+                      onClick={() => applyQuickLocation('pickup', 'bcn_t1')}
+                      className="w-full px-3 py-2 text-left text-xs font-bold text-slate-800 hover:bg-[#e6fdff] flex items-center justify-between cursor-pointer"
+                    >
+                      <span>Terminal 1 (BCN T1)</span>
+                      <Plane className="w-3.5 h-3.5 text-[#008da1]" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => applyQuickLocation('pickup', 'bcn_t2')}
+                      className="w-full px-3 py-2 text-left text-xs font-bold text-slate-800 hover:bg-[#e6fdff] flex items-center justify-between cursor-pointer"
+                    >
+                      <span>Terminal 2 (BCN T2)</span>
+                      <Plane className="w-3.5 h-3.5 text-[#008da1]" />
+                    </button>
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => applyQuickLocation('pickup', 'port')}
+                  className={`inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold border transition-all cursor-pointer whitespace-nowrap ${
+                    pickup.toLowerCase().includes('cruise') || pickup.toLowerCase().includes('moll adossat')
+                      ? 'bg-[#00f0ff] border-[#00c8e8] text-slate-950'
+                      : 'bg-[#e6fdff] hover:bg-[#ccfbff] border-[#8ceeff] text-[#042f40]'
+                  }`}
+                >
+                  <Anchor className="w-2.5 h-2.5 shrink-0" />
+                  <span>Port</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => applyQuickLocation('pickup', 'sants')}
+                  className={`inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold border transition-all cursor-pointer whitespace-nowrap ${
+                    pickup.toLowerCase().includes('sants')
+                      ? 'bg-[#00f0ff] border-[#00c8e8] text-slate-950'
+                      : 'bg-[#e6fdff] hover:bg-[#ccfbff] border-[#8ceeff] text-[#042f40]'
+                  }`}
+                >
+                  <Train className="w-2.5 h-2.5 shrink-0" />
+                  <span>Sants</span>
+                </button>
+              </div>
             </div>
 
             <GooglePlacesInput
@@ -795,11 +899,76 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
 
           {/* Drop-off Input */}
           <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label htmlFor="dropoff-input" className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                <Navigation className="w-3.5 h-3.5 text-[#008da1]" />
+            <div className="flex items-center justify-between gap-1.5 mb-1.5">
+              <label htmlFor="dropoff-input" className="text-[11px] sm:text-xs font-bold text-slate-700 uppercase tracking-tight sm:tracking-wider flex items-center gap-1 whitespace-nowrap shrink-0">
+                <Navigation className="w-3.5 h-3.5 text-[#008da1] shrink-0" />
                 <span>{t.dropoffLabel}</span>
               </label>
+
+              <div ref={dropoffAirportRef} className="relative flex items-center gap-1 shrink-0">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setAirportDropdownField((prev) => (prev === 'dropoff' ? null : 'dropoff'))
+                  }
+                  className={`inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold border transition-all cursor-pointer whitespace-nowrap ${
+                    dropoff.toLowerCase().includes('airport')
+                      ? 'bg-[#00f0ff] border-[#00c8e8] text-slate-950'
+                      : 'bg-[#e6fdff] hover:bg-[#ccfbff] border-[#8ceeff] text-[#042f40]'
+                  }`}
+                >
+                  <Plane className="w-2.5 h-2.5 shrink-0" />
+                  <span>Airport</span>
+                  <ChevronDown className="w-2.5 h-2.5 shrink-0" />
+                </button>
+
+                {airportDropdownField === 'dropoff' && (
+                  <div className="absolute right-0 top-full mt-1 w-52 bg-white border border-[#67efff] rounded-xl shadow-xl z-50 overflow-hidden divide-y divide-[#e6fdff]">
+                    <button
+                      type="button"
+                      onClick={() => applyQuickLocation('dropoff', 'bcn_t1')}
+                      className="w-full px-3 py-2 text-left text-xs font-bold text-slate-800 hover:bg-[#e6fdff] flex items-center justify-between cursor-pointer"
+                    >
+                      <span>Terminal 1 (BCN T1)</span>
+                      <Plane className="w-3.5 h-3.5 text-[#008da1]" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => applyQuickLocation('dropoff', 'bcn_t2')}
+                      className="w-full px-3 py-2 text-left text-xs font-bold text-slate-800 hover:bg-[#e6fdff] flex items-center justify-between cursor-pointer"
+                    >
+                      <span>Terminal 2 (BCN T2)</span>
+                      <Plane className="w-3.5 h-3.5 text-[#008da1]" />
+                    </button>
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => applyQuickLocation('dropoff', 'port')}
+                  className={`inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold border transition-all cursor-pointer whitespace-nowrap ${
+                    dropoff.toLowerCase().includes('cruise') || dropoff.toLowerCase().includes('moll adossat')
+                      ? 'bg-[#00f0ff] border-[#00c8e8] text-slate-950'
+                      : 'bg-[#e6fdff] hover:bg-[#ccfbff] border-[#8ceeff] text-[#042f40]'
+                  }`}
+                >
+                  <Anchor className="w-2.5 h-2.5 shrink-0" />
+                  <span>Port</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => applyQuickLocation('dropoff', 'sants')}
+                  className={`inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold border transition-all cursor-pointer whitespace-nowrap ${
+                    dropoff.toLowerCase().includes('sants')
+                      ? 'bg-[#00f0ff] border-[#00c8e8] text-slate-950'
+                      : 'bg-[#e6fdff] hover:bg-[#ccfbff] border-[#8ceeff] text-[#042f40]'
+                  }`}
+                >
+                  <Train className="w-2.5 h-2.5 shrink-0" />
+                  <span>Sants</span>
+                </button>
+              </div>
             </div>
 
             <GooglePlacesInput
@@ -885,32 +1054,32 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 : 'bg-[#f5feff] hover:bg-[#e6fdff] border-[#9beeff] hover:border-[#00c8e8]'
             }`}
           >
-            <div className="text-left min-w-0 pr-2">
-              <div className="text-xs sm:text-sm font-bold text-slate-900 tracking-tight">
+            <div className="text-left min-w-0 pr-1.5 flex-1">
+              <div className="text-[11px] sm:text-sm font-bold text-slate-900 tracking-tight whitespace-nowrap truncate">
                 Passengers + Luggage + Child Seat
               </div>
-              <div className="text-[11px] font-semibold text-slate-600 flex items-center gap-1.5 mt-0.5 truncate">
-                <span className="text-[#042f40] font-bold bg-[#e6fdff] px-1.5 py-0.2 rounded border border-[#67efff]">
+              <div className="text-[10px] sm:text-[11px] font-semibold text-slate-600 flex items-center gap-1 sm:gap-1.5 mt-0.5 whitespace-nowrap overflow-hidden">
+                <span className="text-[#042f40] font-bold bg-[#e6fdff] px-1.5 py-0.2 rounded border border-[#67efff] shrink-0">
                   {totalPassengers} Pax
                 </span>
-                <span>•</span>
-                <span className="text-slate-800 font-semibold">{totalBags} Luggage</span>
-                <span>•</span>
-                <span className="text-[#007c91] font-bold">
+                <span className="shrink-0">•</span>
+                <span className="text-slate-800 font-semibold shrink-0">{totalBags} Luggage</span>
+                <span className="shrink-0">•</span>
+                <span className="text-[#007c91] font-bold truncate">
                   {totalChildSeats > 0
-                    ? `${totalChildSeats} Child ${totalChildSeats === 1 ? 'Seat' : 'Seats'} (+€${totalChildSeats * CHILD_SEAT_PRICE_EUR})`
-                    : 'Child Seat (+€5 each)'}
+                    ? `${totalChildSeats} Seat (+€${totalChildSeats * CHILD_SEAT_PRICE_EUR})`
+                    : '+€5 Child Seat'}
                 </span>
               </div>
             </div>
 
-            <div className="flex items-center gap-1.5 shrink-0 ml-2">
-              <span className="text-[11px] font-extrabold px-2.5 py-1 rounded-lg bg-[#00f0ff] border border-[#00c8e8] text-slate-950 shadow-xs flex items-center gap-1">
+            <div className="flex items-center shrink-0 ml-1">
+              <span className="text-[10px] sm:text-[11px] font-extrabold px-2 sm:px-2.5 py-1 rounded-lg bg-[#00f0ff] border border-[#00c8e8] text-slate-950 shadow-xs flex items-center gap-1 whitespace-nowrap">
                 <span>{showPassengersLuggageSeats ? 'Close' : 'Choose / Edit'}</span>
                 {showPassengersLuggageSeats ? (
-                  <ChevronUp className="w-3.5 h-3.5" />
+                  <ChevronUp className="w-3.5 h-3.5 shrink-0" />
                 ) : (
-                  <ChevronDown className="w-3.5 h-3.5" />
+                  <ChevronDown className="w-3.5 h-3.5 shrink-0" />
                 )}
               </span>
             </div>
