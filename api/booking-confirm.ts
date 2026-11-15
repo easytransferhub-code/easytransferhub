@@ -287,31 +287,37 @@ async function sendEmailNotifications(
   bookingRef: string
 ): Promise<{ sent: boolean; provider: string | null }> {
   const ownerEmail = process.env.BOOKING_OWNER_EMAIL || 'easytransferhub@gmail.com';
-  const subject = `Booking Confirmed [${bookingRef}] — ${data.pickup} to ${data.dropoff} (€${data.quotedPrice})`;
+  const subject = `Your Easytransferhub Transfer Confirmation [${bookingRef}] — €${data.quotedPrice}`;
   const ownerSubject = `NEW BOOKING [${bookingRef}] €${data.quotedPrice} — ${data.passengerName} (${data.phone})`;
   const html = buildBookingEmailHtml(data, bookingRef);
   const ownerHtml = buildOwnerDispatchEmailHtml(data, bookingRef);
   const text = buildPlainTextMessage(data, bookingRef);
 
-  // Primary Recommended Option: Gmail / Custom SMTP via Nodemailer
-  const smtpUser =
+  // Primary Recommended Option: Gmail / Custom SMTP via Nodemailer (single pooled connection)
+  const smtpUser = (
     process.env.SMTP_USER ||
     process.env.GMAIL_USER ||
     process.env.EMAIL_USER ||
-    ownerEmail;
-  const smtpPass =
+    ownerEmail
+  ).trim();
+  const rawPass =
     process.env.SMTP_PASS ||
     process.env.GMAIL_APP_PASSWORD ||
     process.env.SMTP_PASSWORD ||
-    process.env.EMAIL_PASS;
+    process.env.EMAIL_PASS ||
+    '';
+  const smtpPass = rawPass.replace(/\s+/g, '').trim();
 
   if (smtpUser && smtpPass) {
+    let transporter: ReturnType<typeof nodemailer.createTransport> | null = null;
     try {
-      const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
+      const smtpHost = (process.env.SMTP_HOST || 'smtp.gmail.com').trim();
       const smtpPort = Number(process.env.SMTP_PORT || 465);
-      const transporter = nodemailer.createTransport(
+      transporter = nodemailer.createTransport(
         smtpHost === 'smtp.gmail.com'
           ? {
+              pool: true,
+              maxConnections: 1,
               service: 'gmail',
               auth: {
                 user: smtpUser,
@@ -319,6 +325,8 @@ async function sendEmailNotifications(
               },
             }
           : {
+              pool: true,
+              maxConnections: 1,
               host: smtpHost,
               port: smtpPort,
               secure: smtpPort === 465,
@@ -329,31 +337,50 @@ async function sendEmailNotifications(
             }
       );
 
-      const [clientResult] = await Promise.allSettled([
-        transporter.sendMail({
-          from: `"Easytransferhub" <${smtpUser}>`,
-          to: data.email,
-          replyTo: ownerEmail,
-          subject,
-          html,
-          text,
-        }),
-        transporter.sendMail({
-          from: `"Easytransferhub Dispatch" <${smtpUser}>`,
-          to: ownerEmail,
-          replyTo: data.email,
-          subject: ownerSubject,
-          html: ownerHtml,
-          text,
-        }),
-      ]);
+      // 1. Send Client Email FIRST on single authenticated SMTP session
+      const clientInfo = await transporter.sendMail({
+        from: `"Easytransferhub Bookings" <${smtpUser}>`,
+        to: data.email,
+        replyTo: ownerEmail,
+        subject,
+        html,
+        text,
+        headers: {
+          'X-Entity-Ref-ID': bookingRef,
+        },
+      });
 
-      if (clientResult.status === 'fulfilled') {
+      const clientAccepted =
+        Array.isArray(clientInfo?.accepted) && clientInfo.accepted.length > 0;
+
+      // 2. Send Dedicated Owner Dispatch Email on same pooled session (if different from client)
+      if (ownerEmail && ownerEmail.toLowerCase() !== data.email.toLowerCase()) {
+        await transporter
+          .sendMail({
+            from: `"Easytransferhub Dispatch" <${smtpUser}>`,
+            to: ownerEmail,
+            replyTo: data.email,
+            subject: ownerSubject,
+            html: ownerHtml,
+            text,
+          })
+          .catch((ownerErr: unknown) => {
+            console.warn('SMTP owner dispatch warning:', ownerErr);
+          });
+      }
+
+      if (clientAccepted) {
         return { sent: true, provider: 'smtp' };
       }
-      console.warn('SMTP client email rejected:', clientResult.reason);
+      console.warn('SMTP client email not accepted:', clientInfo?.rejected);
     } catch (err) {
       console.warn('SMTP email error:', err);
+    } finally {
+      try {
+        transporter?.close();
+      } catch {
+        // ignore close error
+      }
     }
   }
 
