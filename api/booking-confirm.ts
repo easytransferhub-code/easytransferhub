@@ -80,7 +80,7 @@ function sanitizeBookingPayload(raw: BookingConfirmPayload): BookingConfirmPaylo
     childSeats: safeSeats,
     childSeatsDetails: sanitizeLine(raw.childSeatsDetails, 160),
     vehicleName: sanitizeLine(raw.vehicleName, 100) || 'Standard Sedan',
-    quotedPrice: Number.isFinite(safePrice) && safePrice > 0 && safePrice <= 50000 ? Math.round(safePrice) : 39,
+    quotedPrice: Number.isFinite(safePrice) && safePrice > 0 && safePrice <= 50000 ? Math.round(safePrice) : 50,
     flightNumber: sanitizeLine(raw.flightNumber, 40),
     passengerName: sanitizeLine(raw.passengerName, 120),
     email: sanitizeLine(raw.email, 160).toLowerCase(),
@@ -169,7 +169,7 @@ function buildBookingEmailHtml(data: BookingConfirmPayload, bookingRef: string):
             </tr>
             <tr>
               <td style="padding:7px 0; color:#64748b; border-bottom:1px solid #f1f5f9;">Passengers &amp; Luggage</td>
-              <td style="padding:7px 0; font-weight:700; color:#0f172a; border-bottom:1px solid #f1f5f9;">${data.passengers} Pax · ${data.luggage} Bags${data.childSeats > 0 ? ` · ${data.childSeats} Child Seat(s)` : ''}</td>
+              <td style="padding:7px 0; font-weight:700; color:#0f172a; border-bottom:1px solid #f1f5f9;">${data.passengers} Pax · ${data.luggage} Bags${data.childSeats > 0 ? ` · ${data.childSeats} Child Seat(s) (+€${data.childSeats * 5})` : ''}</td>
             </tr>
             <tr>
               <td style="padding:7px 0; color:#64748b; border-bottom:1px solid #f1f5f9;">Passenger Phone</td>
@@ -239,7 +239,7 @@ function buildOwnerDispatchEmailHtml(data: BookingConfirmPayload, bookingRef: st
         <strong>Drop-off:</strong> ${escapeHtml(data.dropoff)}<br/>
         <strong>Date &amp; Time:</strong> ${escapeHtml(data.dateTime || 'To be confirmed')}<br/>
         ${data.flightNumber ? `<strong>Flight:</strong> ${escapeHtml(data.flightNumber)}<br/>` : ''}
-        <strong>Pax / Luggage / Seats:</strong> ${data.passengers} Pax · ${data.luggage} Bags · ${data.childSeats} Child Seats<br/>
+        <strong>Pax / Luggage / Seats:</strong> ${data.passengers} Pax · ${data.luggage} Bags · ${data.childSeats} Child Seats${data.childSeats > 0 ? ` (+€${data.childSeats * 5})` : ''}<br/>
         <strong>Payment:</strong> ${escapeHtml(data.paymentMethod || 'Card / Cash')}<br/>
         ${data.driverNotes ? `<strong>Notes:</strong> ${escapeHtml(data.driverNotes)}<br/>` : ''}
       </p>
@@ -268,7 +268,7 @@ function buildPlainTextMessage(data: BookingConfirmPayload, bookingRef: string):
   }
   lines.push(
     `• Vehicle: ${data.vehicleName}`,
-    `• Passengers: ${data.passengers} | Luggage: ${data.luggage} bags${data.childSeats > 0 ? ` | Child Seats: ${data.childSeats}` : ''}`,
+    `• Passengers: ${data.passengers} | Luggage: ${data.luggage} bags${data.childSeats > 0 ? ` | Child Seats: ${data.childSeats} (+€${data.childSeats * 5})` : ''}`,
     `• Payment Method: ${data.paymentMethod || 'Card / Cash to Chauffeur'}`,
     `• Total Fixed Price: €${data.quotedPrice} (All tolls & 60m flight waiting included)`
   );

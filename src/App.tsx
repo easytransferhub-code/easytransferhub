@@ -3,10 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { APIProvider } from '@vis.gl/react-google-maps';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { VehiclesSection } from './components/VehiclesSection';
+import { PricingTable } from './components/PricingTable';
 import { HowItWorks } from './components/HowItWorks';
 import { WhyChooseUs } from './components/WhyChooseUs';
 import { FaqSection } from './components/FaqSection';
@@ -16,13 +18,65 @@ import { FloatingActions } from './components/FloatingWhatsAppButton';
 import { AIAssistantModal } from './components/AIAssistantModal';
 import { BookingVoucherModal } from './components/BookingVoucherModal';
 
+const ENV_MAPS_API_KEY = String(import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '').trim();
+
 export default function App() {
   const [language, setLanguage] = useState<'en' | 'es' | 'ca' | 'ur'>('en');
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
   const [voucherData, setVoucherData] = useState<any>(null);
+  const [mapsApiKey, setMapsApiKey] = useState<string>(ENV_MAPS_API_KEY);
+  const [quotaExceeded, setQuotaExceeded] = useState(false);
 
-  return (
+  // Runtime fallback fetch from /api/maps-config if VITE_* wasn't bundled at build time
+  useEffect(() => {
+    if (ENV_MAPS_API_KEY) return;
+    let active = true;
+    fetch('/api/maps-config')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (active && data?.apiKey && typeof data.apiKey === 'string') {
+          setMapsApiKey(data.apiKey.trim());
+        }
+      })
+      .catch(() => {
+        // graceful fallback to local zone & route search
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // Case A Quota Exceeded listener
+  useEffect(() => {
+    const onQuotaExceeded = () => setQuotaExceeded(true);
+    window.addEventListener('gmp-quota-exceeded', onQuotaExceeded);
+    return () => window.removeEventListener('gmp-quota-exceeded', onQuotaExceeded);
+  }, []);
+
+  const mapsEnabled = Boolean(mapsApiKey) && !quotaExceeded;
+
+  const content = (
     <div id="top" className={`min-h-screen flex flex-col bg-white text-slate-900 ${language === 'ur' ? 'font-sans' : ''}`}>
+      {/* Google Maps Platform Case A Quota Exceeded Defense Banner */}
+      {quotaExceeded && (
+        <div
+          role="alert"
+          className="bg-amber-50 border-b border-amber-300 text-amber-950 px-4 py-2.5 text-xs sm:text-sm font-medium flex flex-wrap items-center justify-center gap-2 z-50"
+        >
+          <span>
+            Google Maps quota has been exceeded for this session — local zone search & fixed rates remain active.
+          </span>
+          <a
+            href="https://developers.google.com/maps/ai/ai-studio?utm_campaign=gmp_mcp_codeassist_v1_aistudio#quota_exceeded_errors"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline font-bold text-amber-900 hover:text-amber-700"
+          >
+            Quota guidance & setup
+          </a>
+        </div>
+      )}
+
       {/* Top Navigation */}
       <Navbar
         language={language}
@@ -36,10 +90,14 @@ export default function App() {
           language={language}
           onOpenVoucher={(data) => setVoucherData(data)}
           onOpenAssistant={() => setIsAssistantOpen(true)}
+          mapsEnabled={mapsEnabled}
         />
 
         {/* Vehicle Fleet Showcase - Directly below Hero Meet & Greet */}
         <VehiclesSection />
+
+        {/* Barcelona 10-Zone Boundary & Airport Fixed Rate Guide */}
+        <PricingTable />
 
         {/* How It Works */}
         <HowItWorks />
@@ -74,4 +132,19 @@ export default function App() {
       />
     </div>
   );
+
+  if (mapsApiKey && !quotaExceeded) {
+    return (
+      <APIProvider
+        apiKey={mapsApiKey}
+        language="en"
+        region="ES"
+        libraries={['places', 'routes', 'marker']}
+      >
+        {content}
+      </APIProvider>
+    );
+  }
+
+  return content;
 }

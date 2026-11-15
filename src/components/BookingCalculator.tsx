@@ -10,7 +10,6 @@ import {
   User,
   ShieldCheck,
   CheckCircle2,
-  ExternalLink,
   MessageCircle,
   FileText,
   Navigation,
@@ -38,10 +37,12 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import {
-  QUICK_LOCATIONS,
-  VEHICLES,
-  TRANSLATIONS,
+  BARCELONA_ZONES,
   BUSINESS_INFO,
+  CHILD_SEAT_PRICE_EUR,
+  QUICK_LOCATIONS,
+  TRANSLATIONS,
+  VEHICLES,
 } from '../data/transferData';
 import {
   calculateQuote,
@@ -49,12 +50,8 @@ import {
   generateWhatsAppLink,
   QuoteResult,
 } from '../utils/pricing';
-
-interface AutocompleteItem {
-  label: string;
-  lat: number;
-  lon: number;
-}
+import { GooglePlacesInput } from './GooglePlacesInput';
+import { GoogleRouteMap } from './GoogleRouteMap';
 
 interface CountryCodeOption {
   iso2: string;
@@ -102,12 +99,14 @@ interface BookingCalculatorProps {
   language: 'en' | 'es' | 'ca' | 'ur';
   prefilledRoute?: { pickup: string; dropoff: string } | null;
   onOpenVoucher: (bookingData: any) => void;
+  mapsEnabled?: boolean;
 }
 
 export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
   language,
   prefilledRoute,
   onOpenVoucher,
+  mapsEnabled = false,
 }) => {
   const t = TRANSLATIONS[language];
 
@@ -178,13 +177,9 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
   // Selected Vehicle
   const [selectedVehicleId, setSelectedVehicleId] = useState<string>('standard');
 
-  // Autocomplete UI state
-  const [pickupSuggestions, setPickupSuggestions] = useState<AutocompleteItem[]>([]);
-  const [dropoffSuggestions, setDropoffSuggestions] = useState<AutocompleteItem[]>([]);
-  const [showPickupList, setShowPickupList] = useState(false);
-  const [showDropoffList, setShowDropoffList] = useState(false);
-  const pickupTimeout = useRef<any>(null);
-  const dropoffTimeout = useRef<any>(null);
+  // Google Routes computed distance & duration
+  const [routeDistanceKm, setRouteDistanceKm] = useState<number | null>(null);
+  const [routeDurationMinutes, setRouteDurationMinutes] = useState<number | null>(null);
 
   // Route & Quote calculation state
   const [calculating, setCalculating] = useState(false);
@@ -230,158 +225,50 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
     }
   }, [prefilledRoute]);
 
-  const matchCoordinatesForAddresses = (pText: string, dText: string) => {
-    const pMatch = QUICK_LOCATIONS.find((q) =>
-      pText.toLowerCase().includes(q.shortLabel.toLowerCase()) ||
-      pText.toLowerCase().includes(q.name.toLowerCase())
+  const resolveKnownCoords = (addr: string): { lat: number; lon: number } | null => {
+    const lower = addr.toLowerCase();
+    const ql = QUICK_LOCATIONS.find(
+      (q) =>
+        lower.includes(q.shortLabel.toLowerCase()) ||
+        lower.includes(q.name.toLowerCase())
     );
-    if (pMatch) setPickupCoords({ lat: pMatch.lat, lon: pMatch.lon });
+    if (ql) return { lat: ql.lat, lon: ql.lon };
 
-    const dMatch = QUICK_LOCATIONS.find((q) =>
-      dText.toLowerCase().includes(q.shortLabel.toLowerCase()) ||
-      dText.toLowerCase().includes(q.name.toLowerCase())
+    const zone = BARCELONA_ZONES.find(
+      (z) =>
+        lower.includes(z.district.toLowerCase()) ||
+        z.mainAreas.some((a) => lower.includes(a.toLowerCase()))
     );
-    if (dMatch) setDropoffCoords({ lat: dMatch.lat, lon: dMatch.lon });
-  };
+    if (zone) return { lat: zone.center.lat, lon: zone.center.lng };
 
-  // Autocomplete search via Photon Komoot (OpenStreetMap)
-  const fetchAddressSuggestions = async (
-    query: string,
-    setList: (items: AutocompleteItem[]) => void,
-    setShow: (val: boolean) => void
-  ) => {
-    if (!query || query.length < 3) {
-      setList([]);
-      setShow(false);
-      return;
-    }
-
-    try {
-      const res = await fetch(
-        `https://photon.komoot.io/api/?limit=5&lang=en&lat=41.39&lon=2.17&q=${encodeURIComponent(query)}`
-      );
-      if (!res.ok) return;
-      const data = await res.json();
-      const items: AutocompleteItem[] = (data.features || [])
-        .filter((f: any) => /^(ES|AD|FR)$/i.test(f.properties?.countrycode || 'ES'))
-        .map((f: any) => {
-          const p = f.properties || {};
-          const parts = [
-            p.name,
-            p.street ? `${p.street} ${p.housenumber || ''}`.trim() : null,
-            p.city || p.town || p.village,
-            p.postcode,
-          ].filter(Boolean);
-          const uniqueParts = Array.from(new Set(parts));
-          return {
-            label: uniqueParts.join(', '),
-            lat: f.geometry.coordinates[1],
-            lon: f.geometry.coordinates[0],
-          };
-        })
-        .filter((item: AutocompleteItem) => item.label.length > 0);
-
-      setList(items);
-      setShow(items.length > 0);
-    } catch (err) {
-      console.warn('Photon autocomplete error:', err);
-    }
-  };
-
-  const handlePickupChange = (val: string) => {
-    setPickup(val);
-    setPickupCoords(null);
-    setValidationError('');
-    clearTimeout(pickupTimeout.current);
-    pickupTimeout.current = setTimeout(() => {
-      fetchAddressSuggestions(val, setPickupSuggestions, setShowPickupList);
-    }, 300);
-  };
-
-  const handleDropoffChange = (val: string) => {
-    setDropoff(val);
-    setDropoffCoords(null);
-    setValidationError('');
-    clearTimeout(dropoffTimeout.current);
-    dropoffTimeout.current = setTimeout(() => {
-      fetchAddressSuggestions(val, setDropoffSuggestions, setShowDropoffList);
-    }, 300);
-  };
-
-  // Swap locations
-  const handleSwap = () => {
-    const tempP = pickup;
-    const tempPCoords = pickupCoords;
-    setPickup(dropoff);
-    setPickupCoords(dropoffCoords);
-    setDropoff(tempP);
-    setDropoffCoords(tempPCoords);
-  };
-
-  // Geocode address fallback via Nominatim
-  const geocodeAddress = async (addr: string): Promise<{ lat: number; lon: number } | null> => {
-    try {
-      const q = addr.toLowerCase().includes('spain') ? addr : `${addr}, Spain`;
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=es,ad,fr&q=${encodeURIComponent(
-          q
-        )}`
-      );
-      if (!res.ok) return null;
-      const json = await res.json();
-      if (json && json.length > 0) {
-        return { lat: parseFloat(json[0].lat), lon: parseFloat(json[0].lon) };
-      }
-    } catch {
-      // fallback
-    }
     return null;
   };
 
-  // Calculate Route & Price
-  const runRouteCalculation = async () => {
+  const matchCoordinatesForAddresses = (pText: string, dText: string) => {
+    const pMatch = resolveKnownCoords(pText);
+    if (pMatch) setPickupCoords(pMatch);
+
+    const dMatch = resolveKnownCoords(dText);
+    if (dMatch) setDropoffCoords(dMatch);
+  };
+
+  // Recalculate Quote using Google Routes distance (or coordinate/zone fallback)
+  const runRouteCalculation = () => {
     if (!pickup.trim() || !dropoff.trim()) {
       setQuote(null);
       return;
     }
 
     setCalculating(true);
-    let pCoords = pickupCoords;
-    let dCoords = dropoffCoords;
+    const pCoords = pickupCoords || resolveKnownCoords(pickup);
+    const dCoords = dropoffCoords || resolveKnownCoords(dropoff);
 
-    if (!pCoords) {
-      pCoords = await geocodeAddress(pickup);
-      if (pCoords) setPickupCoords(pCoords);
-    }
-    if (!dCoords) {
-      dCoords = await geocodeAddress(dropoff);
-      if (dCoords) setDropoffCoords(dCoords);
-    }
+    let distKm = routeDistanceKm ?? 18;
+    let durationMins = routeDurationMinutes ?? 28;
 
-    let distKm = 20; // safe baseline
-    let durationMins = 30;
-
-    if (pCoords && dCoords) {
-      try {
-        const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${pCoords.lon},${pCoords.lat};${dCoords.lon},${dCoords.lat}?overview=false`;
-        const res = await fetch(osrmUrl);
-        if (res.ok) {
-          const data = await res.json();
-          if (data.routes && data.routes[0]) {
-            distKm = data.routes[0].distance / 1000;
-            durationMins = Math.round(data.routes[0].duration / 60);
-          } else {
-            distKm = calculateHaversineKm(pCoords.lat, pCoords.lon, dCoords.lat, dCoords.lon);
-            durationMins = Math.max(15, Math.round(distKm * 1.3));
-          }
-        } else {
-          distKm = calculateHaversineKm(pCoords.lat, pCoords.lon, dCoords.lat, dCoords.lon);
-          durationMins = Math.max(15, Math.round(distKm * 1.3));
-        }
-      } catch {
-        distKm = calculateHaversineKm(pCoords.lat, pCoords.lon, dCoords.lat, dCoords.lon);
-        durationMins = Math.max(15, Math.round(distKm * 1.3));
-      }
+    if (routeDistanceKm === null && pCoords && dCoords) {
+      distKm = calculateHaversineKm(pCoords.lat, pCoords.lon, dCoords.lat, dCoords.lon);
+      durationMins = Math.max(15, Math.round(distKm * 1.35));
     }
 
     const calculatedQuote = calculateQuote(
@@ -392,19 +279,34 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
       totalPassengers,
       checkInSuitcases,
       totalChildSeats,
-      isRoundTrip
+      isRoundTrip,
+      pCoords,
+      dCoords
     );
 
     setQuote(calculatedQuote);
     setCalculating(false);
   };
 
-  // Recalculate when pickup, dropoff, or vehicle params change
+  // Recalculate when pickup, dropoff, route metrics, or vehicle params change
   useEffect(() => {
     if (pickup.trim() && dropoff.trim()) {
       runRouteCalculation();
+    } else {
+      setQuote(null);
     }
-  }, [pickup, dropoff, totalPassengers, checkInSuitcases, totalChildSeats, isRoundTrip]);
+  }, [
+    pickup,
+    dropoff,
+    pickupCoords,
+    dropoffCoords,
+    routeDistanceKm,
+    routeDurationMinutes,
+    totalPassengers,
+    checkInSuitcases,
+    totalChildSeats,
+    isRoundTrip,
+  ]);
 
   // Filter vehicles based on user's exact requirements:
   // 1. Standard Sedan: strictly for max 4 passengers and max 3 suitcases.
@@ -447,7 +349,8 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
     ? isRoundTrip
       ? currentVehicleQuote.roundTripTotal
       : currentVehicleQuote.totalPrice
-    : activeVehicleData.id === 'van' ? 59 : activeVehicleData.id === 'comfort' ? 47 : 39;
+    : (activeVehicleData.id === 'van' ? 70 : activeVehicleData.id === 'comfort' ? 60 : 50) +
+      totalChildSeats * CHILD_SEAT_PRICE_EUR;
 
   // Build descriptive luggage text
   const getLuggageDetailsText = () => {
@@ -751,15 +654,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
     });
   };
 
-  // Google Maps directions URL for iframe & link
-  const originQuery = pickupCoords
-    ? `${pickupCoords.lat},${pickupCoords.lon}`
-    : encodeURIComponent(pickup);
-  const destQuery = dropoffCoords
-    ? `${dropoffCoords.lat},${dropoffCoords.lon}`
-    : encodeURIComponent(dropoff);
-  const googleMapsEmbedUrl = `https://maps.google.com/maps?f=d&hl=en&saddr=${originQuery}&daddr=${destQuery}&output=embed`;
-  const googleMapsExternalUrl = `https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=${originQuery}&destination=${destQuery}`;
+
 
   return (
     <div
@@ -864,97 +759,106 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
 
       {currentStep === 'calculator' ? (
         <div className="p-3.5 sm:p-4 space-y-2.5">
-        {/* Step 1: Pickup and Drop-off with Quick Chips */}
+        {/* Step 1: Pickup and Drop-off with Google Maps Places Autocomplete */}
         <div className="space-y-2.5">
           {/* Pickup Input */}
-          <div className="relative">
+          <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+              <label htmlFor="pickup-input" className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
                 <MapPin className="w-3.5 h-3.5 text-[#008da1]" />
                 <span>{t.pickupLabel}</span>
               </label>
-              <span className="text-[11px] text-slate-500">Terminal, hotel, or address</span>
+              <span className="text-[11px] text-slate-500">Google Maps location search</span>
             </div>
 
-            <div className="relative">
-              <input
-                type="text"
-                value={pickup}
-                onChange={(e) => handlePickupChange(e.target.value)}
-                onFocus={() => pickupSuggestions.length > 0 && setShowPickupList(true)}
-                placeholder={t.pickupPlaceholder}
-                className="w-full pl-3.5 pr-10 py-2.5 text-sm font-medium bg-[#f5feff] hover:bg-white focus:bg-white border border-[#9beeff] focus:border-[#00b8cc] rounded-xl focus:ring-2 focus:ring-[#00f0ff]/35 outline-none transition-all shadow-2xs"
-              />
-              <span className="absolute right-3 top-3 text-slate-400">
-                <MapPin className="w-4 h-4 text-[#008da1]" />
-              </span>
-
-              {/* Suggestions Dropdown */}
-              {showPickupList && pickupSuggestions.length > 0 && (
-                <ul className="absolute left-0 right-0 top-full mt-1 bg-white border border-[#8ceeff] rounded-xl shadow-xl z-30 max-h-52 overflow-y-auto divide-y divide-[#e6fdff] text-xs">
-                  {pickupSuggestions.map((item, idx) => (
-                    <li
-                      key={idx}
-                      onMouseDown={() => {
-                        setPickup(item.label);
-                        setPickupCoords({ lat: item.lat, lon: item.lon });
-                        setShowPickupList(false);
-                      }}
-                      className="px-3.5 py-2.5 hover:bg-[#e6fdff] cursor-pointer flex items-center gap-2 text-slate-800"
-                    >
-                      <MapPin className="w-3.5 h-3.5 text-[#008da1] shrink-0" />
-                      <span className="truncate">{item.label}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
+            <GooglePlacesInput
+              inputId="pickup-input"
+              value={pickup}
+              placeholder={t.pickupPlaceholder}
+              iconType="pickup"
+              mapsEnabled={mapsEnabled}
+              onChangeText={(val) => {
+                setPickup(val);
+                setPickupCoords(null);
+                setRouteDistanceKm(null);
+                setRouteDurationMinutes(null);
+                setValidationError('');
+              }}
+              onSelectPlace={(place) => {
+                setPickup(place.label);
+                setPickupCoords(place.coords);
+                setRouteDistanceKm(null);
+                setRouteDurationMinutes(null);
+                setValidationError('');
+              }}
+            />
           </div>
 
           {/* Drop-off Input */}
-          <div className="relative">
+          <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+              <label htmlFor="dropoff-input" className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
                 <Navigation className="w-3.5 h-3.5 text-[#008da1]" />
                 <span>{t.dropoffLabel}</span>
               </label>
-              <span className="text-[11px] text-slate-500">Destination city or resort</span>
+              <span className="text-[11px] text-slate-500">Google Maps address or zone</span>
             </div>
 
-            <div className="relative">
-              <input
-                type="text"
-                value={dropoff}
-                onChange={(e) => handleDropoffChange(e.target.value)}
-                onFocus={() => dropoffSuggestions.length > 0 && setShowDropoffList(true)}
-                placeholder={t.dropoffPlaceholder}
-                className="w-full pl-3.5 pr-10 py-2.5 text-sm font-medium bg-[#f5feff] hover:bg-white focus:bg-white border border-[#9beeff] focus:border-[#00b8cc] rounded-xl focus:ring-2 focus:ring-[#00f0ff]/35 outline-none transition-all shadow-2xs"
-              />
-              <span className="absolute right-3 top-3 text-slate-400">
-                <Navigation className="w-4 h-4 text-[#008da1]" />
-              </span>
-
-              {/* Suggestions Dropdown */}
-              {showDropoffList && dropoffSuggestions.length > 0 && (
-                <ul className="absolute left-0 right-0 top-full mt-1 bg-white border border-[#8ceeff] rounded-xl shadow-xl z-30 max-h-52 overflow-y-auto divide-y divide-[#e6fdff] text-xs">
-                  {dropoffSuggestions.map((item, idx) => (
-                    <li
-                      key={idx}
-                      onMouseDown={() => {
-                        setDropoff(item.label);
-                        setDropoffCoords({ lat: item.lat, lon: item.lon });
-                        setShowDropoffList(false);
-                      }}
-                      className="px-3.5 py-2.5 hover:bg-[#e6fdff] cursor-pointer flex items-center gap-2 text-slate-800"
-                    >
-                      <Navigation className="w-3.5 h-3.5 text-[#008da1] shrink-0" />
-                      <span className="truncate">{item.label}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
+            <GooglePlacesInput
+              inputId="dropoff-input"
+              value={dropoff}
+              placeholder={t.dropoffPlaceholder}
+              iconType="dropoff"
+              mapsEnabled={mapsEnabled}
+              onChangeText={(val) => {
+                setDropoff(val);
+                setDropoffCoords(null);
+                setRouteDistanceKm(null);
+                setRouteDurationMinutes(null);
+                setValidationError('');
+              }}
+              onSelectPlace={(place) => {
+                setDropoff(place.label);
+                setDropoffCoords(place.coords);
+                setRouteDistanceKm(null);
+                setRouteDurationMinutes(null);
+                setValidationError('');
+              }}
+            />
           </div>
+
+          {/* Detected Barcelona Zone Pill + Live Google Route Map Preview */}
+          {(pickup.trim() || dropoff.trim()) && (
+            <div className="space-y-2 pt-0.5">
+              {quote?.matchedZone && (
+                <div className="p-2.5 rounded-xl bg-[#e6fdff] border border-[#67efff] flex flex-wrap items-center justify-between gap-2 text-xs">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="px-2 py-0.5 rounded-md bg-[#00f0ff] border border-[#00c8e8] text-slate-950 font-extrabold shrink-0">
+                      Zone {quote.matchedZone.zoneNumber}
+                    </span>
+                    <span className="font-bold text-[#042f40] truncate">
+                      {quote.matchedZone.district} ({quote.matchedZone.mainAreas.slice(0, 3).join(', ')})
+                    </span>
+                  </div>
+                  <span className="text-[11px] font-bold text-[#007c91]">
+                    Fixed Rate: €{quote.vehicles[0]?.basePrice} / €{quote.vehicles[1]?.basePrice} / €{quote.vehicles[2]?.basePrice} · All Supplements Included
+                  </span>
+                </div>
+              )}
+
+              <GoogleRouteMap
+                pickup={pickup}
+                dropoff={dropoff}
+                pickupCoords={pickupCoords}
+                dropoffCoords={dropoffCoords}
+                mapsEnabled={mapsEnabled}
+                onRouteMetrics={({ distanceKm, durationMinutes }) => {
+                  setRouteDistanceKm(distanceKm);
+                  setRouteDurationMinutes(durationMinutes);
+                }}
+              />
+            </div>
+          )}
         </div>
 
         {/* Date & Time Row (Pickup + Optional Return if Round Trip) */}
@@ -1015,7 +919,9 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 <span className="text-slate-800 font-semibold">{totalBags} Luggage</span>
                 <span>•</span>
                 <span className="text-[#007c91] font-bold">
-                  {totalChildSeats > 0 ? `${totalChildSeats} Child Seats` : 'Free Child Seat'}
+                  {totalChildSeats > 0
+                    ? `${totalChildSeats} Child ${totalChildSeats === 1 ? 'Seat' : 'Seats'} (+€${totalChildSeats * CHILD_SEAT_PRICE_EUR})`
+                    : 'Child Seat (+€5 each)'}
                 </span>
               </div>
             </div>
@@ -1285,7 +1191,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                         <span>Child Seats</span>
                       </span>
                       <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[#e6fdff] text-[#042f40] border border-[#8ceeff]">
-                        Free
+                        +€{CHILD_SEAT_PRICE_EUR} / seat
                       </span>
                     </div>
 
@@ -1348,7 +1254,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
 
                   <p className="text-[9px] text-slate-400 mt-1 italic flex items-center gap-1">
                     <CheckCircle2 className="w-2.5 h-2.5 text-[#008da1] shrink-0" />
-                    <span>Spanish law compliant · Free</span>
+                    <span>Spanish law compliant · €{CHILD_SEAT_PRICE_EUR} extra per seat</span>
                   </p>
                 </div>
               </div>
@@ -1445,6 +1351,11 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                   <h3 className="font-display font-extrabold text-base text-slate-900">
                     Available Vehicles for Your Trip
                   </h3>
+                  {quote?.matchedZone && (
+                    <span className="text-[10px] font-bold text-[#007c91] block mt-0.5">
+                      Zone {quote.matchedZone.zoneNumber} ({quote.matchedZone.district}) · All Supplements Included
+                    </span>
+                  )}
                 </div>
                 <span className="text-[11px] text-slate-500 font-medium">
                   {quote?.distanceKm || 18} km · Approx. {quote?.durationText || '30 mins'}
@@ -1456,7 +1367,11 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 {(() => {
                   const v = VEHICLES.find((item) => item.id === 'standard') || VEHICLES[0];
                   const vQuote = quote?.vehicles.find((q) => q.vehicleId === 'standard');
-                  const price = vQuote ? (isRoundTrip ? vQuote.roundTripTotal : vQuote.totalPrice) : (isRoundTrip ? 74 : 39);
+                  const price = vQuote
+                    ? isRoundTrip
+                      ? vQuote.roundTripTotal
+                      : vQuote.totalPrice
+                    : (isRoundTrip ? 98 : 50) + totalChildSeats * CHILD_SEAT_PRICE_EUR;
                   const isSelected = selectedVehicleId === 'standard';
                   const isDisabled = totalPassengers > 4 || checkInSuitcases > 3;
                   const isRecommended = totalPassengers <= 4 && checkInSuitcases <= 3;
@@ -1534,7 +1449,11 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 {(() => {
                   const v = VEHICLES.find((item) => item.id === 'comfort') || VEHICLES[1];
                   const vQuote = quote?.vehicles.find((q) => q.vehicleId === 'comfort');
-                  const price = vQuote ? (isRoundTrip ? vQuote.roundTripTotal : vQuote.totalPrice) : (isRoundTrip ? 90 : 47);
+                  const price = vQuote
+                    ? isRoundTrip
+                      ? vQuote.roundTripTotal
+                      : vQuote.totalPrice
+                    : (isRoundTrip ? 117 : 60) + totalChildSeats * CHILD_SEAT_PRICE_EUR;
                   const isSelected = selectedVehicleId === 'comfort';
                   const isDisabled = totalPassengers > 4 || checkInSuitcases > 4;
                   const isRecommended = totalPassengers <= 4 && checkInSuitcases === 4;
@@ -1615,7 +1534,11 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 {(() => {
                   const v = VEHICLES.find((item) => item.id === 'van') || VEHICLES[2];
                   const vQuote = quote?.vehicles.find((q) => q.vehicleId === 'van');
-                  const price = vQuote ? (isRoundTrip ? vQuote.roundTripTotal : vQuote.totalPrice) : (isRoundTrip ? 112 : 59);
+                  const price = vQuote
+                    ? isRoundTrip
+                      ? vQuote.roundTripTotal
+                      : vQuote.totalPrice
+                    : (isRoundTrip ? 137 : 70) + totalChildSeats * CHILD_SEAT_PRICE_EUR;
                   const isSelected = selectedVehicleId === 'van' || selectedVehicleId === 'minivan';
                   const isRecommended = totalPassengers >= 5 || checkInSuitcases >= 5;
 
@@ -2153,7 +2076,9 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 </div>
                 {totalChildSeats > 0 && (
                   <div className="col-span-2">
-                    <span className="text-slate-400 block text-[10px]">Child Seats (Free)</span>
+                    <span className="text-slate-400 block text-[10px]">
+                      Child Seats (+€{totalChildSeats * CHILD_SEAT_PRICE_EUR})
+                    </span>
                     <span className="font-bold text-[#007c91]">{getSeatDetailsText()}</span>
                   </div>
                 )}
@@ -2188,13 +2113,27 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
 
                 <div className="text-[10px] text-slate-600 border-t border-[#9beeff] pt-1.5 space-y-0.5">
                   <div className="flex justify-between">
+                    <span>Base Transfer Fare:</span>
+                    <span className="font-bold text-[#042f40]">
+                      €{currentVehicleQuote?.basePrice ?? (activeVehicleData.id === 'van' ? 70 : activeVehicleData.id === 'comfort' ? 60 : 50)}
+                    </span>
+                  </div>
+                  {totalChildSeats > 0 && (
+                    <div className="flex justify-between">
+                      <span>Extra Child Seats ({totalChildSeats} × €{CHILD_SEAT_PRICE_EUR}):</span>
+                      <span className="font-bold text-[#007c91]">
+                        +€{totalChildSeats * CHILD_SEAT_PRICE_EUR}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex justify-between">
                     <span>Payment Method:</span>
                     <span className="font-bold text-[#042f40] text-right max-w-[60%] truncate">
                       {paymentMethod === 'card' ? 'Card (Visa/MC/Amex)' : paymentMethod === 'paypal' ? 'PayPal' : 'Cash to Driver'}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Highway Tolls & Airport Taxes:</span>
+                    <span>All Zone Supplements &amp; Tolls:</span>
                     <span className="font-bold text-[#007c91]">Included (€0)</span>
                   </div>
                   <div className="flex justify-between">

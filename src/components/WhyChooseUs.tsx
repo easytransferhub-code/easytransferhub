@@ -19,8 +19,8 @@ export const WhyChooseUs: React.FC = () => {
       icon: ShieldCheck,
     },
     {
-      title: 'Child, Baby & Booster Seats',
-      desc: 'Traveling with kids? We supply certified European standard rear-facing baby seats and booster seats for maximum road safety during your holiday in Spain.',
+      title: 'Child, Baby & Booster Seats (+€5)',
+      desc: 'Traveling with kids? We supply certified European standard rear-facing baby seats and booster seats for €5 per extra seat for maximum road safety across Spain.',
       icon: Baby,
     },
     {

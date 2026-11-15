@@ -9,6 +9,7 @@ interface HeroProps {
   prefilledRoute?: { pickup: string; dropoff: string } | null;
   onOpenVoucher: (data: any) => void;
   onOpenAssistant: () => void;
+  mapsEnabled?: boolean;
 }
 
 export const Hero: React.FC<HeroProps> = ({
@@ -16,6 +17,7 @@ export const Hero: React.FC<HeroProps> = ({
   prefilledRoute,
   onOpenVoucher,
   onOpenAssistant,
+  mapsEnabled = false,
 }) => {
   const t = TRANSLATIONS[language];
 
@@ -38,6 +40,7 @@ export const Hero: React.FC<HeroProps> = ({
           language={language}
           prefilledRoute={prefilledRoute}
           onOpenVoucher={onOpenVoucher}
+          mapsEnabled={mapsEnabled}
         />
       </div>
 

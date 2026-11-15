@@ -52,7 +52,7 @@ Drop-off: ${bookingData.dropoff}
 Date & Time: ${bookingData.dateTime || 'To be confirmed'}
 ${bookingData.flightNumber ? `Flight: ${bookingData.flightNumber}\n` : ''}${bookingData.passengerName ? `Client Name: ${bookingData.passengerName}\n` : ''}${bookingData.phone ? `Phone: ${bookingData.phone}\n` : ''}${bookingData.email ? `Email: ${bookingData.email}\n` : ''}Passengers: ${paxDetails}
 Luggage: ${bookingData.luggage} bags ${bookingData.luggageDetails ? `(${bookingData.luggageDetails})` : ''}
-Child Seats: ${bookingData.childSeatsDetails || (bookingData.childSeats > 0 ? `${bookingData.childSeats} included` : 'None')}
+Child Seats: ${bookingData.childSeatsDetails || (bookingData.childSeats > 0 ? `${bookingData.childSeats} seat(s) (+€${bookingData.childSeats * 5})` : 'None')}
 Vehicle: ${bookingData.vehicleName}
 Total Fixed Fare: €${bookingData.quotedPrice} ${bookingData.isRoundTrip ? '(Round Trip)' : '(One Way)'}
 Payment Method: ${bookingData.paymentMethod || 'Pay Cash or Card to Chauffeur'}${bookingData.driverNotes ? `\nDriver Notes: ${bookingData.driverNotes}` : ''}
@@ -216,7 +216,7 @@ All highway tolls & flight tracking included.`;
             <div className="bg-[#f5feff] p-3 rounded-xl border border-[#9beeff]">
               <span className="text-[10px] font-bold uppercase text-slate-500 block">Child Seats</span>
               <span className="font-bold text-xs sm:text-sm text-slate-900 block">
-                {bookingData.childSeatsDetails || (bookingData.childSeats > 0 ? `${bookingData.childSeats} included` : 'None')}
+                {bookingData.childSeatsDetails || (bookingData.childSeats > 0 ? `${bookingData.childSeats} seat(s) (+€${bookingData.childSeats * 5})` : 'None')}
               </span>
             </div>
           </div>
