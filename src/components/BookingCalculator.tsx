@@ -611,7 +611,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
       `Vehicle: ${activeVehicleData.name}`,
       `Fixed Fare: EUR ${finalQuotedPrice}`,
       flightNumber ? `Flight: ${flightNumber}` : '',
-      `Chauffeur Dispatch (Mr. Mir): +34 663 958 889`,
+      `Chauffeur Dispatch (Mr. Mir): +34 666 744 440`,
     ]
       .filter(Boolean)
       .join('\\n');
@@ -645,7 +645,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
 
   const handleCopyConfirmedSummary = () => {
     if (!confirmedBookingInfo) return;
-    const summary = `EASYTRANSFERHUB TRANSFER CONFIRMATION\nRef: ${confirmedBookingInfo.bookingRef}\nClient: ${passengerName}\nPhone: ${confirmedBookingInfo.fullPhone}\nEmail: ${passengerEmail}\nPickup: ${pickup}\nDrop-off: ${dropoff}\nDate & Time: ${dateTime || 'To be confirmed'}\n${flightNumber ? `Flight: ${flightNumber}\n` : ''}Vehicle: ${activeVehicleData.name}\nTotal Guaranteed Fare: €${finalQuotedPrice}\nPayment: ${getPaymentMethodLabel()}\n24/7 Dispatch (Mr. Mir): +34 663 958 889`;
+    const summary = `EASYTRANSFERHUB TRANSFER CONFIRMATION\nRef: ${confirmedBookingInfo.bookingRef}\nClient: ${passengerName}\nPhone: ${confirmedBookingInfo.fullPhone}\nEmail: ${passengerEmail}\nPickup: ${pickup}\nDrop-off: ${dropoff}\nDate & Time: ${dateTime || 'To be confirmed'}\n${flightNumber ? `Flight: ${flightNumber}\n` : ''}Vehicle: ${activeVehicleData.name}\nTotal Guaranteed Fare: €${finalQuotedPrice}\nPayment: ${getPaymentMethodLabel()}\n24/7 Dispatch (Mr. Mir): +34 666 744 440`;
     navigator.clipboard.writeText(summary);
     setCopiedConfirmed(true);
     setTimeout(() => setCopiedConfirmed(false), 2500);

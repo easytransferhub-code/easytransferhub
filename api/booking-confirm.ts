@@ -203,13 +203,13 @@ function buildBookingEmailHtml(data: BookingConfirmPayload, bookingRef: string):
         </div>
 
         <div style="text-align:center; margin-bottom:14px;">
-          <a href="https://wa.me/34663958889?text=${encodeURIComponent(`Hello Mr. Mir, regarding my Easytransferhub booking ${bookingRef} (${data.pickup} to ${data.dropoff}).`)}" style="display:inline-block; background:#00f0ff; color:#042f40; text-decoration:none; font-weight:800; font-size:14px; padding:12px 24px; border-radius:12px; border:1px solid #00c8e8;">
+          <a href="https://wa.me/34666744440?text=${encodeURIComponent(`Hello Mr. Mir, regarding my Easytransferhub booking ${bookingRef} (${data.pickup} to ${data.dropoff}).`)}" style="display:inline-block; background:#00f0ff; color:#042f40; text-decoration:none; font-weight:800; font-size:14px; padding:12px 24px; border-radius:12px; border:1px solid #00c8e8;">
             Message Chauffeur Dispatch on WhatsApp
           </a>
         </div>
 
         <p style="margin:0; font-size:12px; color:#64748b; text-align:center;">
-          24/7 Dispatch Manager: <strong>Mr. Mir</strong> · WhatsApp: <strong>+34 663 958 889</strong> · Email: <strong>easytransferhub@gmail.com</strong>
+          24/7 Dispatch Manager: <strong>Mr. Mir</strong> · WhatsApp: <strong>+34 666 744 440</strong> · Email: <strong>easytransferhub@gmail.com</strong>
         </p>
       </div>
     </div>
@@ -219,7 +219,7 @@ function buildBookingEmailHtml(data: BookingConfirmPayload, bookingRef: string):
 function buildOwnerDispatchEmailHtml(data: BookingConfirmPayload, bookingRef: string): string {
   const clientDigits = normalizePhoneDigits(data.phone);
   const waClientReplyUrl = clientDigits
-    ? `https://wa.me/${clientDigits}?text=${encodeURIComponent(`Hello ${data.passengerName}, thank you for booking with Easytransferhub! Your transfer (${bookingRef}) from ${data.pickup} to ${data.dropoff} is confirmed for €${data.quotedPrice}. Best regards, Mr. Mir (+34 663 958 889)`)}`
+    ? `https://wa.me/${clientDigits}?text=${encodeURIComponent(`Hello ${data.passengerName}, thank you for booking with Easytransferhub! Your transfer (${bookingRef}) from ${data.pickup} to ${data.dropoff} is confirmed for €${data.quotedPrice}. Best regards, Mr. Mir (+34 666 744 440)`)}`
     : '';
 
   return `
@@ -277,7 +277,7 @@ function buildPlainTextMessage(data: BookingConfirmPayload, bookingRef: string):
   }
   lines.push(
     ``,
-    `24/7 Dispatch (Mr. Mir): +34 663 958 889 | easytransferhub@gmail.com`
+    `24/7 Dispatch (Mr. Mir): +34 666 744 440 | easytransferhub@gmail.com`
   );
   return lines.join('\n');
 }
@@ -288,10 +288,14 @@ async function sendEmailNotifications(
 ): Promise<{ sent: boolean; ownerSent: boolean; provider: string | null }> {
   const cleanEnv = (val?: string) =>
     (val || '').trim().replace(/^["']|["']$/g, '').trim();
-  const configuredOwner = cleanEnv(process.env.BOOKING_OWNER_EMAIL);
-  const ownerEmail = EMAIL_REGEX.test(configuredOwner)
-    ? configuredOwner
-    : 'easytransferhub@gmail.com';
+  const configuredOwnerRaw = cleanEnv(process.env.BOOKING_OWNER_EMAIL);
+  const parsedOwners = configuredOwnerRaw
+    .split(/[,;\s]+/)
+    .map((e) => e.trim().toLowerCase())
+    .filter((e) => EMAIL_REGEX.test(e));
+  const ownerEmails =
+    parsedOwners.length > 0 ? Array.from(new Set(parsedOwners)) : ['easytransferhub@gmail.com'];
+  const ownerEmail = ownerEmails[0];
   const subject = `Your Easytransferhub Transfer Confirmation [${bookingRef}] — €${data.quotedPrice}`;
   const ownerSubject = `NEW BOOKING [${bookingRef}] €${data.quotedPrice} — ${data.passengerName} (${data.phone})`;
   const html = buildBookingEmailHtml(data, bookingRef);
@@ -314,8 +318,8 @@ async function sendEmailNotifications(
 
   if (smtpUser && smtpPass) {
     try {
-      const smtpHost = (process.env.SMTP_HOST || 'smtp.gmail.com').trim();
-      const smtpPort = Number(process.env.SMTP_PORT || 465);
+      const smtpHost = cleanEnv(process.env.SMTP_HOST) || 'smtp.gmail.com';
+      const smtpPort = Number(cleanEnv(process.env.SMTP_PORT) || 465);
       const transporter = nodemailer.createTransport(
         smtpHost === 'smtp.gmail.com'
           ? {
@@ -336,32 +340,36 @@ async function sendEmailNotifications(
             }
       );
 
-      // 1. Send Client Email FIRST
-      const clientInfo = await transporter.sendMail({
-        from: `"Easytransferhub Bookings" <${smtpUser}>`,
-        to: data.email,
-        replyTo: ownerEmail,
-        subject,
-        html,
-        text,
-        headers: {
-          'X-Entity-Ref-ID': bookingRef,
-        },
-      });
+      // 1. Send Client Email independently
+      let clientAccepted = false;
+      try {
+        const clientInfo = await transporter.sendMail({
+          from: `"Easytransferhub Bookings" <${smtpUser}>`,
+          to: data.email,
+          replyTo: ownerEmail,
+          subject,
+          html,
+          text,
+        });
+        clientAccepted =
+          Array.isArray(clientInfo?.accepted) && clientInfo.accepted.length > 0;
+        if (!clientAccepted) {
+          console.warn('SMTP client email rejected:', clientInfo?.rejected);
+        }
+      } catch (clientErr: unknown) {
+        console.warn('SMTP client email error:', clientErr);
+      }
 
-      const clientAccepted =
-        Array.isArray(clientInfo?.accepted) && clientInfo.accepted.length > 0;
-
-      // 2. Send Dedicated Owner Dispatch Email to Inbox
+      // 2. Send Dedicated Owner Dispatch Email(s) to Inbox
       // If sender and owner are the same @gmail.com account, use +booking sub-address
       // so Gmail delivers it into Primary Inbox instead of hiding it as self-sent mail.
       let ownerSent = false;
-      if (ownerEmail) {
+      for (const targetOwner of ownerEmails) {
         const ownerInboxTarget =
-          ownerEmail.toLowerCase() === smtpUser.toLowerCase() &&
-          /@gmail\.com$/i.test(ownerEmail)
-            ? ownerEmail.replace(/@gmail\.com$/i, '+booking@gmail.com')
-            : ownerEmail;
+          targetOwner.toLowerCase() === smtpUser.toLowerCase() &&
+          /@gmail\.com$/i.test(targetOwner)
+            ? targetOwner.replace(/@gmail\.com$/i, '+booking@gmail.com')
+            : targetOwner;
 
         try {
           const ownerInfo = await transporter.sendMail({
@@ -371,12 +379,10 @@ async function sendEmailNotifications(
             subject: ownerSubject,
             html: ownerHtml,
             text,
-            headers: {
-              'X-Entity-Ref-ID': `${bookingRef}-dispatch`,
-            },
           });
-          ownerSent =
-            Array.isArray(ownerInfo?.accepted) && ownerInfo.accepted.length > 0;
+          if (Array.isArray(ownerInfo?.accepted) && ownerInfo.accepted.length > 0) {
+            ownerSent = true;
+          }
         } catch (ownerErr: unknown) {
           console.warn('SMTP owner dispatch warning:', ownerErr);
         }
@@ -385,18 +391,17 @@ async function sendEmailNotifications(
       if (clientAccepted || ownerSent) {
         return { sent: clientAccepted, ownerSent, provider: 'smtp' };
       }
-      console.warn('SMTP emails not accepted:', clientInfo?.rejected);
     } catch (err) {
-      console.warn('SMTP email error:', err);
+      console.warn('SMTP transport error:', err);
     }
   }
 
   // Secondary Option: Resend HTTP API
-  const resendKey = process.env.RESEND_API_KEY;
+  const resendKey = cleanEnv(process.env.RESEND_API_KEY);
   if (resendKey && resendKey.length > 8) {
     try {
       const fromAddress =
-        process.env.RESEND_FROM_EMAIL || 'Easytransferhub <onboarding@resend.dev>';
+        cleanEnv(process.env.RESEND_FROM_EMAIL) || 'Easytransferhub <onboarding@resend.dev>';
       const requests: Promise<Response>[] = [
         fetch('https://api.resend.com/emails', {
           method: 'POST',
@@ -415,7 +420,7 @@ async function sendEmailNotifications(
         }),
       ];
 
-      if (ownerEmail) {
+      if (ownerEmails.length > 0) {
         requests.push(
           fetch('https://api.resend.com/emails', {
             method: 'POST',
@@ -425,7 +430,7 @@ async function sendEmailNotifications(
             },
             body: JSON.stringify({
               from: fromAddress,
-              to: [ownerEmail],
+              to: ownerEmails,
               reply_to: data.email,
               subject: ownerSubject,
               html: ownerHtml,
@@ -441,11 +446,15 @@ async function sendEmailNotifications(
       const ownerOk =
         ownerSettled?.status === 'fulfilled' ? ownerSettled.value.ok : false;
 
+      if (!clientOk && clientSettled.status === 'fulfilled') {
+        console.warn('Resend client email returned non-OK:', await clientSettled.value.text());
+      }
+      if (!ownerOk && ownerSettled?.status === 'fulfilled') {
+        console.warn('Resend owner email returned non-OK:', await ownerSettled.value.text());
+      }
+
       if (clientOk || ownerOk) {
         return { sent: clientOk, ownerSent: ownerOk, provider: 'resend' };
-      }
-      if (clientSettled.status === 'fulfilled') {
-        console.warn('Resend email API returned non-OK:', await clientSettled.value.text());
       }
     } catch (err) {
       console.warn('Resend email error:', err);
@@ -459,8 +468,10 @@ async function sendWhatsAppNotifications(
   data: BookingConfirmPayload,
   bookingRef: string
 ): Promise<{ sent: boolean; provider: string | null }> {
+  const cleanEnv = (val?: string) =>
+    (val || '').trim().replace(/^["']|["']$/g, '').trim();
   const clientDigits = normalizePhoneDigits(data.phone);
-  const ownerDigits = normalizePhoneDigits(process.env.OWNER_WHATSAPP_NUMBER || '34663958889');
+  const ownerDigits = normalizePhoneDigits(cleanEnv(process.env.OWNER_WHATSAPP_NUMBER) || '34666744440');
   const messageBody = buildPlainTextMessage(data, bookingRef);
 
   if (!clientDigits) {
@@ -468,9 +479,9 @@ async function sendWhatsAppNotifications(
   }
 
   // Option 1: Meta WhatsApp Cloud API
-  const waToken = process.env.WHATSAPP_CLOUD_TOKEN;
-  const waPhoneId = process.env.WHATSAPP_PHONE_NUMBER_ID;
-  const waTemplate = process.env.WHATSAPP_TEMPLATE_NAME;
+  const waToken = cleanEnv(process.env.WHATSAPP_CLOUD_TOKEN);
+  const waPhoneId = cleanEnv(process.env.WHATSAPP_PHONE_NUMBER_ID);
+  const waTemplate = cleanEnv(process.env.WHATSAPP_TEMPLATE_NAME);
 
   if (waToken && waPhoneId) {
     try {

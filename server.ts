@@ -81,7 +81,7 @@ app.get('/api/maps-config', (_req, res) => {
 
 const SYSTEM_INSTRUCTION = `You are the friendly, professional virtual concierge for EasyTransferHub (owned and managed by Mr. Mir in Barcelona, Spain).
 Contact Details:
-- WhatsApp / Phone: +34 663 958 889
+- WhatsApp / Phone: +34 666 744 440
 - Email: easytransferhub@gmail.com
 - Base: Barcelona, Catalonia, Spain
 
@@ -116,7 +116,7 @@ Your Role:
 - Answer customer questions promptly, warmly, and clearly.
 - If they ask in English, Spanish, Catalan, Urdu, or Hindi, reply in their language.
 - Provide price estimates and vehicle recommendations.
-- When they are ready to book or want immediate confirmation, encourage them to click the "Book on WhatsApp" button or contact Mr. Mir directly at +34 663 958 889.
+- When they are ready to book or want immediate confirmation, encourage them to click the "Book on WhatsApp" button or contact Mr. Mir directly at +34 666 744 440.
 - Keep answers concise, helpful, and courteous.`;
 
 // Assistant Chat Endpoint
@@ -151,7 +151,7 @@ app.post('/api/chat', async (req, res) => {
         );
 
         const response: any = await Promise.race([generatePromise, timeoutPromise]);
-        const reply = response.text || "I'd be delighted to assist you with your transfer. Please contact Mr. Mir on WhatsApp at +34 663 958 889 for instant confirmation.";
+        const reply = response.text || "I'd be delighted to assist you with your transfer. Please contact Mr. Mir on WhatsApp at +34 666 744 440 for instant confirmation.";
         return res.json({ reply });
       } catch (aiErr) {
         console.warn('Gemini API call failed or timed out, using fallback rules:', aiErr);
@@ -160,7 +160,7 @@ app.post('/api/chat', async (req, res) => {
 
     // Smart fallback if no API key provided in environment
     const qLower = query.toLowerCase();
-    let fallbackReply = `Hello! EasyTransferHub provides 24/7 private transfers across Barcelona and Spain. For instant booking and personal service, message Mr. Mir on WhatsApp at +34 663 958 889.`;
+    let fallbackReply = `Hello! EasyTransferHub provides 24/7 private transfers across Barcelona and Spain. For instant booking and personal service, message Mr. Mir on WhatsApp at +34 666 744 440.`;
 
     if (qLower.includes('airport') || qLower.includes('bcn') || qLower.includes('aeropuerto') || qLower.includes('zone')) {
       fallbackReply = `Barcelona Airport (BCN T1 & T2) ↔ City rates (all supplements included): Zones 1–6 (Ciutat Vella, Eixample, Sants-Montjuïc, Les Corts, Sarrià, Gràcia) are €50 Standard / €60 Comfort / €70 Minivan. Zones 7–10 (Horta-Guinardó, Nou Barris, Sant Andreu, Sant Martí) are €60 Standard / €70 Comfort / €80 Minivan.`;
@@ -180,7 +180,7 @@ app.post('/api/chat', async (req, res) => {
   } catch (error) {
     console.error('Chat API Error:', error);
     return res.status(500).json({
-      reply: "Thank you for reaching out! You can reach Mr. Mir directly on WhatsApp at +34 663 958 889 or email easytransferhub@gmail.com for instant transfer quotes."
+      reply: "Thank you for reaching out! You can reach Mr. Mir directly on WhatsApp at +34 666 744 440 or email easytransferhub@gmail.com for instant transfer quotes."
     });
   }
 });

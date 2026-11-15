@@ -59,8 +59,8 @@ export const CHILD_SEAT_PRICE_EUR = 5;
 export const BUSINESS_INFO = {
   name: "Easytransferhub",
   owner: "Mr. Mir",
-  phoneDisplay: "+34 663 958 889",
-  whatsappNumber: "34663958889",
+  phoneDisplay: "+34 666 744 440",
+  whatsappNumber: "34666744440",
   email: "easytransferhub@gmail.com",
   city: "Barcelona, Spain",
   address: "Barcelona, Catalonia, Spain",

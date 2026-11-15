@@ -2,7 +2,7 @@ import { GoogleGenAI } from '@google/genai';
 
 const SYSTEM_INSTRUCTION = `You are the friendly, professional virtual concierge for EasyTransferHub (owned and managed by Mr. Mir in Barcelona, Spain).
 Contact Details:
-- WhatsApp / Phone: +34 663 958 889
+- WhatsApp / Phone: +34 666 744 440
 - Email: easytransferhub@gmail.com
 - Base: Barcelona, Catalonia, Spain
 
@@ -34,7 +34,7 @@ Key Policies & Guarantees:
 
 Your Role:
 - Answer customer questions promptly, warmly, and clearly in English, Spanish, Catalan, Urdu, or Hindi.
-- Recommend calculating on our Google Maps route calculator or contacting Mr. Mir directly on WhatsApp at +34 663 958 889.`;
+- Recommend calculating on our Google Maps route calculator or contacting Mr. Mir directly on WhatsApp at +34 666 744 440.`;
 
 const CHAT_RATE_MAP = new Map<string, number[]>();
 
@@ -57,7 +57,7 @@ export default async function handler(req: any, res: any) {
 
   if (!checkChatRateLimit(req)) {
     return res.status(429).json({
-      reply: 'Please wait a moment before sending another message, or contact Mr. Mir directly on WhatsApp at +34 663 958 889.',
+      reply: 'Please wait a moment before sending another message, or contact Mr. Mir directly on WhatsApp at +34 666 744 440.',
     });
   }
 
@@ -98,7 +98,7 @@ export default async function handler(req: any, res: any) {
         const response: any = await Promise.race([generatePromise, timeoutPromise]);
         const reply =
           response.text ||
-          "I'd be delighted to assist you with your transfer. Please contact Mr. Mir on WhatsApp at +34 663 958 889 for instant confirmation.";
+          "I'd be delighted to assist you with your transfer. Please contact Mr. Mir on WhatsApp at +34 666 744 440 for instant confirmation.";
         return res.status(200).json({ reply });
       } catch (aiErr) {
         console.warn('Gemini API call failed or timed out, using fallback rules:', aiErr);
@@ -107,7 +107,7 @@ export default async function handler(req: any, res: any) {
 
     const qLower = query.toLowerCase();
     let fallbackReply =
-      'Hello! EasyTransferHub provides 24/7 private transfers across Barcelona and Spain. For instant booking and personal service, message Mr. Mir on WhatsApp at +34 663 958 889.';
+      'Hello! EasyTransferHub provides 24/7 private transfers across Barcelona and Spain. For instant booking and personal service, message Mr. Mir on WhatsApp at +34 666 744 440.';
 
     if (qLower.includes('airport') || qLower.includes('bcn') || qLower.includes('aeropuerto') || qLower.includes('zone')) {
       fallbackReply =
@@ -134,7 +134,7 @@ export default async function handler(req: any, res: any) {
     console.error('Vercel Chat API Error:', error);
     return res.status(500).json({
       reply:
-        'Thank you for reaching out! You can reach Mr. Mir directly on WhatsApp at +34 663 958 889 or email easytransferhub@gmail.com for instant transfer quotes.',
+        'Thank you for reaching out! You can reach Mr. Mir directly on WhatsApp at +34 666 744 440 or email easytransferhub@gmail.com for instant transfer quotes.',
     });
   }
 }

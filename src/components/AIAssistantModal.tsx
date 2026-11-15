@@ -70,7 +70,7 @@ How can I assist you today? You can ask me in English, Español, Català, Urdu, 
       });
 
       const data = await response.json();
-      const reply = data.reply || "Thank you! For fast direct confirmation, please chat with Mr. Mir on WhatsApp at +34 663 958 889.";
+      const reply = data.reply || "Thank you! For fast direct confirmation, please chat with Mr. Mir on WhatsApp at +34 666 744 440.";
 
       setMessages((prev) => [
         ...prev,
