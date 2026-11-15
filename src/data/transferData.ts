@@ -493,6 +493,41 @@ export const QUICK_LOCATIONS: QuickLocation[] = [
   },
 ];
 
+export interface BarcelonaPlaca {
+  id: string;
+  name: string;
+  district: string;
+  postalCode: string;
+  address: string;
+  lat: number;
+  lon: number;
+}
+
+export const BARCELONA_PLACAS: BarcelonaPlaca[] = [
+  { id: "placa-catalunya", name: "Plaça de Catalunya", district: "Eixample / Ciutat Vella", postalCode: "08002", address: "Plaça de Catalunya, 08002 Barcelona, Spain", lat: 41.3870, lon: 2.1700 },
+  { id: "placa-espanya", name: "Plaça d'Espanya", district: "Sants-Montjuïc", postalCode: "08014", address: "Plaça d'Espanya, 08014 Barcelona, Spain", lat: 41.3750, lon: 2.1492 },
+  { id: "placa-reial", name: "Plaça Reial", district: "Ciutat Vella (Gòtic)", postalCode: "08002", address: "Plaça Reial, 08002 Barcelona, Spain", lat: 41.3802, lon: 2.1753 },
+  { id: "placa-universitat", name: "Plaça de la Universitat", district: "Eixample", postalCode: "08007", address: "Plaça de la Universitat, 08007 Barcelona, Spain", lat: 41.3854, lon: 2.1636 },
+  { id: "placa-urquinaona", name: "Plaça d'Urquinaona", district: "Eixample", postalCode: "08010", address: "Plaça d'Urquinaona, 08010 Barcelona, Spain", lat: 41.3894, lon: 2.1731 },
+  { id: "placa-tetuan", name: "Plaça de Tetuan", district: "Eixample", postalCode: "08010", address: "Plaça de Tetuan, 08010 Barcelona, Spain", lat: 41.3949, lon: 2.1756 },
+  { id: "placa-sagrada-familia", name: "Plaça de la Sagrada Família", district: "Eixample", postalCode: "08013", address: "Plaça de la Sagrada Família, 08013 Barcelona, Spain", lat: 41.4036, lon: 2.1744 },
+  { id: "placa-francesc-macia", name: "Plaça de Francesc Macià", district: "Les Corts / Eixample", postalCode: "08029", address: "Plaça de Francesc Macià, 08029 Barcelona, Spain", lat: 41.3924, lon: 2.1436 },
+  { id: "placa-glories", name: "Plaça de les Glòries Catalanes", district: "Sant Martí", postalCode: "08018", address: "Plaça de les Glòries Catalanes, 08018 Barcelona, Spain", lat: 41.4034, lon: 2.1871 },
+  { id: "placa-sant-jaume", name: "Plaça de Sant Jaume", district: "Ciutat Vella (Gòtic)", postalCode: "08002", address: "Plaça de Sant Jaume, 08002 Barcelona, Spain", lat: 41.3826, lon: 2.1770 },
+  { id: "placa-catedral", name: "Plaça de la Catedral", district: "Ciutat Vella (Gòtic)", postalCode: "08002", address: "Plaça de la Catedral, 08002 Barcelona, Spain", lat: 41.3840, lon: 2.1757 },
+  { id: "placa-sants", name: "Plaça de Sants", district: "Sants-Montjuïc", postalCode: "08014", address: "Plaça de Sants, 08014 Barcelona, Spain", lat: 41.3757, lon: 2.1360 },
+  { id: "placa-paisos-catalans", name: "Plaça dels Països Catalans (Sants Station)", district: "Sants-Montjuïc", postalCode: "08014", address: "Plaça dels Països Catalans, 08014 Barcelona, Spain", lat: 41.3792, lon: 2.1407 },
+  { id: "placa-lesseps", name: "Plaça de Lesseps", district: "Gràcia", postalCode: "08023", address: "Plaça de Lesseps, 08023 Barcelona, Spain", lat: 41.4059, lon: 2.1499 },
+  { id: "placa-sol", name: "Plaça del Sol", district: "Gràcia", postalCode: "08012", address: "Plaça del Sol, 08012 Barcelona, Spain", lat: 41.4017, lon: 2.1566 },
+  { id: "placa-diamant", name: "Plaça del Diamant", district: "Gràcia", postalCode: "08012", address: "Plaça del Diamant, 08012 Barcelona, Spain", lat: 41.4036, lon: 2.1559 },
+  { id: "placa-vila-gracia", name: "Plaça de la Vila de Gràcia", district: "Gràcia", postalCode: "08012", address: "Plaça de la Vila de Gràcia, 08012 Barcelona, Spain", lat: 41.3999, lon: 2.1573 },
+  { id: "placa-kennedy", name: "Plaça de John F. Kennedy", district: "Sarrià-Sant Gervasi", postalCode: "08022", address: "Plaça de John F. Kennedy, 08022 Barcelona, Spain", lat: 41.4095, lon: 2.1369 },
+  { id: "placa-eivissa", name: "Plaça d'Eivissa", district: "Horta-Guinardó", postalCode: "08032", address: "Plaça d'Eivissa, 08032 Barcelona, Spain", lat: 41.4296, lon: 2.1602 },
+  { id: "placa-virrei-amat", name: "Plaça de Virrei Amat", district: "Nou Barris", postalCode: "08016", address: "Plaça de Virrei Amat, 08016 Barcelona, Spain", lat: 41.4301, lon: 2.1749 },
+  { id: "placa-orfila", name: "Plaça d'Orfila", district: "Sant Andreu", postalCode: "08030", address: "Plaça d'Orfila, 08030 Barcelona, Spain", lat: 41.4357, lon: 2.1897 },
+  { id: "placa-forum", name: "Plaça del Fòrum", district: "Sant Martí (Diagonal Mar)", postalCode: "08019", address: "Plaça del Fòrum, 08019 Barcelona, Spain", lat: 41.4106, lon: 2.2197 },
+];
+
 export const VEHICLES: Vehicle[] = [
   {
     id: "standard",

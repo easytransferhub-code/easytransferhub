@@ -1,8 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useMapsLibrary } from '@vis.gl/react-google-maps';
 import { Loader2, MapPin, Navigation } from 'lucide-react';
-import { BARCELONA_ZONES, QUICK_LOCATIONS } from '../data/transferData';
-import { detectBarcelonaZone } from '../utils/pricing';
+import { BARCELONA_PLACAS, BARCELONA_ZONES, QUICK_LOCATIONS } from '../data/transferData';
 
 export interface SelectedPlaceValue {
   label: string;
@@ -26,6 +25,22 @@ interface LocalSuggestion {
   fullLabel: string;
   coords?: { lat: number; lon: number };
   prediction?: google.maps.places.AutocompleteSuggestion;
+}
+
+function normalizeSearch(str: string): string {
+  return str
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[’'`]/g, "'")
+    .trim();
+}
+
+function normalizeForApiQuery(input: string): string {
+  return input
+    .replace(/\bplaca\b/gi, 'Plaça')
+    .replace(/\bplaza\b/gi, 'Plaça')
+    .trim();
 }
 
 function isQuotaError(err: unknown): boolean {
@@ -73,18 +88,40 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
   }, []);
 
   const buildLocalFallbackSuggestions = useCallback((query: string): LocalSuggestion[] => {
-    const q = query.trim().toLowerCase();
-    if (q.length < 2) return [];
+    const qNorm = normalizeSearch(query);
+    if (qNorm.length < 2) return [];
 
+    // Treat "placa" and "plaza" interchangeably
+    const qAlt = qNorm.replace(/\bplaza\b/g, 'placa');
     const results: LocalSuggestion[] = [];
+    const seen = new Set<string>();
 
+    const pushUnique = (item: LocalSuggestion) => {
+      const k = normalizeSearch(item.primary);
+      if (seen.has(k)) return;
+      seen.add(k);
+      results.push(item);
+    };
+
+    // 1. Prioritize Barcelona Plaças when searching placa / plaza / Plaça
+    for (const p of BARCELONA_PLACAS) {
+      const hay = normalizeSearch(`${p.name} ${p.district} ${p.address}`).replace(/\bplaza\b/g, 'placa');
+      if (hay.includes(qNorm) || hay.includes(qAlt)) {
+        pushUnique({
+          key: `placa-${p.id}`,
+          primary: p.name,
+          secondary: `${p.district}, ${p.postalCode} Barcelona, Spain`,
+          fullLabel: p.address,
+          coords: { lat: p.lat, lon: p.lon },
+        });
+      }
+    }
+
+    // 2. Match major Barcelona hubs & landmarks
     for (const loc of QUICK_LOCATIONS) {
-      if (
-        loc.name.toLowerCase().includes(q) ||
-        loc.address.toLowerCase().includes(q) ||
-        loc.shortLabel.toLowerCase().includes(q)
-      ) {
-        results.push({
+      const hay = normalizeSearch(`${loc.name} ${loc.address} ${loc.shortLabel}`).replace(/\bplaza\b/g, 'placa');
+      if (hay.includes(qNorm) || hay.includes(qAlt)) {
+        pushUnique({
           key: `ql-${loc.id}`,
           primary: loc.name,
           secondary: loc.address,
@@ -94,22 +131,24 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
       }
     }
 
+    // 3. Match Barcelona districts, areas & postal codes
     for (const zone of BARCELONA_ZONES) {
-      const areaHit = zone.mainAreas.find((a) => a.toLowerCase().includes(q));
-      const districtHit = zone.district.toLowerCase().includes(q);
-      if (districtHit || areaHit) {
+      const areaHit = zone.mainAreas.find((a) => normalizeSearch(a).includes(qNorm));
+      const districtHit = normalizeSearch(zone.district).includes(qNorm);
+      const postalHit = zone.postalCodes.some((pc) => pc.includes(qNorm));
+      if (districtHit || areaHit || postalHit) {
         const areaName = areaHit || zone.district;
-        results.push({
+        pushUnique({
           key: `zone-${zone.zone}-${areaName}`,
-          primary: `${areaName}, ${zone.district} (Zone ${zone.zone})`,
-          secondary: `${zone.postalCodes[0]} Barcelona · Airport fixed: €${zone.prices.standard}/€${zone.prices.comfort}/€${zone.prices.van}`,
+          primary: `${areaName}, ${zone.district}`,
+          secondary: `${zone.postalCodes[0]} Barcelona, Spain`,
           fullLabel: `${areaName}, ${zone.district}, ${zone.postalCodes[0]} Barcelona, Spain`,
           coords: { lat: zone.center.lat, lon: zone.center.lng },
         });
       }
     }
 
-    return results.slice(0, 6);
+    return results.slice(0, 8);
   }, []);
 
   const fetchPredictions = useCallback(
@@ -122,6 +161,8 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
         return;
       }
 
+      const localItems = buildLocalFallbackSuggestions(trimmed);
+
       // Use Places API (New) AutocompleteSuggestion when Maps JS library is loaded
       if (mapsEnabled && placesLib?.AutocompleteSuggestion && placesLib?.AutocompleteSessionToken) {
         try {
@@ -130,21 +171,21 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
           }
 
           setIsLoading(true);
+          const normalizedQuery = normalizeForApiQuery(trimmed);
           const request: google.maps.places.AutocompleteRequest = {
-            input: trimmed,
+            input: normalizedQuery,
             sessionToken: sessionTokenRef.current,
             includedRegionCodes: ['es', 'ad', 'fr'],
             locationBias: {
               center: { lat: 41.3874, lng: 2.1686 },
               radius: 50000,
             },
-            language: 'en',
           };
 
           const { suggestions: rawSuggestions } =
             await placesLib.AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
 
-          const mapped: LocalSuggestion[] = (rawSuggestions || [])
+          const apiMapped: LocalSuggestion[] = (rawSuggestions || [])
             .filter((s) => Boolean(s.placePrediction))
             .slice(0, 6)
             .map((s, idx) => {
@@ -160,8 +201,25 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
               };
             });
 
-          if (mapped.length > 0) {
-            setSuggestions(mapped);
+          // Merge instant local Barcelona Plaças/landmarks + live Google Places suggestions without duplicates
+          const merged: LocalSuggestion[] = [];
+          const seen = new Set<string>();
+          const isPlacaSearch = /\bpla[cçz]a\b/i.test(normalizeSearch(trimmed));
+
+          const primaryOrder = isPlacaSearch
+            ? [...localItems, ...apiMapped]
+            : [...apiMapped, ...localItems];
+
+          for (const item of primaryOrder) {
+            const normPrimary = normalizeSearch(item.primary);
+            if (!seen.has(normPrimary)) {
+              seen.add(normPrimary);
+              merged.push(item);
+            }
+          }
+
+          if (merged.length > 0) {
+            setSuggestions(merged.slice(0, 8));
             setIsOpen(true);
             setIsLoading(false);
             return;
@@ -177,8 +235,6 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
         }
       }
 
-      // Graceful local zone / landmark fallback if Places lib unavailable or zero API matches
-      const localItems = buildLocalFallbackSuggestions(trimmed);
       setSuggestions(localItems);
       setIsOpen(localItems.length > 0);
       setIsLoading(false);
@@ -191,10 +247,20 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
     justSelectedRef.current = false;
     onChangeText(val);
 
+    // Show local Plaça / Barcelona landmark matches immediately (0ms)
+    const instantLocal = buildLocalFallbackSuggestions(val);
+    if (instantLocal.length > 0) {
+      setSuggestions(instantLocal);
+      setIsOpen(true);
+    } else if (val.trim().length < 2) {
+      setSuggestions([]);
+      setIsOpen(false);
+    }
+
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
       void fetchPredictions(val);
-    }, 240);
+    }, 180);
   };
 
   const handleSelectItem = async (item: LocalSuggestion) => {
@@ -212,7 +278,7 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
         const loc = place.location;
         const coords = loc ? { lat: loc.lat(), lon: loc.lng() } : null;
 
-        // Extract postal code or neighborhood from addressComponents for rich display & exact zone matching
+        // Keep postal code & neighborhood inside address text for silent zone matching
         const postalComponent = place.addressComponents?.find((c) =>
           c.types.includes('postal_code')
         )?.longText;
@@ -257,8 +323,6 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
     });
   };
 
-  const zonePreview = value.trim() ? detectBarcelonaZone(value) : null;
-
   return (
     <div className="relative" ref={containerRef}>
       <input
@@ -268,8 +332,16 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
         autoComplete="off"
         onChange={handleInputChange}
         onFocus={() => {
-          if (suggestions.length > 0 && !justSelectedRef.current) {
-            setIsOpen(true);
+          if (!justSelectedRef.current) {
+            if (suggestions.length > 0) {
+              setIsOpen(true);
+            } else if (value.trim().length >= 2) {
+              const instantLocal = buildLocalFallbackSuggestions(value);
+              if (instantLocal.length > 0) {
+                setSuggestions(instantLocal);
+                setIsOpen(true);
+              }
+            }
           }
         }}
         placeholder={placeholder}
@@ -285,18 +357,6 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
           <Navigation className="w-4 h-4 text-[#008da1]" />
         )}
       </span>
-
-      {/* Subtle detected zone chip inside field corner when text matches a district */}
-      {zonePreview && !isOpen && (
-        <div className="mt-1 flex items-center gap-1.5 text-[10px] font-bold text-[#007c91]">
-          <span className="px-1.5 py-0.5 rounded bg-[#e6fdff] border border-[#8ceeff]">
-            Zone {zonePreview.zone.zone}: {zonePreview.zone.district}
-          </span>
-          <span className="text-slate-500 font-medium">
-            Airport rate €{zonePreview.zone.prices.standard} / €{zonePreview.zone.prices.comfort} / €{zonePreview.zone.prices.van}
-          </span>
-        </div>
-      )}
 
       {isOpen && suggestions.length > 0 && (
         <ul className="absolute left-0 right-0 top-full mt-1 bg-white border border-[#67efff] rounded-xl shadow-xl z-40 max-h-60 overflow-y-auto divide-y divide-[#e6fdff] text-xs">

@@ -51,7 +51,7 @@ import {
   QuoteResult,
 } from '../utils/pricing';
 import { GooglePlacesInput } from './GooglePlacesInput';
-import { GoogleRouteMap } from './GoogleRouteMap';
+import { GoogleRouteDistanceSync } from './GoogleRouteMap';
 
 interface CountryCodeOption {
   iso2: string;
@@ -768,7 +768,6 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 <MapPin className="w-3.5 h-3.5 text-[#008da1]" />
                 <span>{t.pickupLabel}</span>
               </label>
-              <span className="text-[11px] text-slate-500">Google Maps location search</span>
             </div>
 
             <GooglePlacesInput
@@ -801,7 +800,6 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 <Navigation className="w-3.5 h-3.5 text-[#008da1]" />
                 <span>{t.dropoffLabel}</span>
               </label>
-              <span className="text-[11px] text-slate-500">Google Maps address or zone</span>
             </div>
 
             <GooglePlacesInput
@@ -827,38 +825,18 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
             />
           </div>
 
-          {/* Detected Barcelona Zone Pill + Live Google Route Map Preview */}
-          {(pickup.trim() || dropoff.trim()) && (
-            <div className="space-y-2 pt-0.5">
-              {quote?.matchedZone && (
-                <div className="p-2.5 rounded-xl bg-[#e6fdff] border border-[#67efff] flex flex-wrap items-center justify-between gap-2 text-xs">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <span className="px-2 py-0.5 rounded-md bg-[#00f0ff] border border-[#00c8e8] text-slate-950 font-extrabold shrink-0">
-                      Zone {quote.matchedZone.zoneNumber}
-                    </span>
-                    <span className="font-bold text-[#042f40] truncate">
-                      {quote.matchedZone.district} ({quote.matchedZone.mainAreas.slice(0, 3).join(', ')})
-                    </span>
-                  </div>
-                  <span className="text-[11px] font-bold text-[#007c91]">
-                    Fixed Rate: €{quote.vehicles[0]?.basePrice} / €{quote.vehicles[1]?.basePrice} / €{quote.vehicles[2]?.basePrice} · All Supplements Included
-                  </span>
-                </div>
-              )}
-
-              <GoogleRouteMap
-                pickup={pickup}
-                dropoff={dropoff}
-                pickupCoords={pickupCoords}
-                dropoffCoords={dropoffCoords}
-                mapsEnabled={mapsEnabled}
-                onRouteMetrics={({ distanceKm, durationMinutes }) => {
-                  setRouteDistanceKm(distanceKm);
-                  setRouteDurationMinutes(durationMinutes);
-                }}
-              />
-            </div>
-          )}
+          {/* Silent background Routes API distance calculation (keeps pricing unchanged without visible map UI) */}
+          <GoogleRouteDistanceSync
+            pickup={pickup}
+            dropoff={dropoff}
+            pickupCoords={pickupCoords}
+            dropoffCoords={dropoffCoords}
+            mapsEnabled={mapsEnabled}
+            onRouteMetrics={({ distanceKm, durationMinutes }) => {
+              setRouteDistanceKm(distanceKm);
+              setRouteDurationMinutes(durationMinutes);
+            }}
+          />
         </div>
 
         {/* Date & Time Row (Pickup + Optional Return if Round Trip) */}

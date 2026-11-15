@@ -23,6 +23,105 @@ interface GoogleRouteMapProps {
   onRouteMetrics?: (metrics: { distanceKm: number; durationMinutes: number }) => void;
 }
 
+/** Headless Google Routes API distance calculator (no visible map UI) */
+export const GoogleRouteDistanceSync: React.FC<GoogleRouteMapProps> = ({
+  pickup,
+  dropoff,
+  pickupCoords,
+  dropoffCoords,
+  mapsEnabled,
+  onRouteMetrics,
+}) => {
+  const routesLib = useMapsLibrary('routes');
+  const lastSignatureRef = useRef<string>('');
+  const onRouteMetricsRef = useRef(onRouteMetrics);
+  onRouteMetricsRef.current = onRouteMetrics;
+
+  useEffect(() => {
+    if (!pickup.trim() || !dropoff.trim()) return;
+
+    if (!mapsEnabled || !routesLib) {
+      if (pickupCoords && dropoffCoords) {
+        const fallbackKm = calculateHaversineKm(
+          pickupCoords.lat,
+          pickupCoords.lon,
+          dropoffCoords.lat,
+          dropoffCoords.lon
+        );
+        onRouteMetricsRef.current?.({
+          distanceKm: fallbackKm,
+          durationMinutes: Math.max(15, Math.round(fallbackKm * 1.35)),
+        });
+      }
+      return;
+    }
+
+    const originVal: google.maps.LatLngLiteral | string = pickupCoords
+      ? { lat: pickupCoords.lat, lng: pickupCoords.lon }
+      : pickup.includes('Spain')
+      ? pickup
+      : `${pickup}, Barcelona, Spain`;
+
+    const destVal: google.maps.LatLngLiteral | string = dropoffCoords
+      ? { lat: dropoffCoords.lat, lng: dropoffCoords.lon }
+      : dropoff.includes('Spain')
+      ? dropoff
+      : `${dropoff}, Barcelona, Spain`;
+
+    const signature = JSON.stringify([originVal, destVal]);
+    if (lastSignatureRef.current === signature) return;
+
+    let cancelled = false;
+    const RouteClass = (routesLib as any).Route;
+    if (!RouteClass?.computeRoutes) return;
+
+    RouteClass.computeRoutes({
+      origin: originVal,
+      destination: destVal,
+      travelMode: 'DRIVING',
+      fields: ['distanceMeters', 'durationMillis'],
+    })
+      .then(({ routes }: { routes: any[] }) => {
+        if (cancelled || !routes || routes.length === 0) return;
+        lastSignatureRef.current = signature;
+        const primaryRoute = routes[0];
+        const distKm = Math.max(
+          5,
+          Math.round(((primaryRoute.distanceMeters ?? 18000) as number) / 1000)
+        );
+        const durationMinutes = Math.max(
+          10,
+          Math.round(((primaryRoute.durationMillis ?? 1500000) as number) / 60000)
+        );
+        onRouteMetricsRef.current?.({ distanceKm: distKm, durationMinutes });
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        if (isQuotaError(err)) {
+          window.dispatchEvent(new CustomEvent('gmp-quota-exceeded'));
+        }
+        if (pickupCoords && dropoffCoords) {
+          const fallbackKm = calculateHaversineKm(
+            pickupCoords.lat,
+            pickupCoords.lon,
+            dropoffCoords.lat,
+            dropoffCoords.lon
+          );
+          onRouteMetricsRef.current?.({
+            distanceKm: fallbackKm,
+            durationMinutes: Math.max(15, Math.round(fallbackKm * 1.35)),
+          });
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [mapsEnabled, routesLib, pickup, dropoff, pickupCoords, dropoffCoords]);
+
+  return null;
+};
+
 const BARCELONA_CENTER = { lat: 41.36, lng: 2.135 };
 
 function isQuotaError(err: unknown): boolean {
