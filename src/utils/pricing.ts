@@ -341,8 +341,8 @@ export function calculateQuote(
     }
 
     const oneWayTotal = basePrice + childSeatCost;
-    // 5% discount on round trip
-    const roundTripTotal = isRoundTrip ? Math.round(oneWayTotal * 1.95) : oneWayTotal;
+    // 10% discount on round trip (2 * 0.90 = 1.8)
+    const roundTripTotal = isRoundTrip ? Math.round(oneWayTotal * 1.8) : oneWayTotal;
 
     let isRecommended = false;
     if (passengers > 4 || luggage > 4) {

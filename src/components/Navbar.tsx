@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { MessageCircle, Menu, X, Globe, Sparkles } from 'lucide-react';
-import { BUSINESS_INFO, TRANSLATIONS } from '../data/transferData';
+import { Menu, X, Globe, Sparkles } from 'lucide-react';
+import { TRANSLATIONS } from '../data/transferData';
 
 interface NavbarProps {
   language: 'en' | 'es' | 'ca' | 'ur';
@@ -25,14 +25,14 @@ export const Navbar: React.FC<NavbarProps> = ({ language, setLanguage, onOpenAss
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between">
         {/* Brand Logo */}
         <a href="#top" className="flex items-center gap-2.5 group">
-          <div className="w-9 h-9 rounded-lg bg-[#00f0ff] border border-[#00c8e8] flex items-center justify-center shadow-[0_4px_14px_-4px_rgba(0,240,255,0.6)] font-display font-extrabold text-slate-950 text-base tracking-tight">
+          <div className="w-10 h-10 rounded-xl bg-[#00f0ff] border border-[#00c8e8] flex items-center justify-center shadow-[0_4px_14px_-4px_rgba(0,240,255,0.65)] font-display font-black text-slate-950 text-lg tracking-tight shrink-0">
             ET
           </div>
           <div className="min-w-0">
-            <span className="font-display font-extrabold text-[17px] sm:text-[18px] tracking-tight text-slate-900 block leading-tight whitespace-nowrap">
-              Easytransfer<span className="text-[#00a6bf]">hub</span>
+            <span className="font-display font-black text-[21px] sm:text-[24px] tracking-tight text-slate-900 block leading-tight whitespace-nowrap">
+              Easytransfer<span className="text-[#009eb5]">hub</span>
             </span>
-            <span className="block text-[8px] sm:text-[8.5px] text-slate-500 tracking-[0.16em] uppercase font-semibold whitespace-nowrap leading-none mt-0.5">
+            <span className="block text-[9px] sm:text-[9.5px] text-[#007c91] tracking-[0.17em] uppercase font-bold whitespace-nowrap leading-none mt-0.5">
               Executive Chauffeur Service
             </span>
           </div>
@@ -94,20 +94,6 @@ export const Navbar: React.FC<NavbarProps> = ({ language, setLanguage, onOpenAss
               ))}
             </div>
           </div>
-
-          {/* Book WhatsApp CTA */}
-          <a
-            href={`https://wa.me/${BUSINESS_INFO.whatsappNumber}?text=${encodeURIComponent(
-              'Hello Easytransferhub, I would like to inquire about a private transfer.'
-            )}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-[#00f0ff] hover:bg-[#00d8eb] text-slate-950 font-extrabold text-xs sm:text-sm shadow-[0_4px_16px_-4px_rgba(0,240,255,0.6)] transition-all active:scale-95 whitespace-nowrap"
-          >
-            <MessageCircle className="w-4 h-4 fill-slate-950 text-slate-950" />
-            <span className="hidden md:inline">Book on WhatsApp</span>
-            <span className="md:hidden">Book</span>
-          </a>
 
           {/* Mobile Menu Button */}
           <button

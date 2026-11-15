@@ -142,13 +142,13 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
   const [step2Error, setStep2Error] = useState('');
 
   // Detailed Passenger State
-  const [adults, setAdults] = useState(2);
+  const [adults, setAdults] = useState(1);
   const [children, setChildren] = useState(0);
   const [childAgeGroup, setChildAgeGroup] = useState<'0-2' | '3-6' | '7-11'>('3-6');
 
   // Detailed Luggage State
-  const [largeBags, setLargeBags] = useState(1); // XXL / Large (75-80cm)
-  const [mediumBags, setMediumBags] = useState(1); // Medium (65cm)
+  const [largeBags, setLargeBags] = useState(0); // XXL / Large (75-80cm)
+  const [mediumBags, setMediumBags] = useState(0); // Medium (65cm)
   const [handCarryBags, setHandCarryBags] = useState(0); // Small / Cabin (55cm)
   const [shoulderBags, setShoulderBags] = useState(0); // Backpack / Shoulder bag
   const [showLuggageDetails, setShowLuggageDetails] = useState(false);
@@ -757,7 +757,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
           {/* Full-width top headline — stays on 1 single line on both mobile & desktop */}
           <h2
             className="w-full font-display font-extrabold text-[#042f40] whitespace-nowrap tracking-[-0.03em] sm:tracking-tight leading-tight m-0"
-            style={{ fontSize: 'clamp(10.5px, 2.95vw, 20px)' }}
+            style={{ fontSize: 'clamp(9px, 2.55vw, 20px)' }}
           >
             Private transfers from Barcelona to anywhere in Spain
           </h2>
@@ -785,7 +785,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                Round Trip (-5%)
+                Round Trip (-10%)
               </button>
             </div>
 
@@ -1054,11 +1054,17 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 : 'bg-[#f5feff] hover:bg-[#e6fdff] border-[#9beeff] hover:border-[#00c8e8]'
             }`}
           >
-            <div className="text-left min-w-0 pr-1.5 flex-1">
-              <div className="text-[11px] sm:text-sm font-bold text-slate-900 tracking-tight whitespace-nowrap truncate">
+            <div className="text-left min-w-0 pr-1 flex-1">
+              <div
+                className="font-bold text-slate-900 tracking-tight whitespace-nowrap truncate"
+                style={{ fontSize: 'clamp(10px, 2.85vw, 14px)' }}
+              >
                 Passengers + Luggage + Child Seat
               </div>
-              <div className="text-[10px] sm:text-[11px] font-semibold text-slate-600 flex items-center gap-1 sm:gap-1.5 mt-0.5 whitespace-nowrap overflow-hidden">
+              <div
+                className="font-semibold text-slate-600 flex items-center gap-1 sm:gap-1.5 mt-0.5 whitespace-nowrap overflow-hidden"
+                style={{ fontSize: 'clamp(9px, 2.5vw, 11px)' }}
+              >
                 <span className="text-[#042f40] font-bold bg-[#e6fdff] px-1.5 py-0.2 rounded border border-[#67efff] shrink-0">
                   {totalPassengers} Pax
                 </span>
@@ -1067,19 +1073,19 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 <span className="shrink-0">•</span>
                 <span className="text-[#007c91] font-bold truncate">
                   {totalChildSeats > 0
-                    ? `${totalChildSeats} Seat (+€${totalChildSeats * CHILD_SEAT_PRICE_EUR})`
-                    : '+€5 Child Seat'}
+                    ? `${totalChildSeats} Child ${totalChildSeats === 1 ? 'Seat' : 'Seats'}`
+                    : 'Child Seat'}
                 </span>
               </div>
             </div>
 
             <div className="flex items-center shrink-0 ml-1">
-              <span className="text-[10px] sm:text-[11px] font-extrabold px-2 sm:px-2.5 py-1 rounded-lg bg-[#00f0ff] border border-[#00c8e8] text-slate-950 shadow-xs flex items-center gap-1 whitespace-nowrap">
+              <span className="text-[9.5px] sm:text-[11px] font-extrabold px-1.5 sm:px-2.5 py-1 rounded-lg bg-[#00f0ff] border border-[#00c8e8] text-slate-950 shadow-xs flex items-center gap-0.5 sm:gap-1 whitespace-nowrap">
                 <span>{showPassengersLuggageSeats ? 'Close' : 'Choose / Edit'}</span>
                 {showPassengersLuggageSeats ? (
-                  <ChevronUp className="w-3.5 h-3.5 shrink-0" />
+                  <ChevronUp className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
                 ) : (
-                  <ChevronDown className="w-3.5 h-3.5 shrink-0" />
+                  <ChevronDown className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
                 )}
               </span>
             </div>
@@ -1448,7 +1454,10 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
             <ArrowRight className="w-5 h-5 text-slate-950" />
           </button>
 
-          <p className="text-[10px] text-center text-slate-500 flex items-center justify-center gap-2 flex-wrap mt-2">
+          <p
+            className="text-center text-black font-semibold flex items-center justify-center gap-1 sm:gap-2 whitespace-nowrap flex-nowrap overflow-hidden mt-2"
+            style={{ fontSize: 'clamp(7.5px, 2.25vw, 11px)' }}
+          >
             <span>✓ All-Inclusive Fixed Prices</span>
             <span>·</span>
             <span>✓ Free Flight Delay Tracking</span>
@@ -1481,7 +1490,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
             {dateTime ? new Date(dateTime).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Flexible Date'}
           </span>
           <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-[#e6fdff] border border-[#67efff] text-[#042f40] ml-auto">
-            {isRoundTrip ? 'Round Trip (-5% off)' : 'One Way Fixed'}
+            {isRoundTrip ? 'Round Trip (-10% off)' : 'One Way Fixed'}
           </span>
         </div>
 
@@ -1518,7 +1527,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                     ? isRoundTrip
                       ? vQuote.roundTripTotal
                       : vQuote.totalPrice
-                    : (isRoundTrip ? 98 : 50) + totalChildSeats * CHILD_SEAT_PRICE_EUR;
+                    : (isRoundTrip ? 90 : 50) + totalChildSeats * CHILD_SEAT_PRICE_EUR;
                   const isSelected = selectedVehicleId === 'standard';
                   const isDisabled = totalPassengers > 4 || checkInSuitcases > 3;
                   const isRecommended = totalPassengers <= 4 && checkInSuitcases <= 3;
@@ -1600,7 +1609,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                     ? isRoundTrip
                       ? vQuote.roundTripTotal
                       : vQuote.totalPrice
-                    : (isRoundTrip ? 117 : 60) + totalChildSeats * CHILD_SEAT_PRICE_EUR;
+                    : (isRoundTrip ? 108 : 60) + totalChildSeats * CHILD_SEAT_PRICE_EUR;
                   const isSelected = selectedVehicleId === 'comfort';
                   const isDisabled = totalPassengers > 4 || checkInSuitcases > 4;
                   const isRecommended = totalPassengers <= 4 && checkInSuitcases === 4;
@@ -1685,7 +1694,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                     ? isRoundTrip
                       ? vQuote.roundTripTotal
                       : vQuote.totalPrice
-                    : (isRoundTrip ? 137 : 70) + totalChildSeats * CHILD_SEAT_PRICE_EUR;
+                    : (isRoundTrip ? 126 : 70) + totalChildSeats * CHILD_SEAT_PRICE_EUR;
                   const isSelected = selectedVehicleId === 'van' || selectedVehicleId === 'minivan';
                   const isRecommended = totalPassengers >= 5 || checkInSuitcases >= 5;
 
