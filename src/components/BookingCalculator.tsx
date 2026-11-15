@@ -388,7 +388,11 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
     ? isRoundTrip
       ? currentVehicleQuote.roundTripTotal
       : currentVehicleQuote.totalPrice
-    : (activeVehicleData.id === 'van' ? 70 : activeVehicleData.id === 'comfort' ? 60 : 50) +
+    : (activeVehicleData.id === 'van'
+        ? isRoundTrip ? 126 : 70
+        : activeVehicleData.id === 'comfort'
+        ? isRoundTrip ? 108 : 60
+        : isRoundTrip ? 90 : 50) +
       totalChildSeats * CHILD_SEAT_PRICE_EUR;
 
   // Build descriptive luggage text
@@ -443,8 +447,9 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
       setStep2Error('Please fill in your full name, email address, and phone number.');
       return false;
     }
-    if (!passengerEmail.includes('@')) {
-      setStep2Error('Please enter a valid email address.');
+    const emailPattern = /^[^\s@<>()[\]\\,;:"']+@[^\s@<>()[\]\\,;:"']+\.[^\s@<>()[\]\\,;:"']{2,}$/;
+    if (!emailPattern.test(passengerEmail.trim())) {
+      setStep2Error('Please enter a valid email address (e.g. name@example.com).');
       return false;
     }
     setStep2Error('');
@@ -563,6 +568,11 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
       });
 
       const data = await res.json().catch(() => ({}));
+      if (res.status === 400 && data?.error) {
+        setStep2Error(String(data.error));
+        setConfirmingBooking(false);
+        return;
+      }
       const bookingRef = data.bookingRef || generatedRef;
 
       setConfirmedBookingInfo({
