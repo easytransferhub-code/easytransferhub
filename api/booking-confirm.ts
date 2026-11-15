@@ -285,39 +285,40 @@ function buildPlainTextMessage(data: BookingConfirmPayload, bookingRef: string):
 async function sendEmailNotifications(
   data: BookingConfirmPayload,
   bookingRef: string
-): Promise<{ sent: boolean; provider: string | null }> {
-  const ownerEmail = process.env.BOOKING_OWNER_EMAIL || 'easytransferhub@gmail.com';
+): Promise<{ sent: boolean; ownerSent: boolean; provider: string | null }> {
+  const cleanEnv = (val?: string) =>
+    (val || '').trim().replace(/^["']|["']$/g, '').trim();
+  const configuredOwner = cleanEnv(process.env.BOOKING_OWNER_EMAIL);
+  const ownerEmail = EMAIL_REGEX.test(configuredOwner)
+    ? configuredOwner
+    : 'easytransferhub@gmail.com';
   const subject = `Your Easytransferhub Transfer Confirmation [${bookingRef}] — €${data.quotedPrice}`;
   const ownerSubject = `NEW BOOKING [${bookingRef}] €${data.quotedPrice} — ${data.passengerName} (${data.phone})`;
   const html = buildBookingEmailHtml(data, bookingRef);
   const ownerHtml = buildOwnerDispatchEmailHtml(data, bookingRef);
   const text = buildPlainTextMessage(data, bookingRef);
 
-  // Primary Recommended Option: Gmail / Custom SMTP via Nodemailer (single pooled connection)
-  const smtpUser = (
-    process.env.SMTP_USER ||
-    process.env.GMAIL_USER ||
-    process.env.EMAIL_USER ||
-    ownerEmail
-  ).trim();
+  // Primary Recommended Option: Gmail / Custom SMTP via Nodemailer
+  const smtpUser =
+    cleanEnv(process.env.SMTP_USER) ||
+    cleanEnv(process.env.GMAIL_USER) ||
+    cleanEnv(process.env.EMAIL_USER) ||
+    ownerEmail;
   const rawPass =
-    process.env.SMTP_PASS ||
-    process.env.GMAIL_APP_PASSWORD ||
-    process.env.SMTP_PASSWORD ||
-    process.env.EMAIL_PASS ||
+    cleanEnv(process.env.SMTP_PASS) ||
+    cleanEnv(process.env.GMAIL_APP_PASSWORD) ||
+    cleanEnv(process.env.SMTP_PASSWORD) ||
+    cleanEnv(process.env.EMAIL_PASS) ||
     '';
   const smtpPass = rawPass.replace(/\s+/g, '').trim();
 
   if (smtpUser && smtpPass) {
-    let transporter: ReturnType<typeof nodemailer.createTransport> | null = null;
     try {
       const smtpHost = (process.env.SMTP_HOST || 'smtp.gmail.com').trim();
       const smtpPort = Number(process.env.SMTP_PORT || 465);
-      transporter = nodemailer.createTransport(
+      const transporter = nodemailer.createTransport(
         smtpHost === 'smtp.gmail.com'
           ? {
-              pool: true,
-              maxConnections: 1,
               service: 'gmail',
               auth: {
                 user: smtpUser,
@@ -325,8 +326,6 @@ async function sendEmailNotifications(
               },
             }
           : {
-              pool: true,
-              maxConnections: 1,
               host: smtpHost,
               port: smtpPort,
               secure: smtpPort === 465,
@@ -337,7 +336,7 @@ async function sendEmailNotifications(
             }
       );
 
-      // 1. Send Client Email FIRST on single authenticated SMTP session
+      // 1. Send Client Email FIRST
       const clientInfo = await transporter.sendMail({
         from: `"Easytransferhub Bookings" <${smtpUser}>`,
         to: data.email,
@@ -353,34 +352,42 @@ async function sendEmailNotifications(
       const clientAccepted =
         Array.isArray(clientInfo?.accepted) && clientInfo.accepted.length > 0;
 
-      // 2. Send Dedicated Owner Dispatch Email on same pooled session (if different from client)
-      if (ownerEmail && ownerEmail.toLowerCase() !== data.email.toLowerCase()) {
-        await transporter
-          .sendMail({
+      // 2. Send Dedicated Owner Dispatch Email to Inbox
+      // If sender and owner are the same @gmail.com account, use +booking sub-address
+      // so Gmail delivers it into Primary Inbox instead of hiding it as self-sent mail.
+      let ownerSent = false;
+      if (ownerEmail) {
+        const ownerInboxTarget =
+          ownerEmail.toLowerCase() === smtpUser.toLowerCase() &&
+          /@gmail\.com$/i.test(ownerEmail)
+            ? ownerEmail.replace(/@gmail\.com$/i, '+booking@gmail.com')
+            : ownerEmail;
+
+        try {
+          const ownerInfo = await transporter.sendMail({
             from: `"Easytransferhub Dispatch" <${smtpUser}>`,
-            to: ownerEmail,
+            to: ownerInboxTarget,
             replyTo: data.email,
             subject: ownerSubject,
             html: ownerHtml,
             text,
-          })
-          .catch((ownerErr: unknown) => {
-            console.warn('SMTP owner dispatch warning:', ownerErr);
+            headers: {
+              'X-Entity-Ref-ID': `${bookingRef}-dispatch`,
+            },
           });
+          ownerSent =
+            Array.isArray(ownerInfo?.accepted) && ownerInfo.accepted.length > 0;
+        } catch (ownerErr: unknown) {
+          console.warn('SMTP owner dispatch warning:', ownerErr);
+        }
       }
 
-      if (clientAccepted) {
-        return { sent: true, provider: 'smtp' };
+      if (clientAccepted || ownerSent) {
+        return { sent: clientAccepted, ownerSent, provider: 'smtp' };
       }
-      console.warn('SMTP client email not accepted:', clientInfo?.rejected);
+      console.warn('SMTP emails not accepted:', clientInfo?.rejected);
     } catch (err) {
       console.warn('SMTP email error:', err);
-    } finally {
-      try {
-        transporter?.close();
-      } catch {
-        // ignore close error
-      }
     }
   }
 
@@ -428,9 +435,14 @@ async function sendEmailNotifications(
         );
       }
 
-      const [clientSettled] = await Promise.allSettled(requests);
-      if (clientSettled.status === 'fulfilled' && clientSettled.value.ok) {
-        return { sent: true, provider: 'resend' };
+      const [clientSettled, ownerSettled] = await Promise.allSettled(requests);
+      const clientOk =
+        clientSettled.status === 'fulfilled' && clientSettled.value.ok;
+      const ownerOk =
+        ownerSettled?.status === 'fulfilled' ? ownerSettled.value.ok : false;
+
+      if (clientOk || ownerOk) {
+        return { sent: clientOk, ownerSent: ownerOk, provider: 'resend' };
       }
       if (clientSettled.status === 'fulfilled') {
         console.warn('Resend email API returned non-OK:', await clientSettled.value.text());
@@ -440,7 +452,7 @@ async function sendEmailNotifications(
     }
   }
 
-  return { sent: false, provider: null };
+  return { sent: false, ownerSent: false, provider: null };
 }
 
 async function sendWhatsAppNotifications(
@@ -622,6 +634,7 @@ export async function processBookingConfirmation(rawPayload: BookingConfirmPaylo
     success: true,
     bookingRef,
     emailSent: emailResult.sent,
+    ownerEmailSent: emailResult.ownerSent,
     emailProvider: emailResult.provider,
     whatsappSent: whatsappResult.sent,
     whatsappProvider: whatsappResult.provider,

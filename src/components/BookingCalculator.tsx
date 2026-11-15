@@ -42,7 +42,6 @@ import {
   VEHICLES,
   TRANSLATIONS,
   BUSINESS_INFO,
-  QuickLocation,
 } from '../data/transferData';
 import {
   calculateQuote,
@@ -192,32 +191,8 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
   const [quote, setQuote] = useState<QuoteResult | null>(null);
   const [priceRevealed, setPriceRevealed] = useState(false);
 
-  // Airport terminal toggles & matchers for Pickup & Dropoff
-  const [showPickupAirportTerminals, setShowPickupAirportTerminals] = useState(false);
-  const [showDropoffAirportTerminals, setShowDropoffAirportTerminals] = useState(false);
-
-  const isPickupAirportT1 = pickup.toLowerCase().includes('terminal 1') || pickup.toLowerCase().includes('t1');
-  const isPickupAirportT2 = pickup.toLowerCase().includes('terminal 2') || pickup.toLowerCase().includes('t2');
-  const isPickupAirport = isPickupAirportT1 || isPickupAirportT2 || pickup.toLowerCase().includes('airport');
-
-  const isDropoffAirportT1 = dropoff.toLowerCase().includes('terminal 1') || dropoff.toLowerCase().includes('t1');
-  const isDropoffAirportT2 = dropoff.toLowerCase().includes('terminal 2') || dropoff.toLowerCase().includes('t2');
-  const isDropoffAirport = isDropoffAirportT1 || isDropoffAirportT2 || dropoff.toLowerCase().includes('airport');
-
-  const otherQuickLocations = QUICK_LOCATIONS.filter(
-    (loc) => loc.id === 'port' || loc.id === 'sants'
-  );
-
   // Toggle for merged Passengers + Luggage + Child Seats button
   const [showPassengersLuggageSeats, setShowPassengersLuggageSeats] = useState(false);
-
-  const isQuickLocSelected = (val: string, loc: QuickLocation) => {
-    const v = val.toLowerCase();
-    if (!v) return false;
-    if (loc.id === 'sants') return v.includes('sants');
-    if (loc.id === 'port') return v.includes('cruise') || v.includes('port de barcelona');
-    return v === loc.name.toLowerCase() || v.includes(loc.shortLabel.toLowerCase());
-  };
 
   // Close country picker dropdown on outside click
   useEffect(() => {
@@ -331,20 +306,6 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
     dropoffTimeout.current = setTimeout(() => {
       fetchAddressSuggestions(val, setDropoffSuggestions, setShowDropoffList);
     }, 300);
-  };
-
-  // Quick Pick Chips
-  const applyQuickLocation = (loc: QuickLocation, field: 'pickup' | 'dropoff') => {
-    setValidationError('');
-    if (field === 'pickup') {
-      setPickup(loc.name);
-      setPickupCoords({ lat: loc.lat, lon: loc.lon });
-      setShowPickupList(false);
-    } else {
-      setDropoff(loc.name);
-      setDropoffCoords({ lat: loc.lat, lon: loc.lon });
-      setShowDropoffList(false);
-    }
   };
 
   // Swap locations
@@ -948,99 +909,6 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 </ul>
               )}
             </div>
-
-            {/* Terminal Selector Bar above Quick Chips */}
-            {showPickupAirportTerminals && (
-              <div className="mt-2 p-1.5 bg-[#e6fdff] border border-[#67efff] rounded-xl flex items-center justify-between gap-1.5 shadow-2xs animate-fadeIn">
-                <span className="text-[11px] font-bold text-[#042f40] flex items-center gap-1 pl-1 shrink-0">
-                  <Plane className="w-3.5 h-3.5 text-[#008da1]" />
-                  <span>Terminal:</span>
-                </span>
-                <div className="flex items-center gap-1.5 flex-1 justify-end">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const loc = QUICK_LOCATIONS.find((l) => l.id === 'bcn_t1');
-                      if (loc) applyQuickLocation(loc, 'pickup');
-                      setShowPickupAirportTerminals(false);
-                    }}
-                    className={`text-[11px] px-3 py-1 rounded-lg font-bold border transition-all cursor-pointer flex items-center gap-1 ${
-                      isPickupAirportT1
-                        ? 'bg-[#00f0ff] border-[#00c8e8] text-slate-950 font-extrabold shadow-xs'
-                        : 'bg-white border-[#9beeff] hover:bg-[#d8fbff] text-slate-800'
-                    }`}
-                  >
-                    <span>Terminal 1</span>
-                    {isPickupAirportT1 && <span className="text-[10px]">✓</span>}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const loc = QUICK_LOCATIONS.find((l) => l.id === 'bcn_t2');
-                      if (loc) applyQuickLocation(loc, 'pickup');
-                      setShowPickupAirportTerminals(false);
-                    }}
-                    className={`text-[11px] px-3 py-1 rounded-lg font-bold border transition-all cursor-pointer flex items-center gap-1 ${
-                      isPickupAirportT2
-                        ? 'bg-[#00f0ff] border-[#00c8e8] text-slate-950 font-extrabold shadow-xs'
-                        : 'bg-white border-[#9beeff] hover:bg-[#d8fbff] text-slate-800'
-                    }`}
-                  >
-                    <span>Terminal 2</span>
-                    {isPickupAirportT2 && <span className="text-[10px]">✓</span>}
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Quick Pick Chips for Pickup - 1 Single Row */}
-            <div className="flex items-center gap-1.5 flex-nowrap sm:flex-wrap mt-2 overflow-x-auto pb-0.5 scrollbar-none">
-              <span className="text-[11px] font-bold text-slate-600 mr-1 shrink-0">Quick:</span>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setShowPickupAirportTerminals((prev) => !prev);
-                  if (!isPickupAirport) {
-                    const loc = QUICK_LOCATIONS.find((l) => l.id === 'bcn_t1');
-                    if (loc) applyQuickLocation(loc, 'pickup');
-                  }
-                }}
-                className={`text-[11px] px-2.5 py-1 rounded-lg border font-semibold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 ${
-                  isPickupAirport
-                    ? 'bg-[#00f0ff] border-[#00c8e8] text-slate-950 font-extrabold shadow-xs'
-                    : 'bg-white hover:bg-[#e6fdff] text-slate-800 border-[#9beeff] hover:border-[#00c8e8] shadow-2xs'
-                }`}
-                title="Click to select Airport Terminal 1 or Terminal 2"
-              >
-                <Plane className={`w-3.5 h-3.5 ${isPickupAirport ? 'text-slate-950' : 'text-[#008da1]'}`} />
-                <span>{isPickupAirportT1 ? 'Airport (T1)' : isPickupAirportT2 ? 'Airport (T2)' : 'Airport'}</span>
-                <ChevronDown className={`w-3 h-3 ${isPickupAirport ? 'text-slate-950' : 'text-slate-600'} transition-transform ${showPickupAirportTerminals ? 'rotate-180' : ''}`} />
-              </button>
-
-              {/* Other Quick Locations (Cruise Port & Sants Station on same 1 row) */}
-              {otherQuickLocations.map((loc) => {
-                const active = isQuickLocSelected(pickup, loc);
-                return (
-                  <button
-                    key={loc.id}
-                    type="button"
-                    onClick={() => {
-                      applyQuickLocation(loc, 'pickup');
-                      setShowPickupAirportTerminals(false);
-                    }}
-                    className={`text-[11px] px-2.5 py-1 rounded-lg border font-semibold transition-all cursor-pointer shrink-0 flex items-center gap-1 ${
-                      active
-                        ? 'bg-[#00f0ff] border-[#00c8e8] text-slate-950 font-extrabold shadow-xs'
-                        : 'bg-white hover:bg-[#e6fdff] text-slate-800 border-[#9beeff] hover:border-[#00c8e8] shadow-2xs'
-                    }`}
-                  >
-                    <span>{loc.shortLabel}</span>
-                    {active && <span className="text-[10px] font-black">✓</span>}
-                  </button>
-                );
-              })}
-            </div>
           </div>
 
           {/* Drop-off Input */}
@@ -1085,99 +953,6 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                   ))}
                 </ul>
               )}
-            </div>
-
-            {/* Terminal Selector Bar above Quick Chips */}
-            {showDropoffAirportTerminals && (
-              <div className="mt-2 p-1.5 bg-[#e6fdff] border border-[#67efff] rounded-xl flex items-center justify-between gap-1.5 shadow-2xs animate-fadeIn">
-                <span className="text-[11px] font-bold text-[#042f40] flex items-center gap-1 pl-1 shrink-0">
-                  <Plane className="w-3.5 h-3.5 text-[#008da1]" />
-                  <span>Terminal:</span>
-                </span>
-                <div className="flex items-center gap-1.5 flex-1 justify-end">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const loc = QUICK_LOCATIONS.find((l) => l.id === 'bcn_t1');
-                      if (loc) applyQuickLocation(loc, 'dropoff');
-                      setShowDropoffAirportTerminals(false);
-                    }}
-                    className={`text-[11px] px-3 py-1 rounded-lg font-bold border transition-all cursor-pointer flex items-center gap-1 ${
-                      isDropoffAirportT1
-                        ? 'bg-[#00f0ff] border-[#00c8e8] text-slate-950 font-extrabold shadow-xs'
-                        : 'bg-white border-[#9beeff] hover:bg-[#d8fbff] text-slate-800'
-                    }`}
-                  >
-                    <span>Terminal 1</span>
-                    {isDropoffAirportT1 && <span className="text-[10px]">✓</span>}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const loc = QUICK_LOCATIONS.find((l) => l.id === 'bcn_t2');
-                      if (loc) applyQuickLocation(loc, 'dropoff');
-                      setShowDropoffAirportTerminals(false);
-                    }}
-                    className={`text-[11px] px-3 py-1 rounded-lg font-bold border transition-all cursor-pointer flex items-center gap-1 ${
-                      isDropoffAirportT2
-                        ? 'bg-[#00f0ff] border-[#00c8e8] text-slate-950 font-extrabold shadow-xs'
-                        : 'bg-white border-[#9beeff] hover:bg-[#d8fbff] text-slate-800'
-                    }`}
-                  >
-                    <span>Terminal 2</span>
-                    {isDropoffAirportT2 && <span className="text-[10px]">✓</span>}
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Quick Pick Chips for Drop-off - 1 Single Row */}
-            <div className="flex items-center gap-1.5 flex-nowrap sm:flex-wrap mt-2 overflow-x-auto pb-0.5 scrollbar-none">
-              <span className="text-[11px] font-bold text-slate-600 mr-1 shrink-0">Quick:</span>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setShowDropoffAirportTerminals((prev) => !prev);
-                  if (!isDropoffAirport) {
-                    const loc = QUICK_LOCATIONS.find((l) => l.id === 'bcn_t1');
-                    if (loc) applyQuickLocation(loc, 'dropoff');
-                  }
-                }}
-                className={`text-[11px] px-2.5 py-1 rounded-lg border font-semibold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 ${
-                  isDropoffAirport
-                    ? 'bg-[#00f0ff] border-[#00c8e8] text-slate-950 font-extrabold shadow-xs'
-                    : 'bg-white hover:bg-[#e6fdff] text-slate-800 border-[#9beeff] hover:border-[#00c8e8] shadow-2xs'
-                }`}
-                title="Click to select Airport Terminal 1 or Terminal 2"
-              >
-                <Plane className={`w-3.5 h-3.5 ${isDropoffAirport ? 'text-slate-950' : 'text-[#008da1]'}`} />
-                <span>{isDropoffAirportT1 ? 'Airport (T1)' : isDropoffAirportT2 ? 'Airport (T2)' : 'Airport'}</span>
-                <ChevronDown className={`w-3 h-3 ${isDropoffAirport ? 'text-slate-950' : 'text-slate-600'} transition-transform ${showDropoffAirportTerminals ? 'rotate-180' : ''}`} />
-              </button>
-
-              {/* Other Quick Locations (Cruise Port & Sants Station on same 1 row) */}
-              {otherQuickLocations.map((loc) => {
-                const active = isQuickLocSelected(dropoff, loc);
-                return (
-                  <button
-                    key={loc.id}
-                    type="button"
-                    onClick={() => {
-                      applyQuickLocation(loc, 'dropoff');
-                      setShowDropoffAirportTerminals(false);
-                    }}
-                    className={`text-[11px] px-2.5 py-1 rounded-lg border font-semibold transition-all cursor-pointer shrink-0 flex items-center gap-1 ${
-                      active
-                        ? 'bg-[#00f0ff] border-[#00c8e8] text-slate-950 font-extrabold shadow-xs'
-                        : 'bg-white hover:bg-[#e6fdff] text-slate-800 border-[#9beeff] hover:border-[#00c8e8] shadow-2xs'
-                    }`}
-                  >
-                    <span>{loc.shortLabel}</span>
-                    {active && <span className="text-[10px] font-black">✓</span>}
-                  </button>
-                );
-              })}
             </div>
           </div>
         </div>
