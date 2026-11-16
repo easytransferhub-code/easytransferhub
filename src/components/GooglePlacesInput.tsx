@@ -53,6 +53,105 @@ function isQuotaError(err: unknown): boolean {
   );
 }
 
+function isPermissionOrAuthError(err: unknown): boolean {
+  const msg = String((err as any)?.message || err || '').toLowerCase();
+  return (
+    msg.includes('permission denied') ||
+    msg.includes('permission_denied') ||
+    msg.includes('403') ||
+    msg.includes('suspended') ||
+    msg.includes('not activated') ||
+    msg.includes('api key') ||
+    msg.includes('billing') ||
+    msg.includes('request_denied')
+  );
+}
+
+// Session-level flag so repeated 403/suspension errors fall back immediately to free OpenStreetMap/Photon
+let googlePlacesUnavailableForSession = false;
+
+async function fetchPhotonSuggestions(
+  query: string,
+  signal?: AbortSignal
+): Promise<LocalSuggestion[]> {
+  try {
+    const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(
+      query
+    )}&lat=41.3874&lon=2.1686&limit=10&lang=en`;
+    const res = await fetch(url, { signal });
+    if (!res.ok) return [];
+    const data = await res.json();
+    const features: any[] = Array.isArray(data?.features) ? data.features : [];
+
+    const allowedCountries = new Set(['ES', 'AD', 'FR']);
+    const mapped: LocalSuggestion[] = [];
+    const seen = new Set<string>();
+
+    for (let i = 0; i < features.length; i++) {
+      const f = features[i];
+      const props = f?.properties || {};
+      const coordsArr = f?.geometry?.coordinates;
+      if (!Array.isArray(coordsArr) || coordsArr.length < 2) continue;
+
+      const countryCode = String(props.countrycode || '').toUpperCase();
+      if (countryCode && !allowedCountries.has(countryCode)) continue;
+
+      const lon = Number(coordsArr[0]);
+      const lat = Number(coordsArr[1]);
+      if (!Number.isFinite(lat) || !Number.isFinite(lon)) continue;
+
+      const streetLine = [props.street, props.housenumber].filter(Boolean).join(' ').trim();
+      const primary =
+        String(props.name || '').trim() ||
+        streetLine ||
+        String(props.city || props.town || props.village || props.district || '').trim();
+      if (!primary) continue;
+
+      const cityOrTown = props.city || props.town || props.village || props.county || '';
+      const countryLabel =
+        countryCode === 'ES' ? 'Spain' : countryCode === 'AD' ? 'Andorra' : countryCode === 'FR' ? 'France' : props.country || '';
+
+      const secondaryParts = [
+        props.name && streetLine ? streetLine : '',
+        props.district && props.district !== primary ? props.district : '',
+        [props.postcode, cityOrTown].filter(Boolean).join(' ').trim(),
+        countryLabel,
+      ].filter((p) => Boolean(p && p.trim()));
+
+      // Deduplicate repeated parts in secondary
+      const uniqueSecondary: string[] = [];
+      for (const part of secondaryParts) {
+        if (!uniqueSecondary.some((x) => x.toLowerCase() === part.toLowerCase())) {
+          uniqueSecondary.push(part);
+        }
+      }
+
+      const secondary = uniqueSecondary.join(', ');
+      const fullLabel = secondary ? `${primary}, ${secondary}` : primary;
+      const dedupeKey = normalizeSearch(`${primary}|${cityOrTown}|${props.postcode || ''}`);
+      if (seen.has(dedupeKey)) continue;
+      seen.add(dedupeKey);
+
+      mapped.push({
+        key: `osm-${props.osm_type || 'N'}-${props.osm_id || i}`,
+        primary,
+        secondary,
+        fullLabel,
+        coords: { lat, lon },
+      });
+
+      if (mapped.length >= 6) break;
+    }
+
+    return mapped;
+  } catch (err: any) {
+    if (err?.name !== 'AbortError') {
+      console.warn('Photon fallback lookup skipped:', err);
+    }
+    return [];
+  }
+}
+
 export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
   value,
   onChangeText,
@@ -66,6 +165,7 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
   const sessionTokenRef = useRef<google.maps.places.AutocompleteSessionToken | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
   const justSelectedRef = useRef(false);
 
   const [suggestions, setSuggestions] = useState<LocalSuggestion[]>([]);
@@ -84,7 +184,11 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
       }
     };
     document.addEventListener('mousedown', handleOutside);
-    return () => document.removeEventListener('mousedown', handleOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleOutside);
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      if (abortControllerRef.current) abortControllerRef.current.abort();
+    };
   }, []);
 
   const buildLocalFallbackSuggestions = useCallback((query: string): LocalSuggestion[] => {
@@ -151,6 +255,28 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
     return results.slice(0, 8);
   }, []);
 
+  const mergeSuggestions = useCallback(
+    (primaryList: LocalSuggestion[], secondaryList: LocalSuggestion[], trimmed: string) => {
+      const merged: LocalSuggestion[] = [];
+      const seen = new Set<string>();
+      const isPlacaSearch = /\bpla[cçz]a\b/i.test(normalizeSearch(trimmed));
+
+      const ordered = isPlacaSearch
+        ? [...secondaryList, ...primaryList]
+        : [...primaryList, ...secondaryList];
+
+      for (const item of ordered) {
+        const normPrimary = normalizeSearch(item.primary);
+        if (!seen.has(normPrimary)) {
+          seen.add(normPrimary);
+          merged.push(item);
+        }
+      }
+      return merged.slice(0, 8);
+    },
+    []
+  );
+
   const fetchPredictions = useCallback(
     async (inputString: string) => {
       const trimmed = inputString.trim();
@@ -161,17 +287,28 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
         return;
       }
 
-      const localItems = buildLocalFallbackSuggestions(trimmed);
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
 
-      // Use Places API (New) AutocompleteSuggestion when Maps JS library is loaded
-      if (mapsEnabled && placesLib?.AutocompleteSuggestion && placesLib?.AutocompleteSessionToken) {
+      const localItems = buildLocalFallbackSuggestions(trimmed);
+      const normalizedQuery = normalizeForApiQuery(trimmed);
+
+      // 1. Primary: Google Places API (New) AutocompleteSuggestion when available & not blocked
+      if (
+        mapsEnabled &&
+        !googlePlacesUnavailableForSession &&
+        placesLib?.AutocompleteSuggestion &&
+        placesLib?.AutocompleteSessionToken
+      ) {
         try {
           if (!sessionTokenRef.current) {
             sessionTokenRef.current = new placesLib.AutocompleteSessionToken();
           }
 
           setIsLoading(true);
-          const normalizedQuery = normalizeForApiQuery(trimmed);
           const request: google.maps.places.AutocompleteRequest = {
             input: normalizedQuery,
             sessionToken: sessionTokenRef.current,
@@ -184,6 +321,8 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
 
           const { suggestions: rawSuggestions } =
             await placesLib.AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
+
+          if (controller.signal.aborted) return;
 
           const apiMapped: LocalSuggestion[] = (rawSuggestions || [])
             .filter((s) => Boolean(s.placePrediction))
@@ -201,45 +340,38 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
               };
             });
 
-          // Merge instant local Barcelona Plaças/landmarks + live Google Places suggestions without duplicates
-          const merged: LocalSuggestion[] = [];
-          const seen = new Set<string>();
-          const isPlacaSearch = /\bpla[cçz]a\b/i.test(normalizeSearch(trimmed));
-
-          const primaryOrder = isPlacaSearch
-            ? [...localItems, ...apiMapped]
-            : [...apiMapped, ...localItems];
-
-          for (const item of primaryOrder) {
-            const normPrimary = normalizeSearch(item.primary);
-            if (!seen.has(normPrimary)) {
-              seen.add(normPrimary);
-              merged.push(item);
-            }
-          }
-
+          const merged = mergeSuggestions(apiMapped, localItems, trimmed);
           if (merged.length > 0) {
-            setSuggestions(merged.slice(0, 8));
+            setSuggestions(merged);
             setIsOpen(true);
             setIsLoading(false);
             return;
           }
         } catch (err) {
           if (isQuotaError(err)) {
+            googlePlacesUnavailableForSession = true;
             window.dispatchEvent(new CustomEvent('gmp-quota-exceeded'));
+          } else if (isPermissionOrAuthError(err)) {
+            googlePlacesUnavailableForSession = true;
           } else {
             console.warn('Google Places Autocomplete fallback:', err);
           }
-        } finally {
-          setIsLoading(false);
         }
       }
 
-      setSuggestions(localItems);
-      setIsOpen(localItems.length > 0);
-      setIsLoading(false);
+      // 2. Seamless Free OpenStreetMap / Photon Fallback (works 24/7 with zero API key required)
+      if (!controller.signal.aborted) {
+        setIsLoading(true);
+        const photonItems = await fetchPhotonSuggestions(normalizedQuery, controller.signal);
+        if (controller.signal.aborted) return;
+
+        const mergedFallback = mergeSuggestions(photonItems, localItems, trimmed);
+        setSuggestions(mergedFallback);
+        setIsOpen(mergedFallback.length > 0);
+        setIsLoading(false);
+      }
     },
-    [mapsEnabled, placesLib, buildLocalFallbackSuggestions]
+    [mapsEnabled, placesLib, buildLocalFallbackSuggestions, mergeSuggestions]
   );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

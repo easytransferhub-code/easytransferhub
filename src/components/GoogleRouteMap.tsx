@@ -23,7 +23,31 @@ interface GoogleRouteMapProps {
   onRouteMetrics?: (metrics: { distanceKm: number; durationMinutes: number }) => void;
 }
 
-/** Headless Google Routes API distance calculator (no visible map UI) */
+// Session-level flag so repeated 403/suspension errors fall back immediately to free OSRM routing
+let googleRoutesUnavailableForSession = false;
+
+async function fetchOsrmRouteMetrics(
+  pickupCoords: Coords,
+  dropoffCoords: Coords,
+  signal?: AbortSignal
+): Promise<{ distanceKm: number; durationMinutes: number } | null> {
+  try {
+    const url = `https://router.project-osrm.org/route/v1/driving/${pickupCoords.lon},${pickupCoords.lat};${dropoffCoords.lon},${dropoffCoords.lat}?overview=false`;
+    const res = await fetch(url, { signal });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const route = Array.isArray(data?.routes) ? data.routes[0] : null;
+    if (!route || typeof route.distance !== 'number') return null;
+
+    const distanceKm = Math.max(5, Math.round(route.distance / 1000));
+    const durationMinutes = Math.max(10, Math.round((route.duration || 1500) / 60));
+    return { distanceKm, durationMinutes };
+  } catch {
+    return null;
+  }
+}
+
+/** Headless Google Routes API + Free OSRM fallback distance calculator (no visible map UI) */
 export const GoogleRouteDistanceSync: React.FC<GoogleRouteMapProps> = ({
   pickup,
   dropoff,
@@ -40,21 +64,33 @@ export const GoogleRouteDistanceSync: React.FC<GoogleRouteMapProps> = ({
   useEffect(() => {
     if (!pickup.trim() || !dropoff.trim()) return;
 
-    if (!mapsEnabled || !routesLib) {
-      if (pickupCoords && dropoffCoords) {
-        const fallbackKm = calculateHaversineKm(
-          pickupCoords.lat,
-          pickupCoords.lon,
-          dropoffCoords.lat,
-          dropoffCoords.lon
-        );
-        onRouteMetricsRef.current?.({
-          distanceKm: fallbackKm,
-          durationMinutes: Math.max(15, Math.round(fallbackKm * 1.35)),
-        });
+    const controller = new AbortController();
+    let cancelled = false;
+
+    const runOsrmOrHaversineFallback = async (sig: string) => {
+      if (!pickupCoords || !dropoffCoords) return;
+
+      const osrm = await fetchOsrmRouteMetrics(pickupCoords, dropoffCoords, controller.signal);
+      if (cancelled) return;
+
+      if (osrm) {
+        lastSignatureRef.current = sig;
+        onRouteMetricsRef.current?.(osrm);
+        return;
       }
-      return;
-    }
+
+      const fallbackKm = calculateHaversineKm(
+        pickupCoords.lat,
+        pickupCoords.lon,
+        dropoffCoords.lat,
+        dropoffCoords.lon
+      );
+      lastSignatureRef.current = sig;
+      onRouteMetricsRef.current?.({
+        distanceKm: fallbackKm,
+        durationMinutes: Math.max(15, Math.round(fallbackKm * 1.35)),
+      });
+    };
 
     const originVal: google.maps.LatLngLiteral | string = pickupCoords
       ? { lat: pickupCoords.lat, lng: pickupCoords.lon }
@@ -71,9 +107,19 @@ export const GoogleRouteDistanceSync: React.FC<GoogleRouteMapProps> = ({
     const signature = JSON.stringify([originVal, destVal]);
     if (lastSignatureRef.current === signature) return;
 
-    let cancelled = false;
-    const RouteClass = (routesLib as any).Route;
-    if (!RouteClass?.computeRoutes) return;
+    const RouteClass = (routesLib as any)?.Route;
+    const canTryGoogle =
+      mapsEnabled &&
+      !googleRoutesUnavailableForSession &&
+      Boolean(RouteClass?.computeRoutes);
+
+    if (!canTryGoogle) {
+      void runOsrmOrHaversineFallback(signature);
+      return () => {
+        cancelled = true;
+        controller.abort();
+      };
+    }
 
     RouteClass.computeRoutes({
       origin: originVal,
@@ -98,24 +144,17 @@ export const GoogleRouteDistanceSync: React.FC<GoogleRouteMapProps> = ({
       .catch((err: unknown) => {
         if (cancelled) return;
         if (isQuotaError(err)) {
+          googleRoutesUnavailableForSession = true;
           window.dispatchEvent(new CustomEvent('gmp-quota-exceeded'));
+        } else if (isPermissionOrAuthError(err)) {
+          googleRoutesUnavailableForSession = true;
         }
-        if (pickupCoords && dropoffCoords) {
-          const fallbackKm = calculateHaversineKm(
-            pickupCoords.lat,
-            pickupCoords.lon,
-            dropoffCoords.lat,
-            dropoffCoords.lon
-          );
-          onRouteMetricsRef.current?.({
-            distanceKm: fallbackKm,
-            durationMinutes: Math.max(15, Math.round(fallbackKm * 1.35)),
-          });
-        }
+        void runOsrmOrHaversineFallback(signature);
       });
 
     return () => {
       cancelled = true;
+      controller.abort();
     };
   }, [mapsEnabled, routesLib, pickup, dropoff, pickupCoords, dropoffCoords]);
 
@@ -131,6 +170,20 @@ function isQuotaError(err: unknown): boolean {
     msg.includes('OVER_QUERY_LIMIT') ||
     msg.includes('429') ||
     msg.includes('Quota')
+  );
+}
+
+function isPermissionOrAuthError(err: unknown): boolean {
+  const msg = String((err as any)?.message || err || '').toLowerCase();
+  return (
+    msg.includes('permission denied') ||
+    msg.includes('permission_denied') ||
+    msg.includes('403') ||
+    msg.includes('suspended') ||
+    msg.includes('not activated') ||
+    msg.includes('api key') ||
+    msg.includes('billing') ||
+    msg.includes('request_denied')
   );
 }
 

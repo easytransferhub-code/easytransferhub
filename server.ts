@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import { GoogleGenAI } from '@google/genai';
 import { checkBookingRateLimit, isValidEmailAddress, processBookingConfirmation } from './api/booking-confirm';
+import reviewsHandler from './api/reviews';
 
 dotenv.config();
 
@@ -231,6 +232,10 @@ app.post('/api/booking-confirm', async (req, res) => {
     });
   }
 });
+
+// Live Visitors Meter & Client Reviews Endpoint
+app.get('/api/reviews', (req, res) => reviewsHandler(req, res));
+app.post('/api/reviews', (req, res) => reviewsHandler(req, res));
 
 // Setup Vite middleware in dev or static files in production
 const isProduction = process.env.NODE_ENV === 'production';

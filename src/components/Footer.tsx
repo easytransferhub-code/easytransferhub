@@ -27,6 +27,7 @@ export const Footer: React.FC = () => {
               <li><a href="#calculator" className="hover:text-[#008da1] transition-colors">Instant Calculator</a></li>
               <li><a href="#fleet" className="hover:text-[#008da1] transition-colors">Our Vehicle Fleet</a></li>
               <li><a href="#how" className="hover:text-[#008da1] transition-colors">How It Works</a></li>
+              <li><a href="#reviews" className="hover:text-[#008da1] transition-colors">Visitors &amp; Reviews</a></li>
               <li><a href="#faq" className="hover:text-[#008da1] transition-colors">FAQ & Flight Delays</a></li>
             </ul>
           </div>

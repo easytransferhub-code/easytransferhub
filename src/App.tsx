@@ -11,6 +11,7 @@ import { VehiclesSection } from './components/VehiclesSection';
 import { PricingTable } from './components/PricingTable';
 import { HowItWorks } from './components/HowItWorks';
 import { WhyChooseUs } from './components/WhyChooseUs';
+import { ReviewsAndVisitorsSection } from './components/ReviewsAndVisitorsSection';
 import { FaqSection } from './components/FaqSection';
 import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
@@ -26,6 +27,7 @@ export default function App() {
   const [voucherData, setVoucherData] = useState<any>(null);
   const [mapsApiKey, setMapsApiKey] = useState<string>(ENV_MAPS_API_KEY);
   const [quotaExceeded, setQuotaExceeded] = useState(false);
+  const [mapsAuthFailed, setMapsAuthFailed] = useState(false);
 
   // Runtime fallback fetch from /api/maps-config if VITE_* wasn't bundled at build time
   useEffect(() => {
@@ -39,43 +41,44 @@ export default function App() {
         }
       })
       .catch(() => {
-        // graceful fallback to local zone & route search
+        // graceful fallback to OpenStreetMap/Photon & local zone search
       });
     return () => {
       active = false;
     };
   }, []);
 
-  // Case A Quota Exceeded listener
+  // Graceful fallback listeners for Google Maps quota or project auth/suspension errors
   useEffect(() => {
     const onQuotaExceeded = () => setQuotaExceeded(true);
     window.addEventListener('gmp-quota-exceeded', onQuotaExceeded);
-    return () => window.removeEventListener('gmp-quota-exceeded', onQuotaExceeded);
+
+    const prevGmAuthFailure = (window as any).gm_authFailure;
+    (window as any).gm_authFailure = () => {
+      setMapsAuthFailed(true);
+      if (typeof prevGmAuthFailure === 'function') {
+        try {
+          prevGmAuthFailure();
+        } catch {
+          // ignore
+        }
+      }
+    };
+
+    return () => {
+      window.removeEventListener('gmp-quota-exceeded', onQuotaExceeded);
+      if (prevGmAuthFailure !== undefined) {
+        (window as any).gm_authFailure = prevGmAuthFailure;
+      } else {
+        delete (window as any).gm_authFailure;
+      }
+    };
   }, []);
 
-  const mapsEnabled = Boolean(mapsApiKey) && !quotaExceeded;
+  const mapsEnabled = Boolean(mapsApiKey) && !quotaExceeded && !mapsAuthFailed;
 
   const content = (
     <div id="top" className={`min-h-screen flex flex-col bg-white text-slate-900 ${language === 'ur' ? 'font-sans' : ''}`}>
-      {/* Google Maps Platform Case A Quota Exceeded Defense Banner */}
-      {quotaExceeded && (
-        <div
-          role="alert"
-          className="bg-amber-50 border-b border-amber-300 text-amber-950 px-4 py-2.5 text-xs sm:text-sm font-medium flex flex-wrap items-center justify-center gap-2 z-50"
-        >
-          <span>
-            Google Maps quota has been exceeded for this session — local zone search & fixed rates remain active.
-          </span>
-          <a
-            href="https://developers.google.com/maps/ai/ai-studio?utm_campaign=gmp_mcp_codeassist_v1_aistudio#quota_exceeded_errors"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline font-bold text-amber-900 hover:text-amber-700"
-          >
-            Quota guidance & setup
-          </a>
-        </div>
-      )}
 
       {/* Top Navigation */}
       <Navbar
@@ -104,6 +107,9 @@ export default function App() {
 
         {/* Guarantees & Why Choose Us */}
         <WhyChooseUs />
+
+        {/* Live Visitors Meter & Client Reviews */}
+        <ReviewsAndVisitorsSection />
 
         {/* FAQ Section */}
         <FaqSection />
