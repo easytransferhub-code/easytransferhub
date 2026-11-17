@@ -296,13 +296,84 @@ async function sendEmailNotifications(
   const ownerEmails =
     parsedOwners.length > 0 ? Array.from(new Set(parsedOwners)) : ['easytransferhub@gmail.com'];
   const ownerEmail = ownerEmails[0];
-  const subject = `Your Easytransferhub Transfer Confirmation [${bookingRef}] — €${data.quotedPrice}`;
-  const ownerSubject = `NEW BOOKING [${bookingRef}] €${data.quotedPrice} — ${data.passengerName} (${data.phone})`;
+  const subject = `Booking Confirmation ${bookingRef} - EasyTransferHub Barcelona`;
+  const ownerSubject = `New Booking ${bookingRef} (${data.vehicleName}) - ${data.passengerName}`;
   const html = buildBookingEmailHtml(data, bookingRef);
   const ownerHtml = buildOwnerDispatchEmailHtml(data, bookingRef);
   const text = buildPlainTextMessage(data, bookingRef);
 
-  // Primary Recommended Option: Gmail / Custom SMTP via Nodemailer
+  // Primary Recommended Option for Verified Domains: Resend HTTP API (SPF/DKIM/DMARC Inbox Deliverability)
+  const resendKey = cleanEnv(process.env.RESEND_API_KEY);
+  if (resendKey && resendKey.length > 8) {
+    try {
+      const fromAddress =
+        cleanEnv(process.env.RESEND_FROM_EMAIL) || 'EasyTransferHub <bookings@easytransferhub.com>';
+      const requests: Promise<Response>[] = [
+        fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${resendKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            from: fromAddress,
+            to: [data.email],
+            reply_to: ownerEmail,
+            subject,
+            html,
+            text,
+            headers: {
+              'X-Entity-Ref-ID': bookingRef,
+            },
+          }),
+        }),
+      ];
+
+      if (ownerEmails.length > 0) {
+        requests.push(
+          fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${resendKey}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              from: fromAddress,
+              to: ownerEmails,
+              reply_to: data.email,
+              subject: ownerSubject,
+              html: ownerHtml,
+              text,
+              headers: {
+                'X-Entity-Ref-ID': `${bookingRef}-owner`,
+              },
+            }),
+          })
+        );
+      }
+
+      const [clientSettled, ownerSettled] = await Promise.allSettled(requests);
+      const clientOk =
+        clientSettled.status === 'fulfilled' && clientSettled.value.ok;
+      const ownerOk =
+        ownerSettled?.status === 'fulfilled' ? ownerSettled.value.ok : false;
+
+      if (!clientOk && clientSettled.status === 'fulfilled') {
+        console.warn('Resend client email returned non-OK:', await clientSettled.value.text());
+      }
+      if (!ownerOk && ownerSettled?.status === 'fulfilled') {
+        console.warn('Resend owner email returned non-OK:', await ownerSettled.value.text());
+      }
+
+      if (clientOk || ownerOk) {
+        return { sent: clientOk, ownerSent: ownerOk, provider: 'resend' };
+      }
+    } catch (err) {
+      console.warn('Resend email error:', err);
+    }
+  }
+
+  // Fallback Option: Gmail / Custom SMTP via Nodemailer
   const smtpUser =
     cleanEnv(process.env.SMTP_USER) ||
     cleanEnv(process.env.GMAIL_USER) ||
@@ -344,12 +415,15 @@ async function sendEmailNotifications(
       let clientAccepted = false;
       try {
         const clientInfo = await transporter.sendMail({
-          from: `"Easytransferhub Bookings" <${smtpUser}>`,
+          from: `"EasyTransferHub" <${smtpUser}>`,
           to: data.email,
           replyTo: ownerEmail,
           subject,
           html,
           text,
+          headers: {
+            'X-Entity-Ref-ID': bookingRef,
+          },
         });
         clientAccepted =
           Array.isArray(clientInfo?.accepted) && clientInfo.accepted.length > 0;
@@ -373,12 +447,15 @@ async function sendEmailNotifications(
 
         try {
           const ownerInfo = await transporter.sendMail({
-            from: `"Easytransferhub Dispatch" <${smtpUser}>`,
+            from: `"EasyTransferHub Dispatch" <${smtpUser}>`,
             to: ownerInboxTarget,
             replyTo: data.email,
             subject: ownerSubject,
             html: ownerHtml,
             text,
+            headers: {
+              'X-Entity-Ref-ID': `${bookingRef}-owner`,
+            },
           });
           if (Array.isArray(ownerInfo?.accepted) && ownerInfo.accepted.length > 0) {
             ownerSent = true;
@@ -393,71 +470,6 @@ async function sendEmailNotifications(
       }
     } catch (err) {
       console.warn('SMTP transport error:', err);
-    }
-  }
-
-  // Secondary Option: Resend HTTP API
-  const resendKey = cleanEnv(process.env.RESEND_API_KEY);
-  if (resendKey && resendKey.length > 8) {
-    try {
-      const fromAddress =
-        cleanEnv(process.env.RESEND_FROM_EMAIL) || 'Easytransferhub <onboarding@resend.dev>';
-      const requests: Promise<Response>[] = [
-        fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${resendKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            from: fromAddress,
-            to: [data.email],
-            reply_to: ownerEmail,
-            subject,
-            html,
-            text,
-          }),
-        }),
-      ];
-
-      if (ownerEmails.length > 0) {
-        requests.push(
-          fetch('https://api.resend.com/emails', {
-            method: 'POST',
-            headers: {
-              Authorization: `Bearer ${resendKey}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              from: fromAddress,
-              to: ownerEmails,
-              reply_to: data.email,
-              subject: ownerSubject,
-              html: ownerHtml,
-              text,
-            }),
-          })
-        );
-      }
-
-      const [clientSettled, ownerSettled] = await Promise.allSettled(requests);
-      const clientOk =
-        clientSettled.status === 'fulfilled' && clientSettled.value.ok;
-      const ownerOk =
-        ownerSettled?.status === 'fulfilled' ? ownerSettled.value.ok : false;
-
-      if (!clientOk && clientSettled.status === 'fulfilled') {
-        console.warn('Resend client email returned non-OK:', await clientSettled.value.text());
-      }
-      if (!ownerOk && ownerSettled?.status === 'fulfilled') {
-        console.warn('Resend owner email returned non-OK:', await ownerSettled.value.text());
-      }
-
-      if (clientOk || ownerOk) {
-        return { sent: clientOk, ownerSent: ownerOk, provider: 'resend' };
-      }
-    } catch (err) {
-      console.warn('Resend email error:', err);
     }
   }
 
