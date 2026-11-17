@@ -24,7 +24,7 @@ interface LocalSuggestion {
   secondary?: string;
   fullLabel: string;
   coords?: { lat: number; lon: number };
-  prediction?: google.maps.places.AutocompleteSuggestion;
+  prediction?: any;
 }
 
 function normalizeSearch(str: string): string {
@@ -162,7 +162,7 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
   inputId,
 }) => {
   const placesLib = useMapsLibrary('places');
-  const sessionTokenRef = useRef<google.maps.places.AutocompleteSessionToken | null>(null);
+  const sessionTokenRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -309,7 +309,7 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
           }
 
           setIsLoading(true);
-          const request: google.maps.places.AutocompleteRequest = {
+          const request = {
             input: normalizedQuery,
             sessionToken: sessionTokenRef.current,
             includedRegionCodes: ['es', 'ad', 'fr'],
@@ -325,9 +325,9 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
           if (controller.signal.aborted) return;
 
           const apiMapped: LocalSuggestion[] = (rawSuggestions || [])
-            .filter((s) => Boolean(s.placePrediction))
+            .filter((s: any) => Boolean(s.placePrediction))
             .slice(0, 6)
-            .map((s, idx) => {
+            .map((s: any, idx: number) => {
               const pred = s.placePrediction!;
               const mainText = pred.mainText?.text || pred.text.text;
               const secondaryText = pred.secondaryText?.text || '';
@@ -411,11 +411,11 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
         const coords = loc ? { lat: loc.lat(), lon: loc.lng() } : null;
 
         // Keep postal code & neighborhood inside address text for silent zone matching
-        const postalComponent = place.addressComponents?.find((c) =>
+        const postalComponent = place.addressComponents?.find((c: any) =>
           c.types.includes('postal_code')
         )?.longText;
         const neighborhoodComponent = place.addressComponents?.find(
-          (c) =>
+          (c: any) =>
             c.types.includes('sublocality_level_1') ||
             c.types.includes('neighborhood')
         )?.longText;

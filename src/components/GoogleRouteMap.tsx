@@ -92,13 +92,13 @@ export const GoogleRouteDistanceSync: React.FC<GoogleRouteMapProps> = ({
       });
     };
 
-    const originVal: google.maps.LatLngLiteral | string = pickupCoords
+    const originVal: { lat: number; lng: number } | string = pickupCoords
       ? { lat: pickupCoords.lat, lng: pickupCoords.lon }
       : pickup.includes('Spain')
       ? pickup
       : `${pickup}, Barcelona, Spain`;
 
-    const destVal: google.maps.LatLngLiteral | string = dropoffCoords
+    const destVal: { lat: number; lng: number } | string = dropoffCoords
       ? { lat: dropoffCoords.lat, lng: dropoffCoords.lon }
       : dropoff.includes('Spain')
       ? dropoff
@@ -204,7 +204,7 @@ const RouteOverlay: React.FC<RouteOverlayProps> = ({
 }) => {
   const map = useMap();
   const routesLib = useMapsLibrary('routes');
-  const polylinesRef = useRef<google.maps.Polyline[]>([]);
+  const polylinesRef = useRef<any[]>([]);
   const lastSignatureRef = useRef<string>('');
   const onRouteMetricsRef = useRef(onRouteMetrics);
   onRouteMetricsRef.current = onRouteMetrics;
@@ -227,13 +227,13 @@ const RouteOverlay: React.FC<RouteOverlayProps> = ({
       return;
     }
 
-    const originVal: google.maps.LatLngLiteral | string = pickupCoords
+    const originVal: { lat: number; lng: number } | string = pickupCoords
       ? { lat: pickupCoords.lat, lng: pickupCoords.lon }
       : pickup.includes('Spain')
       ? pickup
       : `${pickup}, Barcelona, Spain`;
 
-    const destVal: google.maps.LatLngLiteral | string = dropoffCoords
+    const destVal: { lat: number; lng: number } | string = dropoffCoords
       ? { lat: dropoffCoords.lat, lng: dropoffCoords.lon }
       : dropoff.includes('Spain')
       ? dropoff
@@ -270,7 +270,7 @@ const RouteOverlay: React.FC<RouteOverlayProps> = ({
 
         if (typeof primaryRoute.createPolylines === 'function') {
           const newPolylines = primaryRoute.createPolylines();
-          newPolylines.forEach((polyline: google.maps.Polyline) => {
+          newPolylines.forEach((polyline: any) => {
             polyline.setOptions({
               strokeColor: '#008da1',
               strokeWeight: 5,
@@ -314,10 +314,13 @@ const RouteOverlay: React.FC<RouteOverlayProps> = ({
             durationMinutes: Math.max(15, Math.round(fallbackKm * 1.35)),
           });
 
-          const bounds = new google.maps.LatLngBounds();
-          bounds.extend({ lat: pickupCoords.lat, lng: pickupCoords.lon });
-          bounds.extend({ lat: dropoffCoords.lat, lng: dropoffCoords.lon });
-          map.fitBounds(bounds);
+          const gm = (window as any).google?.maps;
+          if (gm?.LatLngBounds) {
+            const bounds = new gm.LatLngBounds();
+            bounds.extend({ lat: pickupCoords.lat, lng: pickupCoords.lon });
+            bounds.extend({ lat: dropoffCoords.lat, lng: dropoffCoords.lon });
+            map.fitBounds(bounds);
+          }
         }
       });
 
