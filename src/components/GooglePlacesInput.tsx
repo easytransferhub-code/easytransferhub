@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useMapsLibrary } from '@vis.gl/react-google-maps';
 import { Loader2, MapPin, Navigation } from 'lucide-react';
 import { BARCELONA_PLACAS, BARCELONA_ZONES, QUICK_LOCATIONS } from '../data/transferData';
+import { trackQuotaEvent } from '../utils/telemetryClient';
 
 export interface SelectedPlaceValue {
   label: string;
@@ -323,6 +324,7 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
             await placesLib.AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
 
           if (controller.signal.aborted) return;
+          trackQuotaEvent('placesSearch');
 
           const apiMapped: LocalSuggestion[] = (rawSuggestions || [])
             .filter((s: any) => Boolean(s.placePrediction))
@@ -364,6 +366,9 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
         setIsLoading(true);
         const photonItems = await fetchPhotonSuggestions(normalizedQuery, controller.signal);
         if (controller.signal.aborted) return;
+        if (photonItems.length > 0 || localItems.length > 0) {
+          trackQuotaEvent('freeFallback');
+        }
 
         const mergedFallback = mergeSuggestions(photonItems, localItems, trimmed);
         setSuggestions(mergedFallback);
@@ -406,6 +411,7 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
         await place.fetchFields({
           fields: ['displayName', 'formattedAddress', 'location', 'addressComponents'],
         });
+        trackQuotaEvent('placesDetail');
 
         const loc = place.location;
         const coords = loc ? { lat: loc.lat(), lon: loc.lng() } : null;

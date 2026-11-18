@@ -2,7 +2,11 @@ import React from 'react';
 import { Phone, Mail, MapPin, MessageCircle } from 'lucide-react';
 import { BUSINESS_INFO } from '../data/transferData';
 
-export const Footer: React.FC = () => {
+interface FooterProps {
+  onOpenOwnerMeter?: () => void;
+}
+
+export const Footer: React.FC<FooterProps> = ({ onOpenOwnerMeter }) => {
   return (
     <footer className="bg-[#0D0F12] text-neutral-300 text-xs border-t-2 border-[#F5B800]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
@@ -88,8 +92,17 @@ export const Footer: React.FC = () => {
           <div>
             © {new Date().getFullYear()} {BUSINESS_INFO.name}. All rights reserved. Registered Private Chauffeur &amp; VTC Service Barcelona.
           </div>
-          <div className="flex items-center gap-1 text-neutral-300">
+          <div className="flex items-center gap-3 text-neutral-300">
             <span>Fair Prices · Flight Delay Tracking · 60 Min Free Waiting</span>
+            {onOpenOwnerMeter && (
+              <button
+                type="button"
+                onClick={onOpenOwnerMeter}
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#171A21] border border-[#F5B800]/60 text-[#F5B800] hover:bg-[#F5B800] hover:text-[#0D0F12] font-bold transition-colors cursor-pointer"
+              >
+                <span>Owner A-to-Z Quota Meter</span>
+              </button>
+            )}
           </div>
         </div>
       </div>

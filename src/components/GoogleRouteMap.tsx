@@ -8,6 +8,7 @@ import {
 } from '@vis.gl/react-google-maps';
 import { ExternalLink, MapPin, Navigation } from 'lucide-react';
 import { calculateHaversineKm } from '../utils/pricing';
+import { trackQuotaEvent } from '../utils/telemetryClient';
 
 interface Coords {
   lat: number;
@@ -75,6 +76,7 @@ export const GoogleRouteDistanceSync: React.FC<GoogleRouteMapProps> = ({
 
       if (osrm) {
         lastSignatureRef.current = sig;
+        trackQuotaEvent('freeFallback');
         onRouteMetricsRef.current?.(osrm);
         return;
       }
@@ -130,6 +132,7 @@ export const GoogleRouteDistanceSync: React.FC<GoogleRouteMapProps> = ({
       .then(({ routes }: { routes: any[] }) => {
         if (cancelled || !routes || routes.length === 0) return;
         lastSignatureRef.current = signature;
+        trackQuotaEvent('routeCall');
         const primaryRoute = routes[0];
         const distKm = Math.max(
           5,
@@ -266,6 +269,7 @@ const RouteOverlay: React.FC<RouteOverlayProps> = ({
       .then(({ routes }: { routes: any[] }) => {
         if (cancelled || !routes || routes.length === 0) return;
         lastSignatureRef.current = signature;
+        trackQuotaEvent('routeCall');
         const primaryRoute = routes[0];
 
         if (typeof primaryRoute.createPolylines === 'function') {
@@ -343,6 +347,14 @@ export const GoogleRouteMap: React.FC<GoogleRouteMapProps> = ({
   onRouteMetrics,
 }) => {
   const [mapExpanded, setMapExpanded] = useState(true);
+  const mapLoadTrackedRef = useRef(false);
+
+  useEffect(() => {
+    if (mapsEnabled && mapExpanded && !mapLoadTrackedRef.current && (pickup.trim() || dropoff.trim())) {
+      mapLoadTrackedRef.current = true;
+      trackQuotaEvent('mapLoad');
+    }
+  }, [mapsEnabled, mapExpanded, pickup, dropoff]);
 
   const originQuery = pickupCoords
     ? `${pickupCoords.lat},${pickupCoords.lon}`

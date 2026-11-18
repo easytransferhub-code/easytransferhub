@@ -18,16 +18,38 @@ import { Footer } from './components/Footer';
 import { FloatingActions } from './components/FloatingWhatsAppButton';
 import { AIAssistantModal } from './components/AIAssistantModal';
 import { BookingVoucherModal } from './components/BookingVoucherModal';
+import { OwnerQuotaMeterModal } from './components/OwnerQuotaMeterModal';
+import { recordSessionVisitOnce } from './utils/telemetryClient';
 
 const ENV_MAPS_API_KEY = String(import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '').trim();
+
+function checkOwnerMeterUrl(): boolean {
+  if (typeof window === 'undefined') return false;
+  const hash = window.location.hash.toLowerCase();
+  const params = new URLSearchParams(window.location.search);
+  return hash === '#owner-meter' || params.get('meter') === 'owner';
+}
 
 export default function App() {
   const [language, setLanguage] = useState<'en' | 'es' | 'ca' | 'ur'>('en');
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
+  const [isOwnerMeterOpen, setIsOwnerMeterOpen] = useState<boolean>(() => checkOwnerMeterUrl());
   const [voucherData, setVoucherData] = useState<any>(null);
   const [mapsApiKey, setMapsApiKey] = useState<string>(ENV_MAPS_API_KEY);
   const [quotaExceeded, setQuotaExceeded] = useState(false);
   const [mapsAuthFailed, setMapsAuthFailed] = useState(false);
+
+  // Record 1 SEO/Direct session visit and listen for #owner-meter deep-link
+  useEffect(() => {
+    recordSessionVisitOnce();
+    const onHashChange = () => {
+      if (checkOwnerMeterUrl()) {
+        setIsOwnerMeterOpen(true);
+      }
+    };
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
 
   // Runtime fallback fetch from /api/maps-config if VITE_* wasn't bundled at build time
   useEffect(() => {
@@ -85,6 +107,7 @@ export default function App() {
         language={language}
         setLanguage={setLanguage}
         onOpenAssistant={() => setIsAssistantOpen(true)}
+        onOpenOwnerMeter={() => setIsOwnerMeterOpen(true)}
       />
 
       <main className="flex-1">
@@ -109,7 +132,7 @@ export default function App() {
         <WhyChooseUs />
 
         {/* Live Visitors Meter & Client Reviews */}
-        <ReviewsAndVisitorsSection />
+        <ReviewsAndVisitorsSection onOpenOwnerMeter={() => setIsOwnerMeterOpen(true)} />
 
         {/* FAQ Section */}
         <FaqSection />
@@ -119,7 +142,7 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <Footer />
+      <Footer onOpenOwnerMeter={() => setIsOwnerMeterOpen(true)} />
 
       {/* Floating Action Buttons */}
       <FloatingActions onOpenAssistant={() => setIsAssistantOpen(true)} />
@@ -128,6 +151,17 @@ export default function App() {
       <AIAssistantModal
         isOpen={isAssistantOpen}
         onClose={() => setIsAssistantOpen(false)}
+      />
+
+      {/* Owner-Only A-to-Z Quota, API Key & SEO Visitor Meter */}
+      <OwnerQuotaMeterModal
+        isOpen={isOwnerMeterOpen}
+        onClose={() => {
+          setIsOwnerMeterOpen(false);
+          if (window.location.hash === '#owner-meter') {
+            window.history.replaceState(null, '', window.location.pathname + window.location.search);
+          }
+        }}
       />
 
       {/* Printable Booking Voucher Modal */}

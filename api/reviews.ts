@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { recordServerTelemetryEvent } from './telemetry';
 
 export interface ClientReview {
   id: string;
@@ -179,6 +180,7 @@ export default async function handler(req: any, res: any) {
           : req.body || {};
 
       const action = String(body.action || 'review');
+      recordServerTelemetryEvent('vercelApi');
 
       if (action === 'visit') {
         const store = recordSiteVisit();

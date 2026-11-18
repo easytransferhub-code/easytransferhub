@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import { recordServerTelemetryEvent } from './telemetry';
 
 export interface BookingConfirmPayload {
   bookingRef?: string;
@@ -710,6 +711,7 @@ export default async function handler(req: any, res: any) {
     }
 
     const result = await processBookingConfirmation(body);
+    recordServerTelemetryEvent('bookingEmail');
     return res.status(200).json(result);
   } catch (error) {
     console.error('Booking Confirm API Error:', error);

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Star, ThumbsUp, Send, CheckCircle2, Users, MessageSquare, Compass } from 'lucide-react';
+import { Star, ThumbsUp, Send, CheckCircle2, Users, MessageSquare, Compass, Gauge } from 'lucide-react';
 import type { ClientReview } from '../../api/reviews';
 
 const LOCAL_REVIEWS_KEY = 'eth_client_reviews_v1';
@@ -58,7 +58,11 @@ function formatReviewDate(iso: string): string {
   return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-export const ReviewsAndVisitorsSection: React.FC = () => {
+interface ReviewsAndVisitorsSectionProps {
+  onOpenOwnerMeter?: () => void;
+}
+
+export const ReviewsAndVisitorsSection: React.FC<ReviewsAndVisitorsSectionProps> = ({ onOpenOwnerMeter }) => {
   const [totalVisits, setTotalVisits] = useState<number>(0);
   const [todayVisits, setTodayVisits] = useState<number>(0);
   const [reviews, setReviews] = useState<ClientReview[]>([]);
@@ -368,6 +372,16 @@ export const ReviewsAndVisitorsSection: React.FC = () => {
                   {stats.count}
                 </span>
               </div>
+              {onOpenOwnerMeter && (
+                <button
+                  type="button"
+                  onClick={onOpenOwnerMeter}
+                  className="col-span-3 sm:col-span-1 mt-1 inline-flex items-center justify-center sm:justify-start gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#0D0F12] hover:bg-[#1E232B] text-[#F5B800] text-[11px] font-bold transition-colors cursor-pointer"
+                >
+                  <Gauge className="w-3.5 h-3.5" />
+                  <span>Full Quota &amp; API Meter</span>
+                </button>
+              )}
             </div>
           </div>
         </div>

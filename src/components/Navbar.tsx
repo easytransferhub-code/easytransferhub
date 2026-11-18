@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { Menu, X, Globe, Sparkles } from 'lucide-react';
+import { Menu, X, Globe, Sparkles, Gauge } from 'lucide-react';
 import { TRANSLATIONS } from '../data/transferData';
 
 interface NavbarProps {
   language: 'en' | 'es' | 'ca' | 'ur';
   setLanguage: (lang: 'en' | 'es' | 'ca' | 'ur') => void;
   onOpenAssistant: () => void;
+  onOpenOwnerMeter?: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ language, setLanguage, onOpenAssistant }) => {
+export const Navbar: React.FC<NavbarProps> = ({ language, setLanguage, onOpenAssistant, onOpenOwnerMeter }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const t = TRANSLATIONS[language];
 
@@ -54,6 +55,17 @@ export const Navbar: React.FC<NavbarProps> = ({ language, setLanguage, onOpenAss
 
         {/* Actions & Language Switcher */}
         <div className="flex items-center gap-2.5 shrink-0">
+          {onOpenOwnerMeter && (
+            <button
+              type="button"
+              onClick={onOpenOwnerMeter}
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#171A21] hover:bg-[#F5B800] border border-[#F5B800]/60 text-[#F5B800] hover:text-[#0D0F12] text-xs font-bold transition-colors cursor-pointer whitespace-nowrap shrink-0"
+              title="Open A-to-Z Free Quota & SEO Visitor Meter"
+            >
+              <Gauge className="w-3.5 h-3.5" />
+              <span>Meter</span>
+            </button>
+          )}
           <button
             onClick={onOpenAssistant}
             className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#F5B800] hover:bg-[#E0A600] text-[#0D0F12] text-xs font-bold transition-colors cursor-pointer whitespace-nowrap shrink-0"
@@ -142,6 +154,19 @@ export const Navbar: React.FC<NavbarProps> = ({ language, setLanguage, onOpenAss
           </nav>
 
           <div className="pt-3 border-t border-neutral-800 flex flex-col gap-2">
+            {onOpenOwnerMeter && (
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onOpenOwnerMeter();
+                }}
+                className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-[#171A21] border border-[#F5B800]/60 text-[#F5B800] text-xs font-bold cursor-pointer"
+              >
+                <Gauge className="w-4 h-4" />
+                <span>Open Owner Quota &amp; SEO Meter</span>
+              </button>
+            )}
             <button
               onClick={() => {
                 setMobileMenuOpen(false);

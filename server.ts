@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import { GoogleGenAI } from '@google/genai';
 import { checkBookingRateLimit, isValidEmailAddress, processBookingConfirmation } from './api/booking-confirm';
 import reviewsHandler from './api/reviews';
+import telemetryHandler, { recordServerTelemetryEvent } from './api/telemetry';
 
 dotenv.config();
 
@@ -158,6 +159,7 @@ app.post('/api/chat', async (req, res) => {
 
         const response: any = await Promise.race([generatePromise, timeoutPromise]);
         const reply = response.text || "I'd be delighted to assist you with your transfer. Please contact Mr. Mir on WhatsApp at +34 666 744 440 for instant confirmation.";
+        recordServerTelemetryEvent('aiChat');
         return res.json({ reply });
       } catch (aiErr) {
         console.warn('Gemini API call failed or timed out, using fallback rules:', aiErr);
@@ -229,6 +231,7 @@ app.post('/api/booking-confirm', async (req, res) => {
     }
 
     const result = await processBookingConfirmation(body);
+    recordServerTelemetryEvent('bookingEmail');
     return res.status(200).json(result);
   } catch (error) {
     console.error('Booking Confirm API Error:', error);
@@ -241,6 +244,10 @@ app.post('/api/booking-confirm', async (req, res) => {
 // Live Visitors Meter & Client Reviews Endpoint
 app.get('/api/reviews', (req, res) => reviewsHandler(req, res));
 app.post('/api/reviews', (req, res) => reviewsHandler(req, res));
+
+// Owner Quota & A-to-Z Telemetry Endpoint
+app.get('/api/telemetry', (req, res) => telemetryHandler(req, res));
+app.post('/api/telemetry', (req, res) => telemetryHandler(req, res));
 
 // Setup Vite middleware in dev or static files in production
 const isProduction = process.env.NODE_ENV === 'production';
