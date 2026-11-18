@@ -23,13 +23,13 @@ export const ContactSection: React.FC = () => {
   };
 
   return (
-    <section id="contact" className="py-16 bg-[#f2feff] border-b border-[#9beeff]/70">
+    <section id="contact" className="py-16 bg-[#FAF9F6] border-b border-[#E6DFCB]/70">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           {/* Left info column */}
           <div className="lg:col-span-5 space-y-6">
             <div>
-              <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#008da1] block mb-1">
+              <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#8A5D00] block mb-1">
                 Direct Contact
               </span>
               <h2 className="text-2xl sm:text-3xl font-display font-extrabold text-slate-900 tracking-tight">
@@ -41,15 +41,15 @@ export const ContactSection: React.FC = () => {
             </div>
 
             <div className="space-y-4 pt-2">
-              <div className="flex items-start gap-3.5 bg-white p-4 rounded-xl border border-[#9beeff] hover:border-[#00f0ff] shadow-xs transition-all">
-                <div className="w-10 h-10 rounded-lg bg-[#e6fdff] border border-[#67efff] text-[#008da1] flex items-center justify-center shrink-0">
+              <div className="flex items-start gap-3.5 bg-white p-4 rounded-xl border border-[#E6DFCB] hover:border-[#F5B800] shadow-xs transition-all">
+                <div className="w-10 h-10 rounded-lg bg-[#FBF7E6] border border-[#DFC670] text-[#8A5D00] flex items-center justify-center shrink-0">
                   <Phone className="w-5 h-5" />
                 </div>
                 <div>
                   <span className="text-xs text-slate-500 font-medium block">Phone & WhatsApp Direct</span>
                   <a
                     href={`tel:${BUSINESS_INFO.phoneDisplay.replace(/\s+/g, '')}`}
-                    className="font-bold text-slate-900 hover:text-[#008da1] text-sm block"
+                    className="font-bold text-slate-900 hover:text-[#8A5D00] text-sm block"
                   >
                     {BUSINESS_INFO.phoneDisplay}
                   </a>
@@ -57,22 +57,22 @@ export const ContactSection: React.FC = () => {
                     href={`https://wa.me/${BUSINESS_INFO.whatsappNumber}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-[#008da1] font-semibold hover:underline mt-0.5 inline-block"
+                    className="text-xs text-[#8A5D00] font-semibold hover:underline mt-0.5 inline-block"
                   >
                     Click to open WhatsApp chat
                   </a>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3.5 bg-white p-4 rounded-xl border border-[#9beeff] hover:border-[#00f0ff] shadow-xs transition-all">
-                <div className="w-10 h-10 rounded-lg bg-[#e6fdff] border border-[#67efff] text-[#008da1] flex items-center justify-center shrink-0">
+              <div className="flex items-start gap-3.5 bg-white p-4 rounded-xl border border-[#E6DFCB] hover:border-[#F5B800] shadow-xs transition-all">
+                <div className="w-10 h-10 rounded-lg bg-[#FBF7E6] border border-[#DFC670] text-[#8A5D00] flex items-center justify-center shrink-0">
                   <Mail className="w-5 h-5" />
                 </div>
                 <div>
                   <span className="text-xs text-slate-500 font-medium block">Email Bookings & Invoicing</span>
                   <a
                     href={`mailto:${BUSINESS_INFO.email}`}
-                    className="font-bold text-slate-900 hover:text-[#008da1] text-sm block"
+                    className="font-bold text-slate-900 hover:text-[#8A5D00] text-sm block"
                   >
                     {BUSINESS_INFO.email}
                   </a>
@@ -82,8 +82,8 @@ export const ContactSection: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex items-start gap-3.5 bg-white p-4 rounded-xl border border-[#9beeff] hover:border-[#00f0ff] shadow-xs transition-all">
-                <div className="w-10 h-10 rounded-lg bg-[#e6fdff] border border-[#67efff] text-[#008da1] flex items-center justify-center shrink-0">
+              <div className="flex items-start gap-3.5 bg-white p-4 rounded-xl border border-[#E6DFCB] hover:border-[#F5B800] shadow-xs transition-all">
+                <div className="w-10 h-10 rounded-lg bg-[#FBF7E6] border border-[#DFC670] text-[#8A5D00] flex items-center justify-center shrink-0">
                   <MapPin className="w-5 h-5" />
                 </div>
                 <div>
@@ -101,7 +101,7 @@ export const ContactSection: React.FC = () => {
 
           {/* Right form column */}
           <div className="lg:col-span-7">
-            <div className="bg-white p-6 sm:p-8 rounded-2xl border border-[#9beeff] shadow-md">
+            <div className="bg-white p-6 sm:p-8 rounded-2xl border border-[#E6DFCB] shadow-md">
               <h3 className="font-display font-bold text-lg text-slate-900 mb-1">
                 Send a Fast Inquiry
               </h3>
@@ -110,16 +110,16 @@ export const ContactSection: React.FC = () => {
               </p>
 
               {submitted ? (
-                <div className="p-6 bg-[#e6fdff] border border-[#67efff] rounded-xl text-center space-y-2">
-                  <CheckCircle2 className="w-10 h-10 text-[#009cb3] mx-auto" />
-                  <h4 className="font-bold text-[#042f40] text-base">Inquiry Dispatched!</h4>
-                  <p className="text-xs text-[#007c91] max-w-md mx-auto">
+                <div className="p-6 bg-[#FBF7E6] border border-[#DFC670] rounded-xl text-center space-y-2">
+                  <CheckCircle2 className="w-10 h-10 text-[#8A5D00] mx-auto" />
+                  <h4 className="font-bold text-[#0D0F12] text-base">Inquiry Dispatched!</h4>
+                  <p className="text-xs text-[#704B00] max-w-md mx-auto">
                     Your WhatsApp inquiry has been prepared. If WhatsApp didn't open automatically, you can message us directly at {BUSINESS_INFO.phoneDisplay}.
                   </p>
                   <button
                     type="button"
                     onClick={() => setSubmitted(false)}
-                    className="mt-3 text-xs font-bold text-[#042f40] underline cursor-pointer"
+                    className="mt-3 text-xs font-bold text-[#0D0F12] underline cursor-pointer"
                   >
                     Send another message
                   </button>
@@ -137,7 +137,7 @@ export const ContactSection: React.FC = () => {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="e.g. David Miller"
-                        className="w-full px-3.5 py-2.5 text-xs bg-[#f5feff] border border-[#9beeff] rounded-xl focus:ring-2 focus:ring-[#00f0ff]/40 focus:border-[#00b8cc] outline-none"
+                        className="w-full px-3.5 py-2.5 text-xs bg-[#FCFBF7] border border-[#E6DFCB] rounded-xl focus:ring-2 focus:ring-[#F5B800]/40 focus:border-[#9A6B00] outline-none"
                       />
                     </div>
 
@@ -150,7 +150,7 @@ export const ContactSection: React.FC = () => {
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         placeholder="e.g. +44 7123 456789"
-                        className="w-full px-3.5 py-2.5 text-xs bg-[#f5feff] border border-[#9beeff] rounded-xl focus:ring-2 focus:ring-[#00f0ff]/40 focus:border-[#00b8cc] outline-none"
+                        className="w-full px-3.5 py-2.5 text-xs bg-[#FCFBF7] border border-[#E6DFCB] rounded-xl focus:ring-2 focus:ring-[#F5B800]/40 focus:border-[#9A6B00] outline-none"
                       />
                     </div>
                   </div>
@@ -165,14 +165,14 @@ export const ContactSection: React.FC = () => {
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                       placeholder="Specify your pickup address, destination, date, flight number or any special luggage requirements..."
-                      className="w-full px-3.5 py-2.5 text-xs bg-[#f5feff] border border-[#9beeff] rounded-xl focus:ring-2 focus:ring-[#00f0ff]/40 focus:border-[#00b8cc] outline-none"
+                      className="w-full px-3.5 py-2.5 text-xs bg-[#FCFBF7] border border-[#E6DFCB] rounded-xl focus:ring-2 focus:ring-[#F5B800]/40 focus:border-[#9A6B00] outline-none"
                     />
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                     <button
                       type="submit"
-                      className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#00f0ff] hover:bg-[#00d8eb] text-slate-950 font-extrabold text-xs sm:text-sm shadow-[0_4px_16px_-4px_rgba(0,240,255,0.55)] transition-all cursor-pointer"
+                      className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#F5B800] hover:bg-[#E0A600] text-slate-950 font-extrabold text-xs sm:text-sm shadow-[0_4px_16px_-4px_rgba(245,184,0,0.55)] transition-all cursor-pointer"
                     >
                       <MessageCircle className="w-4 h-4 fill-slate-950 text-slate-950" />
                       <span>Send on WhatsApp</span>
@@ -181,9 +181,9 @@ export const ContactSection: React.FC = () => {
                     <button
                       type="button"
                       onClick={handleSendEmail}
-                      className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#e6fdff] hover:bg-[#ccfbff] text-[#042f40] font-bold text-xs sm:text-sm border border-[#67efff] transition-all cursor-pointer"
+                      className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#FBF7E6] hover:bg-[#F7EDBE] text-[#0D0F12] font-bold text-xs sm:text-sm border border-[#DFC670] transition-all cursor-pointer"
                     >
-                      <Mail className="w-4 h-4 text-[#008da1]" />
+                      <Mail className="w-4 h-4 text-[#8A5D00]" />
                       <span>Send via Email</span>
                     </button>
                   </div>

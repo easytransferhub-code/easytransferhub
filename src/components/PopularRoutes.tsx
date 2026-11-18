@@ -8,11 +8,11 @@ interface PopularRoutesProps {
 
 export const PopularRoutes: React.FC<PopularRoutesProps> = ({ onSelectRoute }) => {
   return (
-    <section id="routes" className="py-16 bg-[#f2feff] border-b border-[#9beeff]/70">
+    <section id="routes" className="py-16 bg-[#FAF9F6] border-b border-[#E6DFCB]/70">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
           <div>
-            <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#008da1] block mb-1">
+            <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#8A5D00] block mb-1">
               Top Pickups & City Transfers
             </span>
             <h2 className="text-2xl sm:text-3xl font-display font-extrabold text-slate-900 tracking-tight">
@@ -39,13 +39,13 @@ export const PopularRoutes: React.FC<PopularRoutesProps> = ({ onSelectRoute }) =
               key={route.id}
               className={`bg-white rounded-2xl border p-5 transition-all hover:shadow-md flex flex-col justify-between ${
                 route.highlight
-                  ? 'border-[#00b8cc] shadow-sm relative ring-1 ring-[#00f0ff]/30'
-                  : 'border-[#9beeff] hover:border-[#00f0ff] shadow-xs'
+                  ? 'border-[#9A6B00] shadow-sm relative ring-1 ring-[#F5B800]/30'
+                  : 'border-[#E6DFCB] hover:border-[#F5B800] shadow-xs'
               }`}
             >
               {route.highlight && (
                 <div className="absolute -top-3 left-5">
-                  <span className="bg-[#00f0ff] text-slate-950 font-extrabold text-[10px] uppercase tracking-wider px-2.5 py-0.5 rounded shadow-xs border border-[#00c8e8]">
+                  <span className="bg-[#F5B800] text-slate-950 font-extrabold text-[10px] uppercase tracking-wider px-2.5 py-0.5 rounded shadow-xs border border-[#D99F00]">
                     Zone Rate
                   </span>
                 </div>
@@ -68,16 +68,16 @@ export const PopularRoutes: React.FC<PopularRoutesProps> = ({ onSelectRoute }) =
                 </div>
 
                 {/* Pricing comparison per vehicle */}
-                <div className="grid grid-cols-3 gap-2 bg-[#f5feff] rounded-xl p-2.5 border border-[#cff9ff] mb-4 text-center">
+                <div className="grid grid-cols-3 gap-2 bg-[#FCFBF7] rounded-xl p-2.5 border border-[#EFE7D1] mb-4 text-center">
                   <div>
                     <span className="text-[10px] text-slate-500 block uppercase font-semibold">Standard</span>
                     <span className="text-sm font-extrabold text-slate-900 tabular-nums">€{route.prices.standard}</span>
                     <span className="text-[10px] text-slate-400 block">1-4 pax</span>
                   </div>
 
-                  <div className="border-x border-[#cff9ff]">
+                  <div className="border-x border-[#EFE7D1]">
                     <span className="text-[10px] text-slate-500 block uppercase font-semibold">Comfort</span>
-                    <span className="text-sm font-extrabold text-[#007c91] tabular-nums">€{route.prices.comfort}</span>
+                    <span className="text-sm font-extrabold text-[#704B00] tabular-nums">€{route.prices.comfort}</span>
                     <span className="text-[10px] text-slate-400 block">Exec</span>
                   </div>
 
@@ -93,7 +93,7 @@ export const PopularRoutes: React.FC<PopularRoutesProps> = ({ onSelectRoute }) =
               <button
                 type="button"
                 onClick={() => onSelectRoute(route)}
-                className="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-[#e6fdff] hover:bg-[#00f0ff] text-[#042f40] border border-[#67efff] font-bold text-xs transition-all cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-[#FBF7E6] hover:bg-[#F5B800] text-[#0D0F12] border border-[#DFC670] font-bold text-xs transition-all cursor-pointer"
               >
                 <span>Select & Calculate Booking</span>
                 <ArrowRight className="w-3.5 h-3.5" />

@@ -24,10 +24,10 @@ export const VehiclesSection: React.FC = () => {
   };
 
   return (
-    <section id="fleet" className="pt-10 pb-14 bg-white border-b border-[#9beeff]/70">
+    <section id="fleet" className="pt-10 pb-14 bg-white border-b border-[#E6DFCB]/70">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center max-w-2xl mx-auto mb-10">
-          <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#008da1] block mb-1">
+          <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#8A5D00] block mb-1">
             Our Fleet & Chauffeurs
           </span>
           <h2 className="text-2xl sm:text-3xl font-display font-extrabold text-slate-900 tracking-tight">
@@ -48,11 +48,11 @@ export const VehiclesSection: React.FC = () => {
             return (
               <div
                 key={vehicle.id}
-                className="bg-[#f5feff] border border-[#9beeff]/80 hover:border-[#00f0ff] rounded-2xl overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col justify-between"
+                className="bg-[#FCFBF7] border border-[#E6DFCB]/80 hover:border-[#F5B800] rounded-2xl overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col justify-between"
               >
                 <div>
                   {/* Vehicle Photo Container */}
-                  <div className="relative w-full h-52 bg-[#e6fdff] overflow-hidden group">
+                  <div className="relative w-full h-52 bg-[#FBF7E6] overflow-hidden group">
                     <img
                       src={currentPhoto}
                       alt={vehicle.name}
@@ -84,7 +84,7 @@ export const VehiclesSection: React.FC = () => {
                             <span
                               key={i}
                               className={`w-2 h-2 rounded-full transition-all ${
-                                i === currentIdx ? 'bg-[#00f0ff] w-4' : 'bg-white/70'
+                                i === currentIdx ? 'bg-[#F5B800] w-4' : 'bg-white/70'
                               }`}
                             />
                           ))}
@@ -92,7 +92,7 @@ export const VehiclesSection: React.FC = () => {
                       </>
                     )}
 
-                    <div className="absolute top-3 left-3 bg-white/95 text-[#042f40] border border-[#67efff] text-[11px] font-bold px-2.5 py-1 rounded-lg backdrop-blur-xs shadow-xs">
+                    <div className="absolute top-3 left-3 bg-white/95 text-[#0D0F12] border border-[#DFC670] text-[11px] font-bold px-2.5 py-1 rounded-lg backdrop-blur-xs shadow-xs">
                       {vehicle.category}
                     </div>
                   </div>
@@ -103,7 +103,7 @@ export const VehiclesSection: React.FC = () => {
                       <h3 className="font-display font-extrabold text-xl text-slate-900">
                         {vehicle.name}
                       </h3>
-                      <span className="text-xs font-bold text-[#042f40] bg-[#e6fdff] border border-[#67efff] px-2.5 py-0.5 rounded-full">
+                      <span className="text-xs font-bold text-[#0D0F12] bg-[#FBF7E6] border border-[#DFC670] px-2.5 py-0.5 rounded-full">
                         {vehicle.seats}
                       </span>
                     </div>
@@ -113,13 +113,13 @@ export const VehiclesSection: React.FC = () => {
                     </p>
 
                     {/* Capacity Specs */}
-                    <div className="grid grid-cols-2 gap-2 py-3 px-3 bg-white rounded-xl border border-[#9beeff]/70 mb-4 text-xs font-semibold text-slate-700">
+                    <div className="grid grid-cols-2 gap-2 py-3 px-3 bg-white rounded-xl border border-[#E6DFCB]/70 mb-4 text-xs font-semibold text-slate-700">
                       <div className="flex items-center gap-2">
-                        <Users className="w-4 h-4 text-[#008da1]" />
+                        <Users className="w-4 h-4 text-[#8A5D00]" />
                         <span>Up to {vehicle.maxPassengers} passengers</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Briefcase className="w-4 h-4 text-[#008da1]" />
+                        <Briefcase className="w-4 h-4 text-[#8A5D00]" />
                         <span>Up to {vehicle.maxLuggage} suitcases</span>
                       </div>
                     </div>
@@ -131,7 +131,7 @@ export const VehiclesSection: React.FC = () => {
                       </span>
                       {vehicle.features.map((feat, i) => (
                         <div key={i} className="flex items-start gap-2 text-xs text-slate-700">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-[#009cb3] mt-0.5 shrink-0" />
+                          <CheckCircle2 className="w-3.5 h-3.5 text-[#8A5D00] mt-0.5 shrink-0" />
                           <span>{feat}</span>
                         </div>
                       ))}
@@ -147,7 +147,7 @@ export const VehiclesSection: React.FC = () => {
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#00f0ff] hover:bg-[#00d8eb] text-slate-950 font-extrabold text-xs transition-colors shadow-[0_4px_16px_-4px_rgba(0,240,255,0.55)]"
+                    className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#F5B800] hover:bg-[#E0A600] text-slate-950 font-extrabold text-xs transition-colors shadow-[0_4px_16px_-4px_rgba(245,184,0,0.55)]"
                   >
                     <MessageCircle className="w-4 h-4 fill-slate-950 text-slate-950" />
                     <span>Inquire About {vehicle.name}</span>

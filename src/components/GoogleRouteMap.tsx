@@ -272,7 +272,7 @@ const RouteOverlay: React.FC<RouteOverlayProps> = ({
           const newPolylines = primaryRoute.createPolylines();
           newPolylines.forEach((polyline: any) => {
             polyline.setOptions({
-              strokeColor: '#008da1',
+              strokeColor: '#8A5D00',
               strokeWeight: 5,
               strokeOpacity: 0.9,
             });
@@ -357,10 +357,10 @@ export const GoogleRouteMap: React.FC<GoogleRouteMapProps> = ({
   }
 
   return (
-    <div className="rounded-xl border border-[#8ceeff] bg-[#f5feff] overflow-hidden shadow-2xs">
-      <div className="px-3 py-2 bg-[#e6fdff] border-b border-[#9beeff] flex items-center justify-between gap-2 text-xs">
-        <div className="flex items-center gap-1.5 font-bold text-[#042f40]">
-          <MapPin className="w-3.5 h-3.5 text-[#008da1]" />
+    <div className="rounded-xl border border-[#E3D6AD] bg-[#FCFBF7] overflow-hidden shadow-2xs">
+      <div className="px-3 py-2 bg-[#FBF7E6] border-b border-[#E6DFCB] flex items-center justify-between gap-2 text-xs">
+        <div className="flex items-center gap-1.5 font-bold text-[#0D0F12]">
+          <MapPin className="w-3.5 h-3.5 text-[#8A5D00]" />
           <span>Google Maps Route Preview</span>
         </div>
         <div className="flex items-center gap-2">
@@ -368,7 +368,7 @@ export const GoogleRouteMap: React.FC<GoogleRouteMapProps> = ({
             href={googleMapsExternalUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[11px] font-bold text-[#007c91] hover:text-[#042f40] flex items-center gap-1"
+            className="text-[11px] font-bold text-[#704B00] hover:text-[#0D0F12] flex items-center gap-1"
           >
             <span>Open in Google Maps</span>
             <ExternalLink className="w-3 h-3" />
@@ -376,7 +376,7 @@ export const GoogleRouteMap: React.FC<GoogleRouteMapProps> = ({
           <button
             type="button"
             onClick={() => setMapExpanded((prev) => !prev)}
-            className="text-[11px] font-bold px-2 py-0.5 rounded bg-white border border-[#9beeff] text-[#042f40] hover:bg-[#d8fbff] cursor-pointer"
+            className="text-[11px] font-bold px-2 py-0.5 rounded bg-white border border-[#E6DFCB] text-[#0D0F12] hover:bg-[#FAF6E8] cursor-pointer"
           >
             {mapExpanded ? 'Hide Map' : 'Show Map'}
           </button>
@@ -384,7 +384,7 @@ export const GoogleRouteMap: React.FC<GoogleRouteMapProps> = ({
       </div>
 
       {mapExpanded && (
-        <div className="relative w-full h-[210px] sm:h-[240px] bg-[#e6fdff]">
+        <div className="relative w-full h-[210px] sm:h-[240px] bg-[#FBF7E6]">
           {mapsEnabled ? (
             <GoogleMap
               mapId="DEMO_MAP_ID"
@@ -404,9 +404,9 @@ export const GoogleRouteMap: React.FC<GoogleRouteMapProps> = ({
                   title={`Pickup: ${pickup}`}
                 >
                   <Pin
-                    background="#00f0ff"
-                    borderColor="#042f40"
-                    glyphColor="#042f40"
+                    background="#F5B800"
+                    borderColor="#0D0F12"
+                    glyphColor="#0D0F12"
                     glyphText="A"
                   />
                 </AdvancedMarker>
@@ -418,9 +418,9 @@ export const GoogleRouteMap: React.FC<GoogleRouteMapProps> = ({
                   title={`Drop-off: ${dropoff}`}
                 >
                   <Pin
-                    background="#042f40"
-                    borderColor="#00f0ff"
-                    glyphColor="#00f0ff"
+                    background="#0D0F12"
+                    borderColor="#F5B800"
+                    glyphColor="#F5B800"
                     glyphText="B"
                   />
                 </AdvancedMarker>
@@ -436,8 +436,8 @@ export const GoogleRouteMap: React.FC<GoogleRouteMapProps> = ({
             </GoogleMap>
           ) : (
             <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center space-y-2">
-              <div className="flex items-center gap-2 text-xs font-bold text-[#042f40]">
-                <Navigation className="w-4 h-4 text-[#008da1]" />
+              <div className="flex items-center gap-2 text-xs font-bold text-[#0D0F12]">
+                <Navigation className="w-4 h-4 text-[#8A5D00]" />
                 <span>
                   {pickup || 'Pickup'} → {dropoff || 'Drop-off'}
                 </span>
@@ -446,7 +446,7 @@ export const GoogleRouteMap: React.FC<GoogleRouteMapProps> = ({
                 href={googleMapsExternalUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#00f0ff] border border-[#00c8e8] text-slate-950 font-bold text-xs shadow-2xs"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#F5B800] border border-[#D99F00] text-slate-950 font-bold text-xs shadow-2xs"
               >
                 <span>View Route on Google Maps</span>
                 <ExternalLink className="w-3.5 h-3.5" />

@@ -94,24 +94,24 @@ All highway tolls & flight tracking included.`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/50 backdrop-blur-xs overflow-y-auto">
-      <div className="bg-white w-full max-w-xl rounded-2xl shadow-2xl border border-[#67efff] overflow-hidden my-6">
+      <div className="bg-white w-full max-w-xl rounded-2xl shadow-2xl border border-[#DFC670] overflow-hidden my-6">
         {/* Voucher Header */}
-        <div className="bg-[#e6fdff] text-slate-900 p-5 flex items-center justify-between border-b border-[#8ceeff]">
+        <div className="bg-[#FBF7E6] text-slate-900 p-5 flex items-center justify-between border-b border-[#E3D6AD]">
           <div>
             <div className="flex items-center gap-2">
               <span className="font-display font-extrabold text-lg text-slate-900">
-                Easytransfer<span className="text-[#00a6bf]">hub</span>
+                Easytransfer<span className="text-[#8A5D00]">hub</span>
               </span>
-              <span className="text-[10px] font-extrabold uppercase tracking-wider bg-[#00f0ff] text-slate-950 px-2 py-0.5 rounded">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider bg-[#F5B800] text-slate-950 px-2 py-0.5 rounded">
                 Official Voucher
               </span>
             </div>
-            <p className="text-xs text-slate-600 mt-0.5">Booking Reference: <b className="text-[#007c91]">{bookingRef}</b></p>
+            <p className="text-xs text-slate-600 mt-0.5">Booking Reference: <b className="text-[#704B00]">{bookingRef}</b></p>
           </div>
 
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-[#ccfbff] transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-[#F7EDBE] transition-colors cursor-pointer"
             aria-label="Close voucher"
           >
             <X className="w-5 h-5" />
@@ -121,15 +121,15 @@ All highway tolls & flight tracking included.`;
         {/* Voucher Printable Content */}
         <div className="p-6 space-y-5 text-slate-900 printable-content">
           {/* Status strip */}
-          <div className="p-3 bg-[#f2feff] border border-[#8ceeff] rounded-xl flex items-center justify-between text-xs">
-            <span className="font-bold text-[#042f40]">Fare Quoted & Ready for Confirmation</span>
-            <span className="font-semibold text-[#008da1]">60 Min Free Airport Waiting</span>
+          <div className="p-3 bg-[#FAF9F6] border border-[#E3D6AD] rounded-xl flex items-center justify-between text-xs">
+            <span className="font-bold text-[#0D0F12]">Fare Quoted & Ready for Confirmation</span>
+            <span className="font-semibold text-[#8A5D00]">60 Min Free Airport Waiting</span>
           </div>
 
           {/* Route details */}
-          <div className="border border-[#9beeff] rounded-xl p-4 bg-[#f5feff] space-y-3">
+          <div className="border border-[#E6DFCB] rounded-xl p-4 bg-[#FCFBF7] space-y-3">
             <div className="flex items-start gap-3">
-              <MapPin className="w-4 h-4 text-[#009cb3] mt-0.5 shrink-0" />
+              <MapPin className="w-4 h-4 text-[#8A5D00] mt-0.5 shrink-0" />
               <div className="text-xs">
                 <span className="font-bold text-slate-500 uppercase tracking-wider block text-[10px]">Pickup Location</span>
                 <span className="font-bold text-slate-900 text-sm">{bookingData.pickup}</span>
@@ -137,14 +137,14 @@ All highway tolls & flight tracking included.`;
             </div>
 
             <div className="flex items-start gap-3">
-              <MapPin className="w-4 h-4 text-[#007c91] mt-0.5 shrink-0" />
+              <MapPin className="w-4 h-4 text-[#704B00] mt-0.5 shrink-0" />
               <div className="text-xs">
                 <span className="font-bold text-slate-500 uppercase tracking-wider block text-[10px]">Drop-off Destination</span>
                 <span className="font-bold text-slate-900 text-sm">{bookingData.dropoff}</span>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 pt-2 border-t border-[#9beeff]/60 text-xs">
+            <div className="grid grid-cols-2 gap-3 pt-2 border-t border-[#E6DFCB]/60 text-xs">
               <div>
                 <span className="text-[10px] uppercase font-bold text-slate-500 block">Pickup Date & Time</span>
                 <span className="font-bold text-slate-800">{bookingData.dateTime ? new Date(bookingData.dateTime).toLocaleString() : 'Pending confirmation'}</span>
@@ -186,7 +186,7 @@ All highway tolls & flight tracking included.`;
               )}
 
               {bookingData.driverNotes && (
-                <div className="col-span-2 pt-1.5 border-t border-[#9beeff]/50">
+                <div className="col-span-2 pt-1.5 border-t border-[#E6DFCB]/50">
                   <span className="text-[10px] uppercase font-bold text-slate-500 block">Notes for Driver</span>
                   <span className="font-medium text-slate-800">{bookingData.driverNotes}</span>
                 </div>
@@ -196,12 +196,12 @@ All highway tolls & flight tracking included.`;
 
           {/* Vehicle and Passengers */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
-            <div className="bg-[#f5feff] p-3 rounded-xl border border-[#9beeff]">
+            <div className="bg-[#FCFBF7] p-3 rounded-xl border border-[#E6DFCB]">
               <span className="text-[10px] font-bold uppercase text-slate-500 block">Vehicle</span>
               <span className="font-bold text-xs sm:text-sm text-slate-900">{bookingData.vehicleName}</span>
             </div>
 
-            <div className="bg-[#f5feff] p-3 rounded-xl border border-[#9beeff]">
+            <div className="bg-[#FCFBF7] p-3 rounded-xl border border-[#E6DFCB]">
               <span className="text-[10px] font-bold uppercase text-slate-500 block">Passengers & Luggage</span>
               <span className="font-bold text-xs sm:text-sm text-slate-900 block">
                 {bookingData.passengers} Pax · {bookingData.luggage} Bags
@@ -213,7 +213,7 @@ All highway tolls & flight tracking included.`;
               )}
             </div>
 
-            <div className="bg-[#f5feff] p-3 rounded-xl border border-[#9beeff]">
+            <div className="bg-[#FCFBF7] p-3 rounded-xl border border-[#E6DFCB]">
               <span className="text-[10px] font-bold uppercase text-slate-500 block">Child Seats</span>
               <span className="font-bold text-xs sm:text-sm text-slate-900 block">
                 {bookingData.childSeatsDetails || (bookingData.childSeats > 0 ? `${bookingData.childSeats} seat(s) (+€${bookingData.childSeats * 5})` : 'None')}
@@ -222,17 +222,17 @@ All highway tolls & flight tracking included.`;
           </div>
 
           {/* Price Box */}
-          <div className="p-4 rounded-xl bg-[#e6fdff] text-slate-900 flex items-center justify-between border border-[#00d8eb]">
+          <div className="p-4 rounded-xl bg-[#FBF7E6] text-slate-900 flex items-center justify-between border border-[#E0A600]">
             <div>
-              <span className="text-xs text-[#042f40] uppercase tracking-wider block font-bold">
+              <span className="text-xs text-[#0D0F12] uppercase tracking-wider block font-bold">
                 Total Guaranteed Price
               </span>
-              <span className="text-2xl font-black font-display text-[#007c91] tabular-nums">
+              <span className="text-2xl font-black font-display text-[#704B00] tabular-nums">
                 €{bookingData.quotedPrice}
               </span>
             </div>
             <div className="text-right text-xs text-slate-700">
-              <span className="font-bold text-[#042f40]">
+              <span className="font-bold text-[#0D0F12]">
                 {bookingData.paymentMethod || 'Pay Cash or Card to Chauffeur'}
               </span>
               <span className="block text-[11px] text-slate-500 mt-0.5">All Catalan tolls included</span>
@@ -251,11 +251,11 @@ All highway tolls & flight tracking included.`;
           </div>
 
           {/* Action buttons */}
-          <div className="flex flex-col sm:flex-row gap-2.5 pt-2 border-t border-[#9beeff]/60">
+          <div className="flex flex-col sm:flex-row gap-2.5 pt-2 border-t border-[#E6DFCB]/60">
             <button
               type="button"
               onClick={handleSendWhatsApp}
-              className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#00f0ff] hover:bg-[#00d8eb] text-slate-950 font-extrabold text-xs sm:text-sm shadow-[0_4px_16px_-4px_rgba(0,240,255,0.55)] cursor-pointer transition-colors"
+              className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#F5B800] hover:bg-[#E0A600] text-slate-950 font-extrabold text-xs sm:text-sm shadow-[0_4px_16px_-4px_rgba(245,184,0,0.55)] cursor-pointer transition-colors"
             >
               <MessageCircle className="w-4 h-4 fill-slate-950 text-slate-950" />
               <span>Confirm on WhatsApp Now</span>
@@ -264,9 +264,9 @@ All highway tolls & flight tracking included.`;
             <button
               type="button"
               onClick={handleCopy}
-              className="flex items-center justify-center gap-1.5 py-3 px-4 rounded-xl bg-[#e6fdff] hover:bg-[#ccfbff] text-[#042f40] border border-[#67efff] font-bold text-xs cursor-pointer transition-colors"
+              className="flex items-center justify-center gap-1.5 py-3 px-4 rounded-xl bg-[#FBF7E6] hover:bg-[#F7EDBE] text-[#0D0F12] border border-[#DFC670] font-bold text-xs cursor-pointer transition-colors"
             >
-              {copied ? <Check className="w-4 h-4 text-[#008da1]" /> : <Copy className="w-4 h-4 text-[#008da1]" />}
+              {copied ? <Check className="w-4 h-4 text-[#8A5D00]" /> : <Copy className="w-4 h-4 text-[#8A5D00]" />}
               <span>{copied ? 'Copied!' : 'Copy Summary'}</span>
             </button>
 

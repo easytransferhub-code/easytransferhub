@@ -36,10 +36,10 @@ export const WhyChooseUs: React.FC = () => {
   ];
 
   return (
-    <section className="py-16 bg-[#e8fdff] text-slate-900 border-y border-[#9beeff]/80">
+    <section className="py-16 bg-[#F6F2E4] text-slate-900 border-y border-[#E6DFCB]/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#008da1] block mb-2">
+          <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#8A5D00] block mb-2">
             Service Excellence
           </span>
           <h2 className="text-2xl sm:text-3xl font-display font-extrabold text-slate-900 tracking-tight">
@@ -56,9 +56,9 @@ export const WhyChooseUs: React.FC = () => {
             return (
               <div
                 key={idx}
-                className="bg-white border border-[#9beeff] hover:border-[#00f0ff] rounded-2xl p-6 transition-all shadow-xs hover:shadow-md"
+                className="bg-white border border-[#E6DFCB] hover:border-[#F5B800] rounded-2xl p-6 transition-all shadow-xs hover:shadow-md"
               >
-                <div className="w-10 h-10 rounded-xl bg-[#00f0ff]/20 border border-[#67efff] text-[#008da1] flex items-center justify-center mb-4">
+                <div className="w-10 h-10 rounded-xl bg-[#F5B800]/20 border border-[#DFC670] text-[#8A5D00] flex items-center justify-center mb-4">
                   <Icon className="w-5 h-5" />
                 </div>
                 <h3 className="font-display font-bold text-base text-slate-900 mb-2">

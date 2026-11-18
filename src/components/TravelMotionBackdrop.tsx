@@ -76,7 +76,7 @@ const RealisticAirplaneSvg: React.FC<AirplaneSvgProps> = ({
     >
       <defs>
         <linearGradient id={`contrail-${idSuffix}`} x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#99f7ff" stopOpacity="0" />
+          <stop offset="0%" stopColor="#F5B800" stopOpacity="0" />
           <stop offset="65%" stopColor="#ffffff" stopOpacity="0.5" />
           <stop offset="100%" stopColor="#ffffff" stopOpacity="0.95" />
         </linearGradient>
@@ -246,9 +246,9 @@ const TrainSvg: React.FC<TrainSvgProps> = ({
   className = 'w-[340px] sm:w-[440px] h-auto',
 }) => {
   const isHighSpeed = variant === 'highspeed';
-  const bodyPrimary = isHighSpeed ? '#ffffff' : '#e6fdff';
-  const stripeColor = isHighSpeed ? '#00d4e6' : '#008da1';
-  const noseAccent = isHighSpeed ? '#042f40' : '#00687a';
+  const bodyPrimary = isHighSpeed ? '#ffffff' : '#FAF9F6';
+  const stripeColor = isHighSpeed ? '#F5B800' : '#8A5D00';
+  const noseAccent = isHighSpeed ? '#0D0F12' : '#262930';
 
   return (
     <svg
@@ -370,11 +370,11 @@ const TaxiCarSvg: React.FC<TaxiCarSvgProps> = ({
 
         <path
           d="M12 37 L12 16 C12 11 16 8 23 8 L106 8 C117 8 128 14 137 22 L144 26 C147 28 148 31 148 35 L148 40 L12 40 Z"
-          fill="#ffffff"
-          stroke="#00b8cc"
+          fill="#0D0F12"
+          stroke="#F5B800"
           strokeWidth="1.2"
         />
-        <rect x="13" y="29" width="134" height="5" fill="#00e5ff" />
+        <rect x="13" y="29" width="134" height="5" fill="#F5B800" />
 
         <rect x="16" y="12" width="26" height="12" rx="2" fill="#0f172a" />
         <rect x="46" y="12" width="28" height="12" rx="1.5" fill="#0f172a" />
@@ -399,8 +399,8 @@ const TaxiCarSvg: React.FC<TaxiCarSvgProps> = ({
   }
 
   const isBcnTaxi = variant === 'bcn-taxi';
-  const bodyColor = isBcnTaxi ? '#111827' : '#042f40';
-  const doorColor = isBcnTaxi ? '#facc15' : '#00f0ff';
+  const bodyColor = isBcnTaxi ? '#0D0F12' : '#181B22';
+  const doorColor = isBcnTaxi ? '#F5B800' : '#E0A600';
 
   return (
     <svg
@@ -417,14 +417,14 @@ const TaxiCarSvg: React.FC<TaxiCarSvgProps> = ({
       {isBcnTaxi && (
         <g>
           <rect x="61" y="4.5" width="18" height="6" rx="1.8" fill="#fef08a" stroke="#111827" strokeWidth="0.9" />
-          <rect x="64" y="6.2" width="12" height="2.4" rx="0.8" fill="#00f0ff" />
+          <rect x="64" y="6.2" width="12" height="2.4" rx="0.8" fill="#F5B800" />
         </g>
       )}
 
       <path
         d="M10 34 L12 22 L32 20 L48 10.5 L92 10.5 L112 21 L133 24 C136 25 138 28 138 32 L138 35.5 L10 35.5 Z"
         fill={bodyColor}
-        stroke={isBcnTaxi ? '#334155' : '#00f0ff'}
+        stroke={isBcnTaxi ? '#334155' : '#F5B800'}
         strokeWidth="0.9"
       />
 
@@ -455,13 +455,13 @@ const TaxiCarSvg: React.FC<TaxiCarSvgProps> = ({
 };
 
 /**
- * Animated Airplane & Soft Mint Cloud Layer for the Upper Sky of the Hero
+ * Animated Airplane & Soft Cloud Layer for the Upper Sky of the Hero
  */
 export const HeroSkyPlanes: React.FC = () => {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none select-none z-[1]" aria-hidden="true">
       {/* Drifting soft clouds */}
-      <div className="absolute top-2 left-0 animate-cloud-slow opacity-55">
+      <div className="absolute top-2 left-0 animate-cloud-slow opacity-15">
         <svg width="180" height="46" viewBox="0 0 180 46" fill="none">
           <path
             d="M28 38 H150 C161 38 168 31 168 23 C168 15.5 161 10 152 10 C149 10 146 11 143 12.5 C139 5 130 1 120 1 C107 1 97 8 94 17.5 C90 15 84 13.5 78 13.5 C64 13.5 53 21.5 51 31 C49 30 46 29.5 43 29.5 C34 29.5 28 33 28 38 Z"
@@ -469,7 +469,7 @@ export const HeroSkyPlanes: React.FC = () => {
           />
         </svg>
       </div>
-      <div className="absolute top-14 left-0 animate-cloud-mid opacity-40">
+      <div className="absolute top-14 left-0 animate-cloud-mid opacity-10">
         <svg width="140" height="36" viewBox="0 0 180 46" fill="none">
           <path
             d="M28 38 H150 C161 38 168 31 168 23 C168 15.5 161 10 152 10 C149 10 146 11 143 12.5 C139 5 130 1 120 1 C107 1 97 8 94 17.5 C90 15 84 13.5 78 13.5 C64 13.5 53 21.5 51 31 C49 30 46 29.5 43 29.5 C34 29.5 28 33 28 38 Z"
@@ -501,17 +501,16 @@ export const HeroSkyPlanes: React.FC = () => {
 };
 
 /**
- * Full-Width Live Transit Panorama placed directly right below the Booking Calculator & "Get Price" button:
- * Realistic Vueling, Ryanair & easyJet flying jets in open sky + High-Speed Trains on Rail Track + Moving Barcelona Taxis on Road
+ * Full-Width Live Transit Panorama placed directly right below the Booking Calculator
  */
 export const TransitCorridorScene: React.FC = () => {
   return (
     <div
-      className="relative w-full h-40 sm:h-48 mt-3 overflow-hidden pointer-events-none select-none border-y border-[#9beeff]/70 bg-gradient-to-b from-[#e0fcff]/80 via-[#f2feff] to-white"
+      className="relative w-full h-40 sm:h-48 mt-5 overflow-hidden pointer-events-none select-none border-y border-[#F5B800]/30 bg-gradient-to-b from-[#1A1E26] via-[#262B36] to-[#FAF9F6]"
       aria-hidden="true"
     >
       {/* Subtle drifting sky clouds */}
-      <div className="absolute top-2 left-0 animate-cloud-mid opacity-70">
+      <div className="absolute top-2 left-0 animate-cloud-mid opacity-20">
         <svg width="150" height="38" viewBox="0 0 180 46" fill="none">
           <path
             d="M28 38 H150 C161 38 168 31 168 23 C168 15.5 161 10 152 10 C149 10 146 11 143 12.5 C139 5 130 1 120 1 C107 1 97 8 94 17.5 C90 15 84 13.5 78 13.5 C64 13.5 53 21.5 51 31 C49 30 46 29.5 43 29.5 C34 29.5 28 33 28 38 Z"
@@ -520,15 +519,15 @@ export const TransitCorridorScene: React.FC = () => {
         </svg>
       </div>
 
-      {/* Distant soft electric-ice Catalan hills & Barcelona landmark silhouettes */}
+      {/* Distant Catalan hills & Barcelona landmark silhouettes */}
       <svg
         viewBox="0 0 1440 160"
         preserveAspectRatio="none"
-        className="absolute inset-x-0 bottom-[34px] sm:bottom-[42px] w-full h-24 sm:h-28 text-[#9beeff]/50"
+        className="absolute inset-x-0 bottom-[34px] sm:bottom-[42px] w-full h-24 sm:h-28 text-[#101318]/65"
         fill="currentColor"
       >
         <path d="M0,120 Q180,68 380,96 T780,84 T1160,98 T1440,76 L1440,160 L0,160 Z" />
-        <g className="text-[#5ceaff]/45">
+        <g className="text-[#F5B800]/25">
           <rect x="190" y="72" width="12" height="36" rx="1" />
           <rect x="206" y="64" width="16" height="44" rx="1" />
           <rect x="330" y="68" width="5" height="36" />
@@ -540,8 +539,7 @@ export const TransitCorridorScene: React.FC = () => {
         </g>
       </svg>
 
-      {/* Open-Sky Realistic Airline Fleet directly visible right beneath "Get Price" */}
-      {/* 1. Vueling (Yellow & Slate) flying Left-to-Right */}
+      {/* Open-Sky Realistic Airline Fleet */}
       <div className="absolute top-1.5 sm:top-2 left-0 animate-fly-ltr will-change-transform z-10">
         <RealisticAirplaneSvg
           idSuffix="corridor-vueling"
@@ -550,7 +548,6 @@ export const TransitCorridorScene: React.FC = () => {
         />
       </div>
 
-      {/* 2. easyJet (Vibrant Orange & White) flying Left-to-Right at staggered phase */}
       <div className="absolute top-6 sm:top-7 left-0 animate-fly-high will-change-transform z-10">
         <RealisticAirplaneSvg
           idSuffix="corridor-easyjet"
@@ -559,7 +556,6 @@ export const TransitCorridorScene: React.FC = () => {
         />
       </div>
 
-      {/* 3. Ryanair (Royal Blue & Gold Harp) flying Right-to-Left */}
       <div className="absolute top-3.5 sm:top-4 left-0 animate-fly-rtl will-change-transform z-10">
         <RealisticAirplaneSvg
           idSuffix="corridor-ryanair"
@@ -571,12 +567,12 @@ export const TransitCorridorScene: React.FC = () => {
 
       {/* Overhead Electric Railway Catenary Wire + Poles */}
       <div className="absolute inset-x-0 bottom-[66px] sm:bottom-[80px] h-10 z-10">
-        <div className="absolute inset-x-0 top-2 h-[1px] bg-[#008da1]/30" />
-        <div className="absolute inset-x-0 top-4 h-[1px] bg-[#008da1]/40" />
+        <div className="absolute inset-x-0 top-2 h-[1px] bg-[#F5B800]/30" />
+        <div className="absolute inset-x-0 top-4 h-[1px] bg-[#F5B800]/40" />
         <div
           className="absolute inset-x-0 top-0 h-10 opacity-45"
           style={{
-            backgroundImage: 'repeating-linear-gradient(90deg, #042f40 0px, #042f40 2px, transparent 2px, transparent 180px)',
+            backgroundImage: 'repeating-linear-gradient(90deg, #0D0F12 0px, #0D0F12 2px, transparent 2px, transparent 180px)',
           }}
         />
       </div>
@@ -602,32 +598,32 @@ export const TransitCorridorScene: React.FC = () => {
 
       {/* Elevated Steel Rail Track & Sleepers Bar */}
       <div className="absolute inset-x-0 bottom-[38px] sm:bottom-[46px] h-[14px] z-20">
-        <div className="w-full h-[2px] bg-slate-500" />
-        <div className="w-full h-[2px] bg-slate-400 mt-[2px]" />
+        <div className="w-full h-[2px] bg-neutral-500" />
+        <div className="w-full h-[2px] bg-neutral-400 mt-[2px]" />
         <div
           className="w-full h-[4px]"
           style={{
-            backgroundImage: 'repeating-linear-gradient(90deg, #008da1 0px, #008da1 6px, transparent 6px, transparent 14px)',
+            backgroundImage: 'repeating-linear-gradient(90deg, #8A5D00 0px, #8A5D00 6px, transparent 6px, transparent 14px)',
             opacity: 0.45,
           }}
         />
-        <div className="w-full h-[5px] bg-[#d8fbff] border-y border-[#8ceeff]" />
+        <div className="w-full h-[5px] bg-[#FAF9F6] border-y border-[#E5DEC9]" />
       </div>
 
-      {/* Electric blue median strip separating rail viaduct & avenue */}
-      <div className="absolute inset-x-0 bottom-[33px] sm:bottom-[40px] h-[7px] bg-gradient-to-r from-[#00f0ff]/35 via-[#00d8eb]/55 to-[#00f0ff]/35 z-20" />
+      {/* Taxi gold median strip */}
+      <div className="absolute inset-x-0 bottom-[33px] sm:bottom-[40px] h-[7px] bg-gradient-to-r from-[#F5B800]/35 via-[#F5B800]/65 to-[#F5B800]/35 z-20" />
 
-      {/* Boulevard Asphalt Road with Dashed Lanes & Moving Taxis / Chauffeur Cars */}
-      <div className="absolute inset-x-0 bottom-0 h-[34px] sm:h-[40px] bg-slate-800 border-t-2 border-[#00f0ff]/80 z-30">
-        <div className="w-full h-[2px] bg-slate-600/80" />
+      {/* Boulevard Asphalt Road with Dashed Lanes & Moving Barcelona Taxis */}
+      <div className="absolute inset-x-0 bottom-0 h-[34px] sm:h-[40px] bg-[#0D0F12] border-t-2 border-[#F5B800] z-30">
+        <div className="w-full h-[2px] bg-neutral-700/80" />
         <div
-          className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-[2px] opacity-70"
+          className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-[2px] opacity-75"
           style={{
-            backgroundImage: 'repeating-linear-gradient(90deg, #e6fdff 0px, #e6fdff 18px, transparent 18px, transparent 36px)',
+            backgroundImage: 'repeating-linear-gradient(90deg, #F5B800 0px, #F5B800 18px, transparent 18px, transparent 36px)',
           }}
         />
 
-        {/* Far Lane (Right-to-Left Traffic) */}
+        {/* Far Lane */}
         <div className="absolute bottom-[13px] sm:bottom-[16px] left-0 animate-drive-rtl-fast will-change-transform">
           <TaxiCarSvg variant="bcn-taxi" flipped className="w-20 sm:w-24 h-auto" />
         </div>
@@ -635,7 +631,7 @@ export const TransitCorridorScene: React.FC = () => {
           <TaxiCarSvg variant="vip-van" flipped className="w-24 sm:w-28 h-auto" />
         </div>
 
-        {/* Near Lane (Left-to-Right Traffic) */}
+        {/* Near Lane */}
         <div className="absolute bottom-[2px] left-0 animate-drive-ltr-fast will-change-transform">
           <TaxiCarSvg variant="bcn-taxi" className="w-24 sm:w-28 h-auto" />
         </div>

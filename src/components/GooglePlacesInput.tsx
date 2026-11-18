@@ -477,21 +477,21 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
           }
         }}
         placeholder={placeholder}
-        className="w-full pl-3.5 pr-10 py-2.5 text-sm font-medium bg-[#f5feff] hover:bg-white focus:bg-white border border-[#9beeff] focus:border-[#00b8cc] rounded-xl focus:ring-2 focus:ring-[#00f0ff]/35 outline-none transition-all shadow-2xs"
+        className="w-full pl-3.5 pr-10 py-2.5 text-sm font-medium bg-[#FCFBF7] hover:bg-white focus:bg-white border border-[#E6DFCB] focus:border-[#9A6B00] rounded-xl focus:ring-2 focus:ring-[#F5B800]/35 outline-none transition-all shadow-2xs"
       />
 
       <span className="absolute right-3 top-3 text-slate-400 pointer-events-none">
         {isLoading ? (
-          <Loader2 className="w-4 h-4 text-[#008da1] animate-spin" />
+          <Loader2 className="w-4 h-4 text-[#8A5D00] animate-spin" />
         ) : iconType === 'pickup' ? (
-          <MapPin className="w-4 h-4 text-[#008da1]" />
+          <MapPin className="w-4 h-4 text-[#8A5D00]" />
         ) : (
-          <Navigation className="w-4 h-4 text-[#008da1]" />
+          <Navigation className="w-4 h-4 text-[#8A5D00]" />
         )}
       </span>
 
       {isOpen && suggestions.length > 0 && (
-        <ul className="absolute left-0 right-0 top-full mt-1 bg-white border border-[#67efff] rounded-xl shadow-xl z-40 max-h-60 overflow-y-auto divide-y divide-[#e6fdff] text-xs">
+        <ul className="absolute left-0 right-0 top-full mt-1 bg-white border border-[#DFC670] rounded-xl shadow-xl z-40 max-h-60 overflow-y-auto divide-y divide-[#FBF7E6] text-xs">
           {suggestions.map((item) => (
             <li
               key={item.key}
@@ -499,12 +499,12 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
                 e.preventDefault();
                 void handleSelectItem(item);
               }}
-              className="px-3.5 py-2.5 hover:bg-[#e6fdff] cursor-pointer flex items-start gap-2.5 text-slate-800 transition-colors"
+              className="px-3.5 py-2.5 hover:bg-[#FBF7E6] cursor-pointer flex items-start gap-2.5 text-slate-800 transition-colors"
             >
               {iconType === 'pickup' ? (
-                <MapPin className="w-3.5 h-3.5 text-[#008da1] shrink-0 mt-0.5" />
+                <MapPin className="w-3.5 h-3.5 text-[#8A5D00] shrink-0 mt-0.5" />
               ) : (
-                <Navigation className="w-3.5 h-3.5 text-[#008da1] shrink-0 mt-0.5" />
+                <Navigation className="w-3.5 h-3.5 text-[#8A5D00] shrink-0 mt-0.5" />
               )}
               <div className="min-w-0 flex-1">
                 <span className="font-bold text-slate-900 block truncate">{item.primary}</span>

@@ -708,20 +708,20 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
   return (
     <div
       id="calculator"
-      className="bg-white rounded-2xl shadow-[0_18px_45px_-12px_rgba(0,240,255,0.22)] border border-[#67efff] overflow-hidden transition-all text-slate-900"
+      className="bg-white rounded-2xl shadow-[0_18px_45px_-12px_rgba(13,15,18,0.22)] border border-[#DFC670] overflow-hidden transition-all text-slate-900"
     >
       {/* Calculator Header Bar */}
       {currentStep === 'confirmed' ? (
-        <div className="bg-[#e6fdff] text-slate-900 px-4 sm:px-6 py-3.5 flex items-center justify-between gap-2.5 border-b border-[#8ceeff]">
+        <div className="bg-[#FBF7E6] text-slate-900 px-4 sm:px-6 py-3.5 flex items-center justify-between gap-2.5 border-b border-[#E3D6AD]">
           <div className="flex items-center gap-2">
-            <span className="w-7 h-7 rounded-full bg-[#00f0ff] border border-[#00c8e8] flex items-center justify-center text-slate-950">
+            <span className="w-7 h-7 rounded-full bg-[#F5B800] border border-[#D99F00] flex items-center justify-center text-slate-950">
               <Check className="w-4 h-4 stroke-[3]" />
             </span>
             <div>
-              <span className="text-[10px] uppercase font-extrabold text-[#008da1] tracking-[0.14em] block">
+              <span className="text-[10px] uppercase font-extrabold text-[#8A5D00] tracking-[0.14em] block">
                 Booking Confirmed
               </span>
-              <span className="text-xs sm:text-sm font-extrabold text-[#042f40]">
+              <span className="text-xs sm:text-sm font-extrabold text-[#0D0F12]">
                 Ref: {confirmedBookingInfo?.bookingRef}
               </span>
             </div>
@@ -733,13 +733,13 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
               setCurrentStep('calculator');
               setConfirmedBookingInfo(null);
             }}
-            className="text-xs sm:text-sm font-bold text-[#042f40] hover:text-slate-950 bg-white hover:bg-[#d8fbff] px-3 py-1.5 rounded-lg transition-all cursor-pointer border border-[#67efff] shadow-xs"
+            className="text-xs sm:text-sm font-bold text-[#0D0F12] hover:text-slate-950 bg-white hover:bg-[#FAF6E8] px-3 py-1.5 rounded-lg transition-all cursor-pointer border border-[#DFC670] shadow-xs"
           >
             New Transfer
           </button>
         </div>
       ) : currentStep === 'booking' ? (
-        <div className="bg-[#e6fdff] text-slate-900 px-4 sm:px-6 py-3.5 flex items-center justify-between gap-2.5 border-b border-[#8ceeff]">
+        <div className="bg-[#FBF7E6] text-slate-900 px-4 sm:px-6 py-3.5 flex items-center justify-between gap-2.5 border-b border-[#E3D6AD]">
           <button
             type="button"
             onClick={() => {
@@ -747,14 +747,14 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
               const el = document.getElementById('calculator');
               if (el) el.scrollIntoView({ behavior: 'smooth' });
             }}
-            className="flex items-center gap-2 text-xs sm:text-sm font-bold text-[#042f40] hover:text-slate-950 bg-white hover:bg-[#d8fbff] px-3 py-1.5 rounded-lg transition-all cursor-pointer border border-[#67efff] shadow-xs"
+            className="flex items-center gap-2 text-xs sm:text-sm font-bold text-[#0D0F12] hover:text-slate-950 bg-white hover:bg-[#FAF6E8] px-3 py-1.5 rounded-lg transition-all cursor-pointer border border-[#DFC670] shadow-xs"
           >
-            <ArrowLeft className="w-4 h-4 text-[#008da1]" />
+            <ArrowLeft className="w-4 h-4 text-[#8A5D00]" />
             <span>Modify Route / Back</span>
           </button>
 
           <div className="text-right">
-            <span className="text-[10px] sm:text-xs uppercase font-extrabold text-[#008da1] tracking-[0.14em] block">
+            <span className="text-[10px] sm:text-xs uppercase font-extrabold text-[#8A5D00] tracking-[0.14em] block">
               Step 2 of 2
             </span>
             <span className="text-xs sm:text-sm font-bold text-slate-900">
@@ -763,24 +763,16 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
           </div>
         </div>
       ) : (
-        <div className="bg-[#e6fdff] text-slate-900 px-3.5 sm:px-5 py-2.5 flex flex-col gap-2 border-b border-[#8ceeff]">
-          {/* Full-width top headline — stays on 1 single line on both mobile & desktop */}
-          <h2
-            className="w-full font-display font-extrabold text-[#042f40] whitespace-nowrap tracking-[-0.03em] sm:tracking-tight leading-tight m-0"
-            style={{ fontSize: 'clamp(9px, 2.55vw, 20px)' }}
-          >
-            Private transfers from Barcelona to anywhere in Spain
-          </h2>
-
+        <div className="bg-[#FBF7E6] text-slate-900 px-3.5 sm:px-5 py-2.5 flex flex-col gap-2 border-b border-[#E3D6AD]">
           {/* Trip Mode Switch + Fair Price Badge directly next to Round Trip */}
           <div className="flex items-center gap-2 flex-wrap">
-            <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-[#8ceeff] text-xs font-semibold shadow-2xs">
+            <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-[#E3D6AD] text-xs font-semibold shadow-2xs">
               <button
                 type="button"
                 onClick={() => setIsRoundTrip(false)}
                 className={`px-3 py-1.5 rounded-md transition-all cursor-pointer ${
                   !isRoundTrip
-                    ? 'bg-[#00f0ff] text-slate-950 shadow-[0_2px_10px_-2px_rgba(0,240,255,0.65)] font-extrabold'
+                    ? 'bg-[#F5B800] text-slate-950 shadow-[0_2px_10px_-2px_rgba(245,184,0,0.65)] font-extrabold'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -791,7 +783,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 onClick={() => setIsRoundTrip(true)}
                 className={`px-3 py-1.5 rounded-md transition-all cursor-pointer ${
                   isRoundTrip
-                    ? 'bg-[#00f0ff] text-slate-950 shadow-[0_2px_10px_-2px_rgba(0,240,255,0.65)] font-extrabold'
+                    ? 'bg-[#F5B800] text-slate-950 shadow-[0_2px_10px_-2px_rgba(245,184,0,0.65)] font-extrabold'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -799,7 +791,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
               </button>
             </div>
 
-            <span className="text-[11px] sm:text-xs font-extrabold px-2.5 py-1.5 rounded-lg bg-[#00f0ff] border border-[#00c8e8] text-slate-950 shadow-2xs whitespace-nowrap">
+            <span className="text-[11px] sm:text-xs font-extrabold px-2.5 py-1.5 rounded-lg bg-[#F5B800] border border-[#D99F00] text-slate-950 shadow-2xs whitespace-nowrap">
               Fair Price
             </span>
           </div>
@@ -814,7 +806,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
           <div>
             <div className="flex items-center justify-between gap-1.5 mb-1.5">
               <label htmlFor="pickup-input" className="text-[11px] sm:text-xs font-bold text-slate-700 uppercase tracking-tight sm:tracking-wider flex items-center gap-1 whitespace-nowrap shrink-0">
-                <MapPin className="w-3.5 h-3.5 text-[#008da1] shrink-0" />
+                <MapPin className="w-3.5 h-3.5 text-[#8A5D00] shrink-0" />
                 <span>{t.pickupLabel}</span>
               </label>
 
@@ -826,8 +818,8 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                   }
                   className={`inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold border transition-all cursor-pointer whitespace-nowrap ${
                     pickup.toLowerCase().includes('airport')
-                      ? 'bg-[#00f0ff] border-[#00c8e8] text-slate-950'
-                      : 'bg-[#e6fdff] hover:bg-[#ccfbff] border-[#8ceeff] text-[#042f40]'
+                      ? 'bg-[#F5B800] border-[#D99F00] text-slate-950'
+                      : 'bg-[#FBF7E6] hover:bg-[#F7EDBE] border-[#E3D6AD] text-[#0D0F12]'
                   }`}
                 >
                   <Plane className="w-2.5 h-2.5 shrink-0" />
@@ -836,22 +828,22 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 </button>
 
                 {airportDropdownField === 'pickup' && (
-                  <div className="absolute right-0 top-full mt-1 w-52 bg-white border border-[#67efff] rounded-xl shadow-xl z-50 overflow-hidden divide-y divide-[#e6fdff]">
+                  <div className="absolute right-0 top-full mt-1 w-52 bg-white border border-[#DFC670] rounded-xl shadow-xl z-50 overflow-hidden divide-y divide-[#FBF7E6]">
                     <button
                       type="button"
                       onClick={() => applyQuickLocation('pickup', 'bcn_t1')}
-                      className="w-full px-3 py-2 text-left text-xs font-bold text-slate-800 hover:bg-[#e6fdff] flex items-center justify-between cursor-pointer"
+                      className="w-full px-3 py-2 text-left text-xs font-bold text-slate-800 hover:bg-[#FBF7E6] flex items-center justify-between cursor-pointer"
                     >
                       <span>Terminal 1 (BCN T1)</span>
-                      <Plane className="w-3.5 h-3.5 text-[#008da1]" />
+                      <Plane className="w-3.5 h-3.5 text-[#8A5D00]" />
                     </button>
                     <button
                       type="button"
                       onClick={() => applyQuickLocation('pickup', 'bcn_t2')}
-                      className="w-full px-3 py-2 text-left text-xs font-bold text-slate-800 hover:bg-[#e6fdff] flex items-center justify-between cursor-pointer"
+                      className="w-full px-3 py-2 text-left text-xs font-bold text-slate-800 hover:bg-[#FBF7E6] flex items-center justify-between cursor-pointer"
                     >
                       <span>Terminal 2 (BCN T2)</span>
-                      <Plane className="w-3.5 h-3.5 text-[#008da1]" />
+                      <Plane className="w-3.5 h-3.5 text-[#8A5D00]" />
                     </button>
                   </div>
                 )}
@@ -861,8 +853,8 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                   onClick={() => applyQuickLocation('pickup', 'port')}
                   className={`inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold border transition-all cursor-pointer whitespace-nowrap ${
                     pickup.toLowerCase().includes('cruise') || pickup.toLowerCase().includes('moll adossat')
-                      ? 'bg-[#00f0ff] border-[#00c8e8] text-slate-950'
-                      : 'bg-[#e6fdff] hover:bg-[#ccfbff] border-[#8ceeff] text-[#042f40]'
+                      ? 'bg-[#F5B800] border-[#D99F00] text-slate-950'
+                      : 'bg-[#FBF7E6] hover:bg-[#F7EDBE] border-[#E3D6AD] text-[#0D0F12]'
                   }`}
                 >
                   <Anchor className="w-2.5 h-2.5 shrink-0" />
@@ -874,8 +866,8 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                   onClick={() => applyQuickLocation('pickup', 'sants')}
                   className={`inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold border transition-all cursor-pointer whitespace-nowrap ${
                     pickup.toLowerCase().includes('sants')
-                      ? 'bg-[#00f0ff] border-[#00c8e8] text-slate-950'
-                      : 'bg-[#e6fdff] hover:bg-[#ccfbff] border-[#8ceeff] text-[#042f40]'
+                      ? 'bg-[#F5B800] border-[#D99F00] text-slate-950'
+                      : 'bg-[#FBF7E6] hover:bg-[#F7EDBE] border-[#E3D6AD] text-[#0D0F12]'
                   }`}
                 >
                   <Train className="w-2.5 h-2.5 shrink-0" />
@@ -911,7 +903,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
           <div>
             <div className="flex items-center justify-between gap-1.5 mb-1.5">
               <label htmlFor="dropoff-input" className="text-[11px] sm:text-xs font-bold text-slate-700 uppercase tracking-tight sm:tracking-wider flex items-center gap-1 whitespace-nowrap shrink-0">
-                <Navigation className="w-3.5 h-3.5 text-[#008da1] shrink-0" />
+                <Navigation className="w-3.5 h-3.5 text-[#8A5D00] shrink-0" />
                 <span>{t.dropoffLabel}</span>
               </label>
 
@@ -923,8 +915,8 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                   }
                   className={`inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold border transition-all cursor-pointer whitespace-nowrap ${
                     dropoff.toLowerCase().includes('airport')
-                      ? 'bg-[#00f0ff] border-[#00c8e8] text-slate-950'
-                      : 'bg-[#e6fdff] hover:bg-[#ccfbff] border-[#8ceeff] text-[#042f40]'
+                      ? 'bg-[#F5B800] border-[#D99F00] text-slate-950'
+                      : 'bg-[#FBF7E6] hover:bg-[#F7EDBE] border-[#E3D6AD] text-[#0D0F12]'
                   }`}
                 >
                   <Plane className="w-2.5 h-2.5 shrink-0" />
@@ -933,22 +925,22 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 </button>
 
                 {airportDropdownField === 'dropoff' && (
-                  <div className="absolute right-0 top-full mt-1 w-52 bg-white border border-[#67efff] rounded-xl shadow-xl z-50 overflow-hidden divide-y divide-[#e6fdff]">
+                  <div className="absolute right-0 top-full mt-1 w-52 bg-white border border-[#DFC670] rounded-xl shadow-xl z-50 overflow-hidden divide-y divide-[#FBF7E6]">
                     <button
                       type="button"
                       onClick={() => applyQuickLocation('dropoff', 'bcn_t1')}
-                      className="w-full px-3 py-2 text-left text-xs font-bold text-slate-800 hover:bg-[#e6fdff] flex items-center justify-between cursor-pointer"
+                      className="w-full px-3 py-2 text-left text-xs font-bold text-slate-800 hover:bg-[#FBF7E6] flex items-center justify-between cursor-pointer"
                     >
                       <span>Terminal 1 (BCN T1)</span>
-                      <Plane className="w-3.5 h-3.5 text-[#008da1]" />
+                      <Plane className="w-3.5 h-3.5 text-[#8A5D00]" />
                     </button>
                     <button
                       type="button"
                       onClick={() => applyQuickLocation('dropoff', 'bcn_t2')}
-                      className="w-full px-3 py-2 text-left text-xs font-bold text-slate-800 hover:bg-[#e6fdff] flex items-center justify-between cursor-pointer"
+                      className="w-full px-3 py-2 text-left text-xs font-bold text-slate-800 hover:bg-[#FBF7E6] flex items-center justify-between cursor-pointer"
                     >
                       <span>Terminal 2 (BCN T2)</span>
-                      <Plane className="w-3.5 h-3.5 text-[#008da1]" />
+                      <Plane className="w-3.5 h-3.5 text-[#8A5D00]" />
                     </button>
                   </div>
                 )}
@@ -958,8 +950,8 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                   onClick={() => applyQuickLocation('dropoff', 'port')}
                   className={`inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold border transition-all cursor-pointer whitespace-nowrap ${
                     dropoff.toLowerCase().includes('cruise') || dropoff.toLowerCase().includes('moll adossat')
-                      ? 'bg-[#00f0ff] border-[#00c8e8] text-slate-950'
-                      : 'bg-[#e6fdff] hover:bg-[#ccfbff] border-[#8ceeff] text-[#042f40]'
+                      ? 'bg-[#F5B800] border-[#D99F00] text-slate-950'
+                      : 'bg-[#FBF7E6] hover:bg-[#F7EDBE] border-[#E3D6AD] text-[#0D0F12]'
                   }`}
                 >
                   <Anchor className="w-2.5 h-2.5 shrink-0" />
@@ -971,8 +963,8 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                   onClick={() => applyQuickLocation('dropoff', 'sants')}
                   className={`inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold border transition-all cursor-pointer whitespace-nowrap ${
                     dropoff.toLowerCase().includes('sants')
-                      ? 'bg-[#00f0ff] border-[#00c8e8] text-slate-950'
-                      : 'bg-[#e6fdff] hover:bg-[#ccfbff] border-[#8ceeff] text-[#042f40]'
+                      ? 'bg-[#F5B800] border-[#D99F00] text-slate-950'
+                      : 'bg-[#FBF7E6] hover:bg-[#F7EDBE] border-[#E3D6AD] text-[#0D0F12]'
                   }`}
                 >
                   <Train className="w-2.5 h-2.5 shrink-0" />
@@ -1019,19 +1011,19 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
         </div>
 
         {/* Date & Time Row (Pickup + Optional Return if Round Trip) */}
-        <div className="pt-2 border-t border-[#cff9ff]">
+        <div className="pt-2 border-t border-[#EFE7D1]">
           <div className={`grid grid-cols-1 ${isRoundTrip ? 'sm:grid-cols-2' : ''} gap-2.5`}>
             {/* Box 1: Pickup Date & Time */}
             <div>
               <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 mb-1">
-                <Calendar className="w-3.5 h-3.5 text-[#008da1]" />
+                <Calendar className="w-3.5 h-3.5 text-[#8A5D00]" />
                 <span>Pickup Date & Time</span>
               </label>
               <input
                 type="datetime-local"
                 value={dateTime}
                 onChange={(e) => setDateTime(e.target.value)}
-                className="w-full px-3 py-2 text-xs sm:text-sm bg-[#f5feff] hover:bg-white focus:bg-white border border-[#9beeff] focus:border-[#00b8cc] rounded-xl focus:ring-2 focus:ring-[#00f0ff]/35 outline-none shadow-2xs transition-all font-medium"
+                className="w-full px-3 py-2 text-xs sm:text-sm bg-[#FCFBF7] hover:bg-white focus:bg-white border border-[#E6DFCB] focus:border-[#9A6B00] rounded-xl focus:ring-2 focus:ring-[#F5B800]/35 outline-none shadow-2xs transition-all font-medium"
               />
             </div>
 
@@ -1039,14 +1031,14 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
             {isRoundTrip && (
               <div>
                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 mb-1">
-                  <Clock className="w-3.5 h-3.5 text-[#008da1]" />
+                  <Clock className="w-3.5 h-3.5 text-[#8A5D00]" />
                   <span>Return Date & Time</span>
                 </label>
                 <input
                   type="datetime-local"
                   value={returnDateTime}
                   onChange={(e) => setReturnDateTime(e.target.value)}
-                  className="w-full px-3 py-2 text-xs sm:text-sm bg-[#f5feff] hover:bg-white focus:bg-white border border-[#9beeff] focus:border-[#00b8cc] rounded-xl focus:ring-2 focus:ring-[#00f0ff]/35 outline-none shadow-2xs transition-all font-medium"
+                  className="w-full px-3 py-2 text-xs sm:text-sm bg-[#FCFBF7] hover:bg-white focus:bg-white border border-[#E6DFCB] focus:border-[#9A6B00] rounded-xl focus:ring-2 focus:ring-[#F5B800]/35 outline-none shadow-2xs transition-all font-medium"
                 />
               </div>
             )}
@@ -1054,14 +1046,14 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
         </div>
 
         {/* Merged Option Button: Passengers + Luggage + Child Seat */}
-        <div className="pt-2 border-t border-[#cff9ff]">
+        <div className="pt-2 border-t border-[#EFE7D1]">
           <button
             type="button"
             onClick={() => setShowPassengersLuggageSeats((prev) => !prev)}
             className={`w-full p-2.5 sm:p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-between shadow-2xs ${
               showPassengersLuggageSeats
-                ? 'bg-[#e6fdff] border-[#00c8e8] ring-2 ring-[#00f0ff]/30'
-                : 'bg-[#f5feff] hover:bg-[#e6fdff] border-[#9beeff] hover:border-[#00c8e8]'
+                ? 'bg-[#FBF7E6] border-[#D99F00] ring-2 ring-[#F5B800]/30'
+                : 'bg-[#FCFBF7] hover:bg-[#FBF7E6] border-[#E6DFCB] hover:border-[#D99F00]'
             }`}
           >
             <div className="text-left min-w-0 pr-1 flex-1">
@@ -1075,13 +1067,13 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 className="font-semibold text-slate-600 flex items-center gap-1 sm:gap-1.5 mt-0.5 whitespace-nowrap overflow-hidden"
                 style={{ fontSize: 'clamp(9px, 2.5vw, 11px)' }}
               >
-                <span className="text-[#042f40] font-bold bg-[#e6fdff] px-1.5 py-0.2 rounded border border-[#67efff] shrink-0">
+                <span className="text-[#0D0F12] font-bold bg-[#FBF7E6] px-1.5 py-0.2 rounded border border-[#DFC670] shrink-0">
                   {totalPassengers} Pax
                 </span>
                 <span className="shrink-0">•</span>
                 <span className="text-slate-800 font-semibold shrink-0">{totalBags} Luggage</span>
                 <span className="shrink-0">•</span>
-                <span className="text-[#007c91] font-bold truncate">
+                <span className="text-[#704B00] font-bold truncate">
                   {totalChildSeats > 0
                     ? `${totalChildSeats} Child ${totalChildSeats === 1 ? 'Seat' : 'Seats'}`
                     : 'Child Seat'}
@@ -1090,7 +1082,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
             </div>
 
             <div className="flex items-center shrink-0 ml-1">
-              <span className="text-[9.5px] sm:text-[11px] font-extrabold px-1.5 sm:px-2.5 py-1 rounded-lg bg-[#00f0ff] border border-[#00c8e8] text-slate-950 shadow-xs flex items-center gap-0.5 sm:gap-1 whitespace-nowrap">
+              <span className="text-[9.5px] sm:text-[11px] font-extrabold px-1.5 sm:px-2.5 py-1 rounded-lg bg-[#F5B800] border border-[#D99F00] text-slate-950 shadow-xs flex items-center gap-0.5 sm:gap-1 whitespace-nowrap">
                 <span>{showPassengersLuggageSeats ? 'Close' : 'Choose / Edit'}</span>
                 {showPassengersLuggageSeats ? (
                   <ChevronUp className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
@@ -1103,17 +1095,17 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
 
           {/* Expandable Panel: Passengers, Luggage, Child Seats */}
           {showPassengersLuggageSeats && (
-            <div className="mt-2.5 p-2.5 sm:p-3 bg-white border border-[#67efff] rounded-2xl shadow-md space-y-2.5 transition-all">
+            <div className="mt-2.5 p-2.5 sm:p-3 bg-white border border-[#DFC670] rounded-2xl shadow-md space-y-2.5 transition-all">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-2.5">
                 {/* Box 1: Passengers */}
-                <div className="bg-[#f5feff] border border-[#9beeff] hover:border-[#00c8e8] rounded-xl p-2.5 flex flex-col justify-between shadow-2xs transition-colors">
+                <div className="bg-[#FCFBF7] border border-[#E6DFCB] hover:border-[#D99F00] rounded-xl p-2.5 flex flex-col justify-between shadow-2xs transition-colors">
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
                       <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1">
-                        <Users className="w-3.5 h-3.5 text-[#008da1]" />
+                        <Users className="w-3.5 h-3.5 text-[#8A5D00]" />
                         <span>Passengers</span>
                       </span>
-                      <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-[#e6fdff] text-[#042f40] border border-[#8ceeff]">
+                      <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-[#FBF7E6] text-[#0D0F12] border border-[#E3D6AD]">
                         {totalPassengers} Pax
                       </span>
                     </div>
@@ -1209,7 +1201,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                               }}
                               className={`py-0.5 rounded text-center text-[9px] font-bold transition-all cursor-pointer ${
                                 childAgeGroup === ag.id
-                                  ? 'bg-[#00f0ff] border border-[#00c8e8] text-slate-950 font-extrabold shadow-xs'
+                                  ? 'bg-[#F5B800] border border-[#D99F00] text-slate-950 font-extrabold shadow-xs'
                                   : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100'
                               }`}
                             >
@@ -1223,22 +1215,22 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 </div>
 
                 {/* Box 2: Luggage (Compact 2x2 grid) */}
-                <div className="bg-[#f5feff] border border-[#9beeff] hover:border-[#00c8e8] rounded-xl p-2.5 flex flex-col justify-between shadow-2xs transition-colors">
+                <div className="bg-[#FCFBF7] border border-[#E6DFCB] hover:border-[#D99F00] rounded-xl p-2.5 flex flex-col justify-between shadow-2xs transition-colors">
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
                       <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1">
-                        <Briefcase className="w-3.5 h-3.5 text-[#008da1]" />
+                        <Briefcase className="w-3.5 h-3.5 text-[#8A5D00]" />
                         <span>Luggage</span>
                       </span>
                       <div className="flex items-center gap-1.5">
                         <button
                           type="button"
                           onClick={() => setShowSizeChart(true)}
-                          className="text-[9px] font-bold text-[#042f40] hover:text-slate-950 bg-[#e6fdff] border border-[#8ceeff] px-1.5 py-0.5 rounded flex items-center gap-0.5 cursor-pointer transition-colors"
+                          className="text-[9px] font-bold text-[#0D0F12] hover:text-slate-950 bg-[#FBF7E6] border border-[#E3D6AD] px-1.5 py-0.5 rounded flex items-center gap-0.5 cursor-pointer transition-colors"
                         >
                           <span>📏 Guide</span>
                         </button>
-                        <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full bg-[#e6fdff] text-[#042f40] border border-[#8ceeff]">
+                        <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full bg-[#FBF7E6] text-[#0D0F12] border border-[#E3D6AD]">
                           {totalBags} Bags
                         </span>
                       </div>
@@ -1346,14 +1338,14 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 </div>
 
                 {/* Box 3: Child Seats */}
-                <div className="bg-[#f5feff] border border-[#9beeff] hover:border-[#00c8e8] rounded-xl p-2.5 flex flex-col justify-between shadow-2xs transition-colors">
+                <div className="bg-[#FCFBF7] border border-[#E6DFCB] hover:border-[#D99F00] rounded-xl p-2.5 flex flex-col justify-between shadow-2xs transition-colors">
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
                       <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1">
-                        <Baby className="w-3.5 h-3.5 text-[#008da1]" />
+                        <Baby className="w-3.5 h-3.5 text-[#8A5D00]" />
                         <span>Child Seats</span>
                       </span>
-                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[#e6fdff] text-[#042f40] border border-[#8ceeff]">
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[#FBF7E6] text-[#0D0F12] border border-[#E3D6AD]">
                         +€{CHILD_SEAT_PRICE_EUR} / seat
                       </span>
                     </div>
@@ -1416,18 +1408,18 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                   </div>
 
                   <p className="text-[9px] text-slate-400 mt-1 italic flex items-center gap-1">
-                    <CheckCircle2 className="w-2.5 h-2.5 text-[#008da1] shrink-0" />
+                    <CheckCircle2 className="w-2.5 h-2.5 text-[#8A5D00] shrink-0" />
                     <span>Spanish law compliant · €{CHILD_SEAT_PRICE_EUR} extra per seat</span>
                   </p>
                 </div>
               </div>
 
               {/* Done / Next button */}
-              <div className="flex justify-end pt-1 border-t border-[#cff9ff]">
+              <div className="flex justify-end pt-1 border-t border-[#EFE7D1]">
                 <button
                   type="button"
                   onClick={() => setShowPassengersLuggageSeats(false)}
-                  className="w-full sm:w-auto px-4 py-1.5 rounded-lg bg-[#00f0ff] hover:bg-[#00d8eb] border border-[#00c8e8] text-slate-950 font-extrabold text-xs shadow-xs cursor-pointer flex items-center justify-center gap-1.5 transition-transform active:scale-95"
+                  className="w-full sm:w-auto px-4 py-1.5 rounded-lg bg-[#F5B800] hover:bg-[#E0A600] border border-[#D99F00] text-slate-950 font-extrabold text-xs shadow-xs cursor-pointer flex items-center justify-center gap-1.5 transition-transform active:scale-95"
                 >
                   <span>Done</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -1438,7 +1430,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
         </div>
 
         {/* Step 1 Action Button: Get Price */}
-        <div className="pt-2 border-t border-[#cff9ff]">
+        <div className="pt-2 border-t border-[#EFE7D1]">
           {validationError && (
             <div className="p-2.5 mb-2.5 bg-rose-50 border border-rose-300 rounded-xl text-xs font-bold text-rose-700 flex items-center gap-2">
               <span>⚠️ {validationError}</span>
@@ -1457,7 +1449,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
               const el = document.getElementById('calculator');
               if (el) el.scrollIntoView({ behavior: 'smooth' });
             }}
-            className="w-full flex items-center justify-center gap-2.5 py-3 px-6 rounded-xl bg-[#00f0ff] hover:bg-[#00d8eb] border border-[#00c8e8] text-slate-950 font-extrabold text-base sm:text-lg shadow-[0_6px_20px_-4px_rgba(0,240,255,0.65)] hover:shadow-[0_10px_25px_-4px_rgba(0,240,255,0.8)] transition-all active:scale-[0.98] cursor-pointer font-display"
+            className="w-full flex items-center justify-center gap-2.5 py-3 px-6 rounded-xl bg-[#F5B800] hover:bg-[#E0A600] border border-[#D99F00] text-slate-950 font-extrabold text-base sm:text-lg shadow-[0_6px_20px_-4px_rgba(245,184,0,0.65)] hover:shadow-[0_10px_25px_-4px_rgba(245,184,0,0.8)] transition-all active:scale-[0.98] cursor-pointer font-display"
           >
             <Sparkles className="w-5 h-5 text-slate-950" />
             <span>Get Price</span>
@@ -1478,28 +1470,28 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
       </div>
     ) : currentStep === 'booking' ? (
       /* Step 2: Booking Details, Vehicle, Client Contact, Payment & Summary */
-      <div className="p-4 sm:p-6 bg-[#f5feff] space-y-5">
+      <div className="p-4 sm:p-6 bg-[#FCFBF7] space-y-5">
         {/* Top Meta Quick Facts Chips Row (matching reference booking/details) */}
-        <div className="flex flex-wrap items-center gap-2 pb-3 border-b border-[#9beeff]">
-          <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-white border border-[#9beeff] text-[#042f40] shadow-2xs flex items-center gap-1">
-            <Users className="w-3 h-3 text-[#008da1]" />
+        <div className="flex flex-wrap items-center gap-2 pb-3 border-b border-[#E6DFCB]">
+          <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-white border border-[#E6DFCB] text-[#0D0F12] shadow-2xs flex items-center gap-1">
+            <Users className="w-3 h-3 text-[#8A5D00]" />
             {totalPassengers} {totalPassengers > 1 ? 'Passengers' : 'Passenger'}
           </span>
-          <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-white border border-[#9beeff] text-[#042f40] shadow-2xs flex items-center gap-1">
-            <Briefcase className="w-3 h-3 text-[#008da1]" />
+          <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-white border border-[#E6DFCB] text-[#0D0F12] shadow-2xs flex items-center gap-1">
+            <Briefcase className="w-3 h-3 text-[#8A5D00]" />
             {totalBags} Luggage
           </span>
           {totalChildSeats > 0 && (
-            <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-white border border-[#9beeff] text-[#042f40] shadow-2xs flex items-center gap-1">
-              <Baby className="w-3 h-3 text-[#008da1]" />
+            <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-white border border-[#E6DFCB] text-[#0D0F12] shadow-2xs flex items-center gap-1">
+              <Baby className="w-3 h-3 text-[#8A5D00]" />
               {getSeatDetailsText()}
             </span>
           )}
-          <span className="text-[11px] font-extrabold px-2.5 py-1 rounded-full bg-[#00f0ff] border border-[#00c8e8] text-slate-950 shadow-2xs flex items-center gap-1">
+          <span className="text-[11px] font-extrabold px-2.5 py-1 rounded-full bg-[#F5B800] border border-[#D99F00] text-slate-950 shadow-2xs flex items-center gap-1">
             <Calendar className="w-3 h-3 text-slate-950" />
             {dateTime ? new Date(dateTime).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Flexible Date'}
           </span>
-          <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-[#e6fdff] border border-[#67efff] text-[#042f40] ml-auto">
+          <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-[#FBF7E6] border border-[#DFC670] text-[#0D0F12] ml-auto">
             {isRoundTrip ? 'Round Trip (-10% off)' : 'One Way Fixed'}
           </span>
         </div>
@@ -1508,17 +1500,17 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
           {/* Left Column (lg:col-span-7): Vehicle, Flight, Client Contact & Payment */}
           <div className="lg:col-span-7 space-y-5">
             {/* 1. Vehicle Selection */}
-            <div className="bg-white rounded-2xl border border-[#8ceeff] p-4 shadow-xs space-y-3">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 pb-2 border-b border-[#cff9ff]">
+            <div className="bg-white rounded-2xl border border-[#E3D6AD] p-4 shadow-xs space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 pb-2 border-b border-[#EFE7D1]">
                 <div>
-                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#008da1] block">
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#8A5D00] block">
                     1 · Choose Vehicle
                   </span>
                   <h3 className="font-display font-extrabold text-base text-slate-900">
                     Available Vehicles for Your Trip
                   </h3>
                   {quote?.matchedZone && (
-                    <span className="text-[10px] font-bold text-[#007c91] block mt-0.5">
+                    <span className="text-[10px] font-bold text-[#704B00] block mt-0.5">
                       Zone {quote.matchedZone.zoneNumber} ({quote.matchedZone.district}) · All Supplements Included
                     </span>
                   )}
@@ -1552,20 +1544,20 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                         isDisabled
                           ? 'opacity-40 cursor-not-allowed bg-slate-50 border-slate-200'
                           : isSelected
-                          ? 'border-[#00c8e8] bg-[#e6fdff] shadow-xs ring-2 ring-[#00f0ff]/45 cursor-pointer'
-                          : 'border-[#9beeff] hover:border-[#00c8e8] bg-white hover:bg-[#f0feff] cursor-pointer shadow-2xs'
+                          ? 'border-[#D99F00] bg-[#FBF7E6] shadow-xs ring-2 ring-[#F5B800]/45 cursor-pointer'
+                          : 'border-[#E6DFCB] hover:border-[#D99F00] bg-white hover:bg-[#f0feff] cursor-pointer shadow-2xs'
                       }`}
                     >
                       <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
                         <div
                           className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
-                            isSelected ? 'border-[#042f40] bg-[#00f0ff]' : 'border-slate-300 bg-white'
+                            isSelected ? 'border-[#0D0F12] bg-[#F5B800]' : 'border-slate-300 bg-white'
                           }`}
                         >
                           {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-slate-950" />}
                         </div>
 
-                        <div className="w-14 sm:w-16 h-10 sm:h-11 rounded-lg bg-slate-100 overflow-hidden shrink-0 border border-[#9beeff] shadow-2xs">
+                        <div className="w-14 sm:w-16 h-10 sm:h-11 rounded-lg bg-slate-100 overflow-hidden shrink-0 border border-[#E6DFCB] shadow-2xs">
                           <img src={v.photos[0]} alt={v.name} className="w-full h-full object-cover" loading="lazy" />
                         </div>
 
@@ -1575,7 +1567,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                               {v.name}
                             </h4>
                             {isRecommended && !isDisabled && (
-                              <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-sm bg-[#00f0ff] border border-[#00c8e8] text-slate-950 uppercase tracking-tight">
+                              <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-sm bg-[#F5B800] border border-[#D99F00] text-slate-950 uppercase tracking-tight">
                                 Recommended
                               </span>
                             )}
@@ -1634,20 +1626,20 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                         isDisabled
                           ? 'opacity-40 cursor-not-allowed bg-slate-50 border-slate-200'
                           : isSelected
-                          ? 'border-[#00c8e8] bg-[#e6fdff] shadow-xs ring-2 ring-[#00f0ff]/45 cursor-pointer'
-                          : 'border-[#9beeff] hover:border-[#00c8e8] bg-white hover:bg-[#f0feff] cursor-pointer shadow-2xs'
+                          ? 'border-[#D99F00] bg-[#FBF7E6] shadow-xs ring-2 ring-[#F5B800]/45 cursor-pointer'
+                          : 'border-[#E6DFCB] hover:border-[#D99F00] bg-white hover:bg-[#f0feff] cursor-pointer shadow-2xs'
                       }`}
                     >
                       <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
                         <div
                           className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
-                            isSelected ? 'border-[#042f40] bg-[#00f0ff]' : 'border-slate-300 bg-white'
+                            isSelected ? 'border-[#0D0F12] bg-[#F5B800]' : 'border-slate-300 bg-white'
                           }`}
                         >
                           {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-slate-950" />}
                         </div>
 
-                        <div className="w-14 sm:w-16 h-10 sm:h-11 rounded-lg bg-slate-100 overflow-hidden shrink-0 border border-[#9beeff] shadow-2xs">
+                        <div className="w-14 sm:w-16 h-10 sm:h-11 rounded-lg bg-slate-100 overflow-hidden shrink-0 border border-[#E6DFCB] shadow-2xs">
                           <img src={v.photos[0]} alt={v.name} className="w-full h-full object-cover" loading="lazy" />
                         </div>
 
@@ -1656,11 +1648,11 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                             <h4 className="font-display font-bold text-xs sm:text-sm text-slate-900 leading-tight">
                               {v.name}
                             </h4>
-                            <span className="text-[9px] font-semibold px-1 py-0.2 rounded bg-[#e6fdff] text-[#042f40] border border-[#8ceeff]">
+                            <span className="text-[9px] font-semibold px-1 py-0.2 rounded bg-[#FBF7E6] text-[#0D0F12] border border-[#E3D6AD]">
                               Executive
                             </span>
                             {isRecommended && !isDisabled && (
-                              <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-sm bg-[#00f0ff] border border-[#00c8e8] text-slate-950 uppercase tracking-tight">
+                              <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-sm bg-[#F5B800] border border-[#D99F00] text-slate-950 uppercase tracking-tight">
                                 Recommended
                               </span>
                             )}
@@ -1714,20 +1706,20 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                       onClick={() => setSelectedVehicleId('van')}
                       className={`p-3 rounded-xl border transition-all flex items-center justify-between gap-3 ${
                         isSelected
-                          ? 'border-[#00c8e8] bg-[#e6fdff] shadow-xs ring-2 ring-[#00f0ff]/45 cursor-pointer'
-                          : 'border-[#9beeff] hover:border-[#00c8e8] bg-white hover:bg-[#f0feff] cursor-pointer shadow-2xs'
+                          ? 'border-[#D99F00] bg-[#FBF7E6] shadow-xs ring-2 ring-[#F5B800]/45 cursor-pointer'
+                          : 'border-[#E6DFCB] hover:border-[#D99F00] bg-white hover:bg-[#f0feff] cursor-pointer shadow-2xs'
                       }`}
                     >
                       <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
                         <div
                           className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
-                            isSelected ? 'border-[#042f40] bg-[#00f0ff]' : 'border-slate-300 bg-white'
+                            isSelected ? 'border-[#0D0F12] bg-[#F5B800]' : 'border-slate-300 bg-white'
                           }`}
                         >
                           {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-slate-950" />}
                         </div>
 
-                        <div className="w-14 sm:w-16 h-10 sm:h-11 rounded-lg bg-slate-100 overflow-hidden shrink-0 border border-[#9beeff] shadow-2xs">
+                        <div className="w-14 sm:w-16 h-10 sm:h-11 rounded-lg bg-slate-100 overflow-hidden shrink-0 border border-[#E6DFCB] shadow-2xs">
                           <img src={v.photos[0]} alt={v.name} className="w-full h-full object-cover" loading="lazy" />
                         </div>
 
@@ -1737,7 +1729,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                               Minivan (8-Seater)
                             </h4>
                             {isRecommended && (
-                              <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-sm bg-[#00f0ff] border border-[#00c8e8] text-slate-950 uppercase tracking-tight">
+                              <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-sm bg-[#F5B800] border border-[#D99F00] text-slate-950 uppercase tracking-tight">
                                 Recommended for your group
                               </span>
                             )}
@@ -1770,24 +1762,24 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
             </div>
 
             {/* 2. Flight Details */}
-            <div className="bg-white rounded-2xl border border-[#8ceeff] p-4 shadow-xs space-y-3">
-              <div className="pb-2 border-b border-[#cff9ff] flex items-center justify-between gap-2">
+            <div className="bg-white rounded-2xl border border-[#E3D6AD] p-4 shadow-xs space-y-3">
+              <div className="pb-2 border-b border-[#EFE7D1] flex items-center justify-between gap-2">
                 <div>
-                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#008da1] block">
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#8A5D00] block">
                     2 · Flight Details
                   </span>
                   <h3 className="font-display font-extrabold text-base text-slate-900">
                     Flight Number (Optional)
                   </h3>
                 </div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#e6fdff] border border-[#8ceeff] text-[#042f40]">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FBF7E6] border border-[#E3D6AD] text-[#0D0F12]">
                   60m Free Waiting
                 </span>
               </div>
 
               <div>
                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 mb-1.5">
-                  <Plane className="w-3.5 h-3.5 text-[#008da1]" />
+                  <Plane className="w-3.5 h-3.5 text-[#8A5D00]" />
                   <span>Flight Number</span>
                 </label>
                 <div className="relative">
@@ -1796,9 +1788,9 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                     value={flightNumber}
                     onChange={(e) => setFlightNumber(e.target.value.toUpperCase())}
                     placeholder="e.g. VY1451, FR6302, U28574"
-                    className="w-full pl-3.5 pr-10 py-2.5 text-sm font-medium bg-[#f5feff] hover:bg-white focus:bg-white border border-[#9beeff] focus:border-[#00b8cc] rounded-xl focus:ring-2 focus:ring-[#00f0ff]/35 outline-none transition-all shadow-2xs"
+                    className="w-full pl-3.5 pr-10 py-2.5 text-sm font-medium bg-[#FCFBF7] hover:bg-white focus:bg-white border border-[#E6DFCB] focus:border-[#9A6B00] rounded-xl focus:ring-2 focus:ring-[#F5B800]/35 outline-none transition-all shadow-2xs"
                   />
-                  <Plane className="w-4 h-4 text-[#008da1] absolute right-3 top-3" />
+                  <Plane className="w-4 h-4 text-[#8A5D00] absolute right-3 top-3" />
                 </div>
                 <p className="text-[11px] text-slate-500 mt-1.5">
                   We monitor your flight live — if your flight is delayed, your chauffeur automatically adjusts pickup time.
@@ -1807,9 +1799,9 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
             </div>
 
             {/* 3. Client Details & Driver Notes */}
-            <div className="bg-white rounded-2xl border border-[#8ceeff] p-4 shadow-xs space-y-3.5">
-              <div className="pb-2 border-b border-[#cff9ff]">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#008da1] block">
+            <div className="bg-white rounded-2xl border border-[#E3D6AD] p-4 shadow-xs space-y-3.5">
+              <div className="pb-2 border-b border-[#EFE7D1]">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#8A5D00] block">
                   3 · Client Details
                 </span>
                 <h3 className="font-display font-extrabold text-base text-slate-900">
@@ -1824,7 +1816,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 {/* Full Name */}
                 <div>
                   <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 mb-1">
-                    <User className="w-3.5 h-3.5 text-[#008da1]" />
+                    <User className="w-3.5 h-3.5 text-[#8A5D00]" />
                     <span>Full Name *</span>
                   </label>
                   <input
@@ -1836,14 +1828,14 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                     }}
                     placeholder="As shown on ID / Greeting sign"
                     required
-                    className="w-full px-3 py-2.5 text-xs sm:text-sm font-medium bg-[#f5feff] hover:bg-white focus:bg-white border border-[#9beeff] focus:border-[#00b8cc] rounded-xl focus:ring-2 focus:ring-[#00f0ff]/35 outline-none transition-all shadow-2xs"
+                    className="w-full px-3 py-2.5 text-xs sm:text-sm font-medium bg-[#FCFBF7] hover:bg-white focus:bg-white border border-[#E6DFCB] focus:border-[#9A6B00] rounded-xl focus:ring-2 focus:ring-[#F5B800]/35 outline-none transition-all shadow-2xs"
                   />
                 </div>
 
                 {/* Email */}
                 <div>
                   <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 mb-1">
-                    <Mail className="w-3.5 h-3.5 text-[#008da1]" />
+                    <Mail className="w-3.5 h-3.5 text-[#8A5D00]" />
                     <span>Email Address *</span>
                   </label>
                   <input
@@ -1855,7 +1847,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                     }}
                     placeholder="name@example.com"
                     required
-                    className="w-full px-3 py-2.5 text-xs sm:text-sm font-medium bg-[#f5feff] hover:bg-white focus:bg-white border border-[#9beeff] focus:border-[#00b8cc] rounded-xl focus:ring-2 focus:ring-[#00f0ff]/35 outline-none transition-all shadow-2xs"
+                    className="w-full px-3 py-2.5 text-xs sm:text-sm font-medium bg-[#FCFBF7] hover:bg-white focus:bg-white border border-[#E6DFCB] focus:border-[#9A6B00] rounded-xl focus:ring-2 focus:ring-[#F5B800]/35 outline-none transition-all shadow-2xs"
                   />
                 </div>
               </div>
@@ -1863,7 +1855,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
               {/* Phone Number with Searchable Country Code Picker */}
               <div>
                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 mb-1">
-                  <Phone className="w-3.5 h-3.5 text-[#008da1]" />
+                  <Phone className="w-3.5 h-3.5 text-[#8A5D00]" />
                   <span>Phone / WhatsApp Number *</span>
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-12 gap-2">
@@ -1883,13 +1875,13 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                           setCountrySearch(e.target.value);
                           setShowCountryList(true);
                         }}
-                        className="w-full pl-3 pr-8 py-2.5 text-xs sm:text-sm font-medium bg-[#f5feff] hover:bg-white focus:bg-white border border-[#9beeff] focus:border-[#00b8cc] rounded-xl focus:ring-2 focus:ring-[#00f0ff]/35 outline-none transition-all shadow-2xs"
+                        className="w-full pl-3 pr-8 py-2.5 text-xs sm:text-sm font-medium bg-[#FCFBF7] hover:bg-white focus:bg-white border border-[#E6DFCB] focus:border-[#9A6B00] rounded-xl focus:ring-2 focus:ring-[#F5B800]/35 outline-none transition-all shadow-2xs"
                       />
-                      <Search className="w-3.5 h-3.5 text-[#008da1] absolute right-2.5 top-3 pointer-events-none" />
+                      <Search className="w-3.5 h-3.5 text-[#8A5D00] absolute right-2.5 top-3 pointer-events-none" />
                     </div>
 
                     {showCountryList && (
-                      <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-[#8ceeff] rounded-xl shadow-xl z-40 max-h-52 overflow-y-auto divide-y divide-[#e6fdff] text-xs">
+                      <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-[#E3D6AD] rounded-xl shadow-xl z-40 max-h-52 overflow-y-auto divide-y divide-[#FBF7E6] text-xs">
                         {COUNTRY_CODES.filter((c) => {
                           const q = countrySearch.toLowerCase().trim();
                           if (!q) return true;
@@ -1907,14 +1899,14 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                               setCountrySearch(`${c.flag} ${c.name} (${c.dialCode})`);
                               setShowCountryList(false);
                             }}
-                            className={`w-full text-left px-3 py-2 flex items-center justify-between hover:bg-[#e6fdff] cursor-pointer transition-colors ${
-                              selectedCountry.iso2 === c.iso2 ? 'bg-[#e6fdff] font-bold text-[#042f40]' : 'text-slate-800'
+                            className={`w-full text-left px-3 py-2 flex items-center justify-between hover:bg-[#FBF7E6] cursor-pointer transition-colors ${
+                              selectedCountry.iso2 === c.iso2 ? 'bg-[#FBF7E6] font-bold text-[#0D0F12]' : 'text-slate-800'
                             }`}
                           >
                             <span className="truncate">
                               {c.flag} {c.name}
                             </span>
-                            <span className="font-bold text-[#008da1] ml-2 shrink-0">{c.dialCode}</span>
+                            <span className="font-bold text-[#8A5D00] ml-2 shrink-0">{c.dialCode}</span>
                           </button>
                         ))}
                       </div>
@@ -1932,14 +1924,14 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                       }}
                       placeholder="6XX XXX XXX"
                       required
-                      className="w-full px-3 py-2.5 text-xs sm:text-sm font-medium bg-[#f5feff] hover:bg-white focus:bg-white border border-[#9beeff] focus:border-[#00b8cc] rounded-xl focus:ring-2 focus:ring-[#00f0ff]/35 outline-none transition-all shadow-2xs"
+                      className="w-full px-3 py-2.5 text-xs sm:text-sm font-medium bg-[#FCFBF7] hover:bg-white focus:bg-white border border-[#E6DFCB] focus:border-[#9A6B00] rounded-xl focus:ring-2 focus:ring-[#F5B800]/35 outline-none transition-all shadow-2xs"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Driver Notes Toggle + Quick Accessibility/Bulky Luggage Options */}
-              <div className="pt-2 border-t border-[#cff9ff] space-y-2.5">
+              <div className="pt-2 border-t border-[#EFE7D1] space-y-2.5">
                 <label className="inline-flex items-center gap-2.5 cursor-pointer select-none">
                   <input
                     type="checkbox"
@@ -1953,9 +1945,9 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                         setDriverNotesText('');
                       }
                     }}
-                    className="w-4 h-4 accent-[#00c8e8] rounded cursor-pointer"
+                    className="w-4 h-4 accent-[#D99F00] rounded cursor-pointer"
                   />
-                  <span className="text-xs sm:text-sm font-bold text-[#042f40]">
+                  <span className="text-xs sm:text-sm font-bold text-[#0D0F12]">
                     Add notes for the driver
                   </span>
                 </label>
@@ -1967,22 +1959,22 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                       value={driverNotesText}
                       onChange={(e) => setDriverNotesText(e.target.value)}
                       placeholder="Type any extra instructions for your driver (hotel gate, cruise ship name, extra stop)..."
-                      className="w-full px-3 py-2 text-xs sm:text-sm bg-[#f5feff] hover:bg-white focus:bg-white border border-[#9beeff] focus:border-[#00b8cc] rounded-xl focus:ring-2 focus:ring-[#00f0ff]/35 outline-none transition-all resize-none"
+                      className="w-full px-3 py-2 text-xs sm:text-sm bg-[#FCFBF7] hover:bg-white focus:bg-white border border-[#E6DFCB] focus:border-[#9A6B00] rounded-xl focus:ring-2 focus:ring-[#F5B800]/35 outline-none transition-all resize-none"
                     />
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       <label
                         className={`p-2.5 rounded-xl border flex items-start gap-2 cursor-pointer transition-all ${
                           bulkyLuggage
-                            ? 'bg-[#e6fdff] border-[#00c8e8] shadow-2xs'
-                            : 'bg-[#f5feff] border-[#9beeff] hover:border-[#00c8e8]'
+                            ? 'bg-[#FBF7E6] border-[#D99F00] shadow-2xs'
+                            : 'bg-[#FCFBF7] border-[#E6DFCB] hover:border-[#D99F00]'
                         }`}
                       >
                         <input
                           type="checkbox"
                           checked={bulkyLuggage}
                           onChange={(e) => setBulkyLuggage(e.target.checked)}
-                          className="w-4 h-4 mt-0.5 accent-[#00c8e8] rounded cursor-pointer shrink-0"
+                          className="w-4 h-4 mt-0.5 accent-[#D99F00] rounded cursor-pointer shrink-0"
                         />
                         <div className="text-xs leading-tight">
                           <span className="font-bold text-slate-900 block">Bulky luggage</span>
@@ -1993,15 +1985,15 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                       <label
                         className={`p-2.5 rounded-xl border flex items-start gap-2 cursor-pointer transition-all ${
                           wheelchairAccessible
-                            ? 'bg-[#e6fdff] border-[#00c8e8] shadow-2xs'
-                            : 'bg-[#f5feff] border-[#9beeff] hover:border-[#00c8e8]'
+                            ? 'bg-[#FBF7E6] border-[#D99F00] shadow-2xs'
+                            : 'bg-[#FCFBF7] border-[#E6DFCB] hover:border-[#D99F00]'
                         }`}
                       >
                         <input
                           type="checkbox"
                           checked={wheelchairAccessible}
                           onChange={(e) => setWheelchairAccessible(e.target.checked)}
-                          className="w-4 h-4 mt-0.5 accent-[#00c8e8] rounded cursor-pointer shrink-0"
+                          className="w-4 h-4 mt-0.5 accent-[#D99F00] rounded cursor-pointer shrink-0"
                         />
                         <div className="text-xs leading-tight">
                           <span className="font-bold text-slate-900 block">Wheelchair accessible vehicle</span>
@@ -2015,17 +2007,17 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
             </div>
 
             {/* 4. Payment Options (Card Payment, PayPal, Cash to Driver) */}
-            <div className="bg-white rounded-2xl border border-[#8ceeff] p-4 shadow-xs space-y-3">
-              <div className="pb-2 border-b border-[#cff9ff] flex items-center justify-between gap-2">
+            <div className="bg-white rounded-2xl border border-[#E3D6AD] p-4 shadow-xs space-y-3">
+              <div className="pb-2 border-b border-[#EFE7D1] flex items-center justify-between gap-2">
                 <div>
-                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#008da1] block">
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#8A5D00] block">
                     4 · Payment Options
                   </span>
                   <h3 className="font-display font-extrabold text-base text-slate-900">
                     Choose Payment Method
                   </h3>
                 </div>
-                <span className="text-[10px] font-bold text-[#007c91] flex items-center gap-1">
+                <span className="text-[10px] font-bold text-[#704B00] flex items-center gap-1">
                   <Lock className="w-3 h-3" /> Secure · 0 Booking Fee
                 </span>
               </div>
@@ -2036,22 +2028,22 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                   onClick={() => setPaymentMethod('card')}
                   className={`p-3 rounded-xl border transition-all cursor-pointer ${
                     paymentMethod === 'card'
-                      ? 'border-[#00c8e8] bg-[#e6fdff] ring-2 ring-[#00f0ff]/45 shadow-xs'
-                      : 'border-[#9beeff] bg-[#f5feff] hover:bg-[#e6fdff]/60'
+                      ? 'border-[#D99F00] bg-[#FBF7E6] ring-2 ring-[#F5B800]/45 shadow-xs'
+                      : 'border-[#E6DFCB] bg-[#FCFBF7] hover:bg-[#FBF7E6]/60'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-start gap-2.5">
                       <div
                         className={`w-4 h-4 mt-0.5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                          paymentMethod === 'card' ? 'border-[#042f40] bg-[#00f0ff]' : 'border-slate-300 bg-white'
+                          paymentMethod === 'card' ? 'border-[#0D0F12] bg-[#F5B800]' : 'border-slate-300 bg-white'
                         }`}
                       >
                         {paymentMethod === 'card' && <div className="w-1.5 h-1.5 rounded-full bg-slate-950" />}
                       </div>
                       <div>
                         <div className="flex items-center gap-2 flex-wrap">
-                          <CreditCard className="w-4 h-4 text-[#008da1]" />
+                          <CreditCard className="w-4 h-4 text-[#8A5D00]" />
                           <span className="font-display font-bold text-xs sm:text-sm text-slate-900">
                             Card Payment (Visa / Mastercard / Amex)
                           </span>
@@ -2063,13 +2055,13 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                     </div>
 
                     <div className="flex items-center gap-1 shrink-0">
-                      <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-white border border-[#9beeff] text-[#042f40]">
+                      <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-white border border-[#E6DFCB] text-[#0D0F12]">
                         VISA
                       </span>
-                      <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-white border border-[#9beeff] text-[#042f40]">
+                      <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-white border border-[#E6DFCB] text-[#0D0F12]">
                         MC
                       </span>
-                      <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-white border border-[#9beeff] text-[#042f40] hidden sm:inline">
+                      <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-white border border-[#E6DFCB] text-[#0D0F12] hidden sm:inline">
                         AMEX
                       </span>
                     </div>
@@ -2077,7 +2069,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
 
                   {paymentMethod === 'card' && (
                     <div
-                      className="mt-2.5 pt-2.5 border-t border-[#9beeff] flex flex-wrap gap-2 pl-6"
+                      className="mt-2.5 pt-2.5 border-t border-[#E6DFCB] flex flex-wrap gap-2 pl-6"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <button
@@ -2085,8 +2077,8 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                         onClick={() => setCardPreference('online')}
                         className={`text-[11px] px-2.5 py-1 rounded-lg border font-bold cursor-pointer transition-all flex items-center gap-1 ${
                           cardPreference === 'online'
-                            ? 'bg-[#00f0ff] border-[#00c8e8] text-slate-950 font-extrabold shadow-2xs'
-                            : 'bg-white border-[#9beeff] text-slate-700 hover:bg-[#d8fbff]'
+                            ? 'bg-[#F5B800] border-[#D99F00] text-slate-950 font-extrabold shadow-2xs'
+                            : 'bg-white border-[#E6DFCB] text-slate-700 hover:bg-[#FAF6E8]'
                         }`}
                       >
                         {cardPreference === 'online' && <Check className="w-3 h-3" />}
@@ -2097,8 +2089,8 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                         onClick={() => setCardPreference('vehicle')}
                         className={`text-[11px] px-2.5 py-1 rounded-lg border font-bold cursor-pointer transition-all flex items-center gap-1 ${
                           cardPreference === 'vehicle'
-                            ? 'bg-[#00f0ff] border-[#00c8e8] text-slate-950 font-extrabold shadow-2xs'
-                            : 'bg-white border-[#9beeff] text-slate-700 hover:bg-[#d8fbff]'
+                            ? 'bg-[#F5B800] border-[#D99F00] text-slate-950 font-extrabold shadow-2xs'
+                            : 'bg-white border-[#E6DFCB] text-slate-700 hover:bg-[#FAF6E8]'
                         }`}
                       >
                         {cardPreference === 'vehicle' && <Check className="w-3 h-3" />}
@@ -2113,21 +2105,21 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                   onClick={() => setPaymentMethod('paypal')}
                   className={`p-3 rounded-xl border transition-all cursor-pointer flex items-start justify-between gap-3 ${
                     paymentMethod === 'paypal'
-                      ? 'border-[#00c8e8] bg-[#e6fdff] ring-2 ring-[#00f0ff]/45 shadow-xs'
-                      : 'border-[#9beeff] bg-[#f5feff] hover:bg-[#e6fdff]/60'
+                      ? 'border-[#D99F00] bg-[#FBF7E6] ring-2 ring-[#F5B800]/45 shadow-xs'
+                      : 'border-[#E6DFCB] bg-[#FCFBF7] hover:bg-[#FBF7E6]/60'
                   }`}
                 >
                   <div className="flex items-start gap-2.5">
                     <div
                       className={`w-4 h-4 mt-0.5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                        paymentMethod === 'paypal' ? 'border-[#042f40] bg-[#00f0ff]' : 'border-slate-300 bg-white'
+                        paymentMethod === 'paypal' ? 'border-[#0D0F12] bg-[#F5B800]' : 'border-slate-300 bg-white'
                       }`}
                     >
                       {paymentMethod === 'paypal' && <div className="w-1.5 h-1.5 rounded-full bg-slate-950" />}
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <Wallet className="w-4 h-4 text-[#008da1]" />
+                        <Wallet className="w-4 h-4 text-[#8A5D00]" />
                         <span className="font-display font-bold text-xs sm:text-sm text-slate-900">
                           PayPal
                         </span>
@@ -2137,7 +2129,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                       </p>
                     </div>
                   </div>
-                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded bg-white border border-[#9beeff] text-[#042f40] shrink-0">
+                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded bg-white border border-[#E6DFCB] text-[#0D0F12] shrink-0">
                     PayPal
                   </span>
                 </div>
@@ -2147,21 +2139,21 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                   onClick={() => setPaymentMethod('cash')}
                   className={`p-3 rounded-xl border transition-all cursor-pointer flex items-start justify-between gap-3 ${
                     paymentMethod === 'cash'
-                      ? 'border-[#00c8e8] bg-[#e6fdff] ring-2 ring-[#00f0ff]/45 shadow-xs'
-                      : 'border-[#9beeff] bg-[#f5feff] hover:bg-[#e6fdff]/60'
+                      ? 'border-[#D99F00] bg-[#FBF7E6] ring-2 ring-[#F5B800]/45 shadow-xs'
+                      : 'border-[#E6DFCB] bg-[#FCFBF7] hover:bg-[#FBF7E6]/60'
                   }`}
                 >
                   <div className="flex items-start gap-2.5">
                     <div
                       className={`w-4 h-4 mt-0.5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                        paymentMethod === 'cash' ? 'border-[#042f40] bg-[#00f0ff]' : 'border-slate-300 bg-white'
+                        paymentMethod === 'cash' ? 'border-[#0D0F12] bg-[#F5B800]' : 'border-slate-300 bg-white'
                       }`}
                     >
                       {paymentMethod === 'cash' && <div className="w-1.5 h-1.5 rounded-full bg-slate-950" />}
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <Banknote className="w-4 h-4 text-[#008da1]" />
+                        <Banknote className="w-4 h-4 text-[#8A5D00]" />
                         <span className="font-display font-bold text-xs sm:text-sm text-slate-900">
                           Cash to Chauffeur on Arrival
                         </span>
@@ -2171,7 +2163,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                       </p>
                     </div>
                   </div>
-                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded bg-white border border-[#9beeff] text-[#042f40] shrink-0">
+                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded bg-white border border-[#E6DFCB] text-[#0D0F12] shrink-0">
                     € Cash
                   </span>
                 </div>
@@ -2181,17 +2173,17 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
 
           {/* Right Column (lg:col-span-5): Confirmation Details & Ride Summary (Sticky) */}
           <div className="lg:col-span-5">
-            <div className="bg-white rounded-2xl border border-[#8ceeff] p-4 sm:p-5 shadow-md space-y-4 sticky top-4">
-              <div className="border-b border-[#cff9ff] pb-3 flex items-center justify-between">
+            <div className="bg-white rounded-2xl border border-[#E3D6AD] p-4 sm:p-5 shadow-md space-y-4 sticky top-4">
+              <div className="border-b border-[#EFE7D1] pb-3 flex items-center justify-between">
                 <div>
-                  <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#008da1] block">
+                  <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#8A5D00] block">
                     Review & Confirm
                   </span>
                   <h3 className="font-display font-extrabold text-base text-slate-900">
                     Ride & Payment Summary
                   </h3>
                 </div>
-                <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-[#00f0ff] border border-[#00c8e8] text-slate-950">
+                <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-[#F5B800] border border-[#D99F00] text-slate-950">
                   Fixed Fare
                 </span>
               </div>
@@ -2199,7 +2191,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
               {/* Route Visual Line */}
               <div className="space-y-2 text-xs">
                 <div className="flex items-start gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#00d4e6] mt-1 shrink-0"></span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#E0A600] mt-1 shrink-0"></span>
                   <div className="min-w-0">
                     <span className="text-[10px] uppercase font-bold text-slate-400 block">Pick-up Location</span>
                     <span className="font-bold text-slate-800 break-words">{pickup}</span>
@@ -2216,7 +2208,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
               </div>
 
               {/* Date, Pax, Luggage, Distance, Child Seats Grid */}
-              <div className="grid grid-cols-2 gap-2 text-[11px] bg-[#f5feff] p-2.5 rounded-xl border border-[#cff9ff]">
+              <div className="grid grid-cols-2 gap-2 text-[11px] bg-[#FCFBF7] p-2.5 rounded-xl border border-[#EFE7D1]">
                 <div>
                   <span className="text-slate-400 block text-[10px]">Date & Time</span>
                   <span className="font-bold text-slate-800">{dateTime || 'Flexible'}</span>
@@ -2245,22 +2237,22 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                     <span className="text-slate-400 block text-[10px]">
                       Child Seats (+€{totalChildSeats * CHILD_SEAT_PRICE_EUR})
                     </span>
-                    <span className="font-bold text-[#007c91]">{getSeatDetailsText()}</span>
+                    <span className="font-bold text-[#704B00]">{getSeatDetailsText()}</span>
                   </div>
                 )}
                 {flightNumber.trim() && (
                   <div className="col-span-2">
                     <span className="text-slate-400 block text-[10px]">Flight Number</span>
-                    <span className="font-bold text-[#042f40]">{flightNumber.trim()}</span>
+                    <span className="font-bold text-[#0D0F12]">{flightNumber.trim()}</span>
                   </div>
                 )}
               </div>
 
               {/* Selected Vehicle & Price Breakdown Box */}
-              <div className="bg-[#e6fdff] border border-[#67efff] rounded-xl p-3">
+              <div className="bg-[#FBF7E6] border border-[#DFC670] rounded-xl p-3">
                 <div className="flex items-center justify-between mb-1.5">
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#007c91] block">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#704B00] block">
                       Selected Vehicle
                     </span>
                     <span className="font-display font-extrabold text-sm text-slate-900">
@@ -2268,7 +2260,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                     </span>
                   </div>
                   <div className="text-right">
-                    <span className="text-2xl font-extrabold text-[#042f40] font-display block tabular-nums">
+                    <span className="text-2xl font-extrabold text-[#0D0F12] font-display block tabular-nums">
                       €{finalQuotedPrice}
                     </span>
                     <span className="text-[10px] font-bold text-slate-600">
@@ -2277,38 +2269,38 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                   </div>
                 </div>
 
-                <div className="text-[10px] text-slate-600 border-t border-[#9beeff] pt-1.5 space-y-0.5">
+                <div className="text-[10px] text-slate-600 border-t border-[#E6DFCB] pt-1.5 space-y-0.5">
                   <div className="flex justify-between">
                     <span>Base Transfer Fare:</span>
-                    <span className="font-bold text-[#042f40]">
+                    <span className="font-bold text-[#0D0F12]">
                       €{currentVehicleQuote?.basePrice ?? (activeVehicleData.id === 'van' ? 70 : activeVehicleData.id === 'comfort' ? 60 : 50)}
                     </span>
                   </div>
                   {totalChildSeats > 0 && (
                     <div className="flex justify-between">
                       <span>Extra Child Seats ({totalChildSeats} × €{CHILD_SEAT_PRICE_EUR}):</span>
-                      <span className="font-bold text-[#007c91]">
+                      <span className="font-bold text-[#704B00]">
                         +€{totalChildSeats * CHILD_SEAT_PRICE_EUR}
                       </span>
                     </div>
                   )}
                   <div className="flex justify-between">
                     <span>Payment Method:</span>
-                    <span className="font-bold text-[#042f40] text-right max-w-[60%] truncate">
+                    <span className="font-bold text-[#0D0F12] text-right max-w-[60%] truncate">
                       {paymentMethod === 'card' ? 'Card (Visa/MC/Amex)' : paymentMethod === 'paypal' ? 'PayPal' : 'Cash to Driver'}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span>All Zone Supplements &amp; Tolls:</span>
-                    <span className="font-bold text-[#007c91]">Included (€0)</span>
+                    <span className="font-bold text-[#704B00]">Included (€0)</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Meet & Greet with Name Sign:</span>
-                    <span className="font-bold text-[#007c91]">Included (€0)</span>
+                    <span className="font-bold text-[#704B00]">Included (€0)</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Flight Delay Monitoring:</span>
-                    <span className="font-bold text-[#007c91]">Included (€0)</span>
+                    <span className="font-bold text-[#704B00]">Included (€0)</span>
                   </div>
                 </div>
               </div>
@@ -2326,7 +2318,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                   type="button"
                   onClick={handleConfirmBooking}
                   disabled={confirmingBooking}
-                  className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#00f0ff] hover:bg-[#00d8eb] border border-[#00c8e8] text-slate-950 font-extrabold text-sm sm:text-base shadow-[0_6px_20px_-4px_rgba(0,240,255,0.6)] transition-all active:scale-[0.98] cursor-pointer font-display disabled:opacity-70"
+                  className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#F5B800] hover:bg-[#E0A600] border border-[#D99F00] text-slate-950 font-extrabold text-sm sm:text-base shadow-[0_6px_20px_-4px_rgba(245,184,0,0.6)] transition-all active:scale-[0.98] cursor-pointer font-display disabled:opacity-70"
                 >
                   {confirmingBooking ? (
                     <>
@@ -2344,26 +2336,26 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 <button
                   type="button"
                   onClick={handleViewVoucher}
-                  className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-[#e6fdff] hover:bg-[#ccfbff] text-[#042f40] font-bold text-xs border border-[#67efff] shadow-2xs transition-all active:scale-[0.98] cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-[#FBF7E6] hover:bg-[#F7EDBE] text-[#0D0F12] font-bold text-xs border border-[#DFC670] shadow-2xs transition-all active:scale-[0.98] cursor-pointer"
                 >
-                  <FileText className="w-3.5 h-3.5 text-[#008da1]" />
+                  <FileText className="w-3.5 h-3.5 text-[#8A5D00]" />
                   <span>View Official Printable Voucher</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={handleBookWhatsApp}
-                  className="w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-white hover:bg-[#f5feff] text-[#007c91] font-bold text-xs border border-[#9beeff] transition-all cursor-pointer"
+                  className="w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-white hover:bg-[#FCFBF7] text-[#704B00] font-bold text-xs border border-[#E6DFCB] transition-all cursor-pointer"
                 >
-                  <MessageCircle className="w-3.5 h-3.5 text-[#008da1]" />
+                  <MessageCircle className="w-3.5 h-3.5 text-[#8A5D00]" />
                   <span>Confirm Directly on WhatsApp</span>
                 </button>
               </div>
 
               {/* Trust Badges */}
-              <div className="pt-2 border-t border-[#cff9ff] text-[10px] text-slate-500 space-y-1 text-center">
+              <div className="pt-2 border-t border-[#EFE7D1] text-[10px] text-slate-500 space-y-1 text-center">
                 <p className="flex items-center justify-center gap-1.5 font-medium">
-                  <ShieldCheck className="w-3.5 h-3.5 text-[#008da1]" />
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#8A5D00]" />
                   <span>Instant Email & WhatsApp confirmation · 0 booking fee</span>
                 </p>
                 <p className="text-slate-400">
@@ -2376,19 +2368,19 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
       </div>
     ) : (
       /* Step 3: Executive Boarding-Pass Booking Confirmed Screen */
-      <div className="p-4 sm:p-8 bg-[#f5feff]">
-        <div className="max-w-2xl mx-auto bg-white rounded-2xl border border-[#67efff] shadow-[0_14px_40px_-10px_rgba(0,180,216,0.2)] overflow-hidden">
-          <div className="h-1.5 w-full bg-[#00f0ff]" />
+      <div className="p-4 sm:p-8 bg-[#FCFBF7]">
+        <div className="max-w-2xl mx-auto bg-white rounded-2xl border border-[#DFC670] shadow-[0_14px_40px_-10px_rgba(0,180,216,0.2)] overflow-hidden">
+          <div className="h-1.5 w-full bg-[#F5B800]" />
           <div className="p-5 sm:p-7 space-y-5">
             {/* Header + Ref Badge */}
-            <div className="text-center space-y-2 pb-4 border-b border-[#cff9ff]">
-              <div className="w-12 h-12 rounded-2xl bg-[#00f0ff] border border-[#00c8e8] flex items-center justify-center mx-auto shadow-[0_6px_18px_-4px_rgba(0,240,255,0.6)]">
+            <div className="text-center space-y-2 pb-4 border-b border-[#EFE7D1]">
+              <div className="w-12 h-12 rounded-2xl bg-[#F5B800] border border-[#D99F00] flex items-center justify-center mx-auto shadow-[0_6px_18px_-4px_rgba(245,184,0,0.6)]">
                 <CheckCircle2 className="w-7 h-7 text-slate-950" />
               </div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#e6fdff] border border-[#67efff] text-[11px] font-extrabold text-[#007c91]">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FBF7E6] border border-[#DFC670] text-[11px] font-extrabold text-[#704B00]">
                 <span>OFFICIAL REF: {confirmedBookingInfo?.bookingRef}</span>
               </div>
-              <h3 className="font-display font-extrabold text-xl sm:text-2xl text-[#042f40]">
+              <h3 className="font-display font-extrabold text-xl sm:text-2xl text-[#0D0F12]">
                 Transfer Confirmed, {passengerName}!
               </h3>
               <p className="text-xs sm:text-sm text-slate-600">
@@ -2397,23 +2389,23 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
             </div>
 
             {/* Route Visual Boarding Card */}
-            <div className="rounded-xl bg-[#f5feff] border border-[#8ceeff] p-4 space-y-2.5">
+            <div className="rounded-xl bg-[#FCFBF7] border border-[#E3D6AD] p-4 space-y-2.5">
               <div className="flex items-start gap-2.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#00c8e8] mt-1 shrink-0 ring-4 ring-[#ccfaff]" />
+                <span className="w-2.5 h-2.5 rounded-full bg-[#D99F00] mt-1 shrink-0 ring-4 ring-[#ccfaff]" />
                 <div className="min-w-0 flex-1">
-                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#007c91] block">Pickup Location</span>
-                  <span className="text-xs sm:text-sm font-extrabold text-[#042f40] block">{pickup}</span>
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#704B00] block">Pickup Location</span>
+                  <span className="text-xs sm:text-sm font-extrabold text-[#0D0F12] block">{pickup}</span>
                 </div>
               </div>
-              <div className="ml-1 pl-3 border-l-2 border-dashed border-[#67efff] py-0.5 text-[11px] font-semibold text-slate-500">
+              <div className="ml-1 pl-3 border-l-2 border-dashed border-[#DFC670] py-0.5 text-[11px] font-semibold text-slate-500">
                 {activeVehicleData.name} · {totalPassengers} Pax · {totalBags} Bags
                 {flightNumber ? ` · Flight ${flightNumber}` : ''}
               </div>
               <div className="flex items-start gap-2.5">
-                <MapPin className="w-4 h-4 text-[#007c91] -ml-0.5 mt-0.5 shrink-0" />
+                <MapPin className="w-4 h-4 text-[#704B00] -ml-0.5 mt-0.5 shrink-0" />
                 <div className="min-w-0 flex-1">
-                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#007c91] block">Drop-off Destination</span>
-                  <span className="text-xs sm:text-sm font-extrabold text-[#042f40] block">{dropoff}</span>
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#704B00] block">Drop-off Destination</span>
+                  <span className="text-xs sm:text-sm font-extrabold text-[#0D0F12] block">{dropoff}</span>
                 </div>
               </div>
             </div>
@@ -2421,13 +2413,13 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
             {/* Delivery Cards: Email & Client WhatsApp */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* Email Confirmation Box */}
-              <div className="p-3.5 rounded-xl bg-[#f5feff] border border-[#8ceeff] space-y-1.5">
+              <div className="p-3.5 rounded-xl bg-[#FCFBF7] border border-[#E3D6AD] space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-extrabold text-[#042f40] flex items-center gap-1.5">
-                    <Mail className="w-4 h-4 text-[#008da1]" />
+                  <span className="text-xs font-extrabold text-[#0D0F12] flex items-center gap-1.5">
+                    <Mail className="w-4 h-4 text-[#8A5D00]" />
                     <span>Email Confirmation</span>
                   </span>
-                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-[#e6fdff] text-[#007c91] border border-[#67efff]">
+                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-[#FBF7E6] text-[#704B00] border border-[#DFC670]">
                     {confirmedBookingInfo?.emailSent ? 'Sent Automatically ✓' : 'Voucher Ready ✓'}
                   </span>
                 </div>
@@ -2440,13 +2432,13 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
               </div>
 
               {/* WhatsApp Confirmation Box */}
-              <div className="p-3.5 rounded-xl bg-[#f5feff] border border-[#8ceeff] space-y-1.5">
+              <div className="p-3.5 rounded-xl bg-[#FCFBF7] border border-[#E3D6AD] space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-extrabold text-[#042f40] flex items-center gap-1.5">
-                    <MessageCircle className="w-4 h-4 text-[#008da1]" />
+                  <span className="text-xs font-extrabold text-[#0D0F12] flex items-center gap-1.5">
+                    <MessageCircle className="w-4 h-4 text-[#8A5D00]" />
                     <span>WhatsApp Dispatch</span>
                   </span>
-                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-[#e6fdff] text-[#007c91] border border-[#67efff]">
+                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-[#FBF7E6] text-[#704B00] border border-[#DFC670]">
                     {confirmedBookingInfo?.whatsappSent ? 'Sent Automatically ✓' : '24/7 Direct Line'}
                   </span>
                 </div>
@@ -2460,13 +2452,13 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
             </div>
 
             {/* Fare & Payment Strip */}
-            <div className="bg-[#e6fdff] border border-[#67efff] rounded-xl p-4 flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div className="bg-[#FBF7E6] border border-[#DFC670] rounded-xl p-4 flex flex-wrap items-center justify-between gap-3 text-xs">
               <div>
-                <span className="text-[10px] font-bold uppercase text-[#007c91] block">Total Guaranteed Fare</span>
-                <span className="font-display font-extrabold text-2xl text-[#042f40] tabular-nums">€{finalQuotedPrice}</span>
+                <span className="text-[10px] font-bold uppercase text-[#704B00] block">Total Guaranteed Fare</span>
+                <span className="font-display font-extrabold text-2xl text-[#0D0F12] tabular-nums">€{finalQuotedPrice}</span>
               </div>
               <div className="text-left sm:text-right">
-                <span className="text-[10px] font-bold uppercase text-[#007c91] block">Pickup Time & Payment</span>
+                <span className="text-[10px] font-bold uppercase text-[#704B00] block">Pickup Time & Payment</span>
                 <span className="font-bold text-slate-900 block">
                   {dateTime ? new Date(dateTime).toLocaleString() : 'To be confirmed'}
                 </span>
@@ -2481,7 +2473,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                   href={confirmedBookingInfo?.whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#00f0ff] hover:bg-[#00d8eb] border border-[#00c8e8] text-slate-950 font-extrabold text-xs sm:text-sm shadow-[0_6px_20px_-4px_rgba(0,240,255,0.6)] transition-all"
+                  className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#F5B800] hover:bg-[#E0A600] border border-[#D99F00] text-slate-950 font-extrabold text-xs sm:text-sm shadow-[0_6px_20px_-4px_rgba(245,184,0,0.6)] transition-all"
                 >
                   <MessageCircle className="w-4 h-4 fill-slate-950 text-slate-950" />
                   <span>Message Chauffeur on WhatsApp</span>
@@ -2490,9 +2482,9 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 <button
                   type="button"
                   onClick={handleViewVoucher}
-                  className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#e6fdff] hover:bg-[#ccfbff] text-[#042f40] font-bold text-xs sm:text-sm border border-[#67efff] cursor-pointer transition-all"
+                  className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#FBF7E6] hover:bg-[#F7EDBE] text-[#0D0F12] font-bold text-xs sm:text-sm border border-[#DFC670] cursor-pointer transition-all"
                 >
-                  <FileText className="w-4 h-4 text-[#008da1]" />
+                  <FileText className="w-4 h-4 text-[#8A5D00]" />
                   <span>Print Official Voucher</span>
                 </button>
               </div>
@@ -2501,18 +2493,18 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 <button
                   type="button"
                   onClick={handleDownloadCalendar}
-                  className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-white hover:bg-[#f2feff] text-[#042f40] font-bold text-xs border border-[#9beeff] cursor-pointer transition-all"
+                  className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-white hover:bg-[#FAF9F6] text-[#0D0F12] font-bold text-xs border border-[#E6DFCB] cursor-pointer transition-all"
                 >
-                  <Calendar className="w-3.5 h-3.5 text-[#008da1]" />
+                  <Calendar className="w-3.5 h-3.5 text-[#8A5D00]" />
                   <span>Add to Calendar (.ics)</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={handleCopyConfirmedSummary}
-                  className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-white hover:bg-[#f2feff] text-[#042f40] font-bold text-xs border border-[#9beeff] cursor-pointer transition-all"
+                  className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-white hover:bg-[#FAF9F6] text-[#0D0F12] font-bold text-xs border border-[#E6DFCB] cursor-pointer transition-all"
                 >
-                  {copiedConfirmed ? <Check className="w-3.5 h-3.5 text-[#008da1]" /> : <Copy className="w-3.5 h-3.5 text-[#008da1]" />}
+                  {copiedConfirmed ? <Check className="w-3.5 h-3.5 text-[#8A5D00]" /> : <Copy className="w-3.5 h-3.5 text-[#8A5D00]" />}
                   <span>{copiedConfirmed ? 'Copied Summary!' : 'Copy Confirmation'}</span>
                 </button>
 
@@ -2538,10 +2530,10 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
           onClick={() => setShowSizeChart(false)}
         >
           <div
-            className="bg-white rounded-2xl max-w-xl w-full p-4 sm:p-5 shadow-2xl border border-[#8ceeff] overflow-hidden text-slate-900 max-h-[90vh] overflow-y-auto"
+            className="bg-white rounded-2xl max-w-xl w-full p-4 sm:p-5 shadow-2xl border border-[#E3D6AD] overflow-hidden text-slate-900 max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between pb-2.5 border-b border-[#cff9ff]">
+            <div className="flex items-center justify-between pb-2.5 border-b border-[#EFE7D1]">
               <div className="flex items-center gap-2">
                 <span className="text-xl">🧳</span>
                 <div>
@@ -2556,7 +2548,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
               <button
                 type="button"
                 onClick={() => setShowSizeChart(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-[#e6fdff] transition-colors cursor-pointer"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-[#FBF7E6] transition-colors cursor-pointer"
                 aria-label="Close size chart"
               >
                 <X className="w-5 h-5" />
@@ -2564,37 +2556,37 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
             </div>
 
             {/* Real Bags Visual Comparison Photo - Clean Only */}
-            <div className="rounded-xl overflow-hidden border border-[#9beeff] shadow-sm bg-white my-3">
+            <div className="rounded-xl overflow-hidden border border-[#E6DFCB] shadow-sm bg-white my-3">
               <img
                 src="/images/luggage-guide.jpg"
                 alt="Real luggage types: Backpack, Cabin 55cm, Medium 65cm, Large XXL 80cm"
                 className="w-full h-auto object-cover max-h-72"
               />
-              <div className="grid grid-cols-4 text-center py-2.5 bg-[#e6fdff] text-slate-900 text-[11px] sm:text-xs font-bold divide-x divide-[#9beeff] border-t border-[#9beeff]">
+              <div className="grid grid-cols-4 text-center py-2.5 bg-[#FBF7E6] text-slate-900 text-[11px] sm:text-xs font-bold divide-x divide-[#E6DFCB] border-t border-[#E6DFCB]">
                 <div className="px-1">
-                  <span className="block text-[#042f40]">Backpack</span>
+                  <span className="block text-[#0D0F12]">Backpack</span>
                   <span className="text-[9px] text-slate-500 font-normal">Personal Lap</span>
                 </div>
                 <div className="px-1">
-                  <span className="block text-[#042f40]">55 cm</span>
+                  <span className="block text-[#0D0F12]">55 cm</span>
                   <span className="text-[9px] text-slate-500 font-normal">Cabin / Hand</span>
                 </div>
                 <div className="px-1">
-                  <span className="block text-[#042f40]">65 cm</span>
+                  <span className="block text-[#0D0F12]">65 cm</span>
                   <span className="text-[9px] text-slate-500 font-normal">Medium Check-in</span>
                 </div>
                 <div className="px-1">
-                  <span className="block text-[#042f40]">75–80 cm</span>
+                  <span className="block text-[#0D0F12]">75–80 cm</span>
                   <span className="text-[9px] text-slate-500 font-normal">Large / XXL</span>
                 </div>
               </div>
             </div>
 
-            <div className="mt-3 pt-2.5 border-t border-[#cff9ff] flex justify-end">
+            <div className="mt-3 pt-2.5 border-t border-[#EFE7D1] flex justify-end">
               <button
                 type="button"
                 onClick={() => setShowSizeChart(false)}
-                className="w-full sm:w-auto px-5 py-2 rounded-xl bg-[#00f0ff] hover:bg-[#00d8eb] border border-[#00c8e8] text-slate-950 font-extrabold text-xs shadow-xs cursor-pointer transition-colors"
+                className="w-full sm:w-auto px-5 py-2 rounded-xl bg-[#F5B800] hover:bg-[#E0A600] border border-[#D99F00] text-slate-950 font-extrabold text-xs shadow-xs cursor-pointer transition-colors"
               >
                 Got It / Close
               </button>
