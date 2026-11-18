@@ -1,6 +1,6 @@
 import React from 'react';
-import { ShieldCheck, Radar, Clock, Sparkles } from 'lucide-react';
-import { TRANSLATIONS } from '../data/transferData';
+import { ShieldCheck, Radar, Clock, Sparkles, MessageCircle } from 'lucide-react';
+import { BUSINESS_INFO, TRANSLATIONS } from '../data/transferData';
 import { BookingCalculator } from './BookingCalculator';
 import { HeroSkyPlanes, TransitCorridorScene } from './TravelMotionBackdrop';
 
@@ -29,14 +29,27 @@ export const Hero: React.FC<HeroProps> = ({
       <HeroSkyPlanes />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
-        {/* Compact Single-Line Hero Headline */}
-        <div className="mb-2.5 sm:mb-3">
+        {/* Compact Single-Line Hero Headline + Fair-Price-Sized Green WhatsApp Badge */}
+        <div className="mb-2.5 sm:mb-3 flex items-center justify-between sm:justify-start gap-2.5">
           <h1
-            className="font-display font-bold text-[#FAF9F6] tracking-tight leading-tight whitespace-nowrap truncate m-0"
+            className="font-display font-bold text-[#FAF9F6] tracking-tight leading-tight whitespace-nowrap truncate min-w-0 m-0"
             style={{ fontSize: 'clamp(13px, 2.25vw, 24px)' }}
           >
             {t.heroTitle}
           </h1>
+
+          <a
+            href={`https://wa.me/${BUSINESS_INFO.whatsappNumber}?text=${encodeURIComponent(
+              'Hello Easytransferhub, I would like to book a private transfer in Barcelona.'
+            )}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-extrabold px-2.5 py-1.5 rounded-lg bg-[#25D366] hover:bg-[#1FB858] border border-[#1EA952] text-white shadow-2xs whitespace-nowrap shrink-0 transition-colors"
+            title="Chat on WhatsApp +34 666 744 440"
+          >
+            <MessageCircle className="w-3.5 h-3.5 fill-white text-white shrink-0" />
+            <span>WhatsApp</span>
+          </a>
         </div>
 
         {/* 1. CALCULATOR — Positioned cleanly on the dark-gold split */}

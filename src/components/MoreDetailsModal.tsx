@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
   X,
-  MapPin,
   ShieldCheck,
   Calculator,
   Car,
@@ -16,10 +15,9 @@ import {
   LayoutGrid,
 } from 'lucide-react';
 import { BUSINESS_INFO } from '../data/transferData';
-import { PricingTable } from './PricingTable';
 import { WhyChooseUs } from './WhyChooseUs';
 
-export type MoreDetailsTab = 'menu' | 'fares' | 'why';
+export type MoreDetailsTab = 'menu' | 'why';
 
 interface MoreDetailsModalProps {
   isOpen: boolean;
@@ -107,19 +105,6 @@ export const MoreDetailsModal: React.FC<MoreDetailsModalProps> = ({
 
           <button
             type="button"
-            onClick={() => setActiveTab('fares')}
-            className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-colors cursor-pointer ${
-              activeTab === 'fares'
-                ? 'bg-[#0D0F12] text-[#F5B800] shadow-xs'
-                : 'bg-white text-slate-700 border border-[#E3D6AD] hover:border-[#F5B800]'
-            }`}
-          >
-            <MapPin className="w-3.5 h-3.5" />
-            <span>10-Zone Fares &amp; Rates</span>
-          </button>
-
-          <button
-            type="button"
             onClick={() => setActiveTab('why')}
             className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-colors cursor-pointer ${
               activeTab === 'why'
@@ -136,33 +121,12 @@ export const MoreDetailsModal: React.FC<MoreDetailsModalProps> = ({
         <div className="p-4 sm:p-6">
           {activeTab === 'menu' && (
             <div className="space-y-6">
-              {/* Highlighted Detail Sections Moved From Main Page */}
+              {/* Highlighted Detail Section */}
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#8A5D00] block mb-2">
-                  Detailed Information Sections
+                  Service Guarantees
                 </span>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab('fares')}
-                    className="text-left p-4 rounded-2xl bg-white border border-[#E3D6AD] hover:border-[#F5B800] shadow-2xs hover:shadow-md transition-all flex items-center justify-between gap-3 cursor-pointer group"
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-[#FBF7E6] border border-[#DFC670] text-[#704B00] flex items-center justify-center shrink-0">
-                        <MapPin className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <h3 className="font-display font-extrabold text-sm sm:text-base text-slate-900">
-                          Barcelona 10-Zone Fares &amp; Rates
-                        </h3>
-                        <p className="text-xs text-slate-600 mt-0.5">
-                          Zones 1–6 (€50–€70) &amp; Zones 7–10 (€60–€80) fixed rates table &amp; child seat pricing.
-                        </p>
-                      </div>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-[#8A5D00] group-hover:translate-x-0.5 transition-transform shrink-0" />
-                  </button>
-
+                <div className="grid grid-cols-1 gap-3.5">
                   <button
                     type="button"
                     onClick={() => setActiveTab('why')}
@@ -277,12 +241,6 @@ export const MoreDetailsModal: React.FC<MoreDetailsModalProps> = ({
                   </button>
                 </div>
               </div>
-            </div>
-          )}
-
-          {activeTab === 'fares' && (
-            <div className="space-y-3">
-              <PricingTable embedded />
             </div>
           )}
 

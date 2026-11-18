@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MoreVertical, Globe, Phone, MessageCircle } from 'lucide-react';
+import { MoreVertical, Globe, Phone } from 'lucide-react';
 import { BUSINESS_INFO, TRANSLATIONS } from '../data/transferData';
 
 interface NavbarProps {
@@ -26,20 +26,17 @@ export const Navbar: React.FC<NavbarProps> = ({
   ] as const;
 
   const phoneHref = `tel:${BUSINESS_INFO.phoneDisplay.replace(/\s+/g, '')}`;
-  const whatsappHref = `https://wa.me/${BUSINESS_INFO.whatsappNumber}?text=${encodeURIComponent(
-    'Hello Easytransferhub, I would like to book a private transfer in Barcelona.'
-  )}`;
 
   return (
     <header className="relative lg:sticky lg:top-0 z-40 bg-[#0D0F12]/95 text-white border-b border-[#F5B800]/30 shadow-sm backdrop-blur-md">
       {/* Main Nav */}
       <div className="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-3">
-        {/* Brand Wordmark (Compact Adjusted Size) */}
-        <a href="#top" className="flex items-center gap-2 sm:gap-2.5 group shrink-0">
-          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#F5B800] border border-[#FFD24C] flex items-center justify-center font-display font-bold text-[#0D0F12] text-xs sm:text-sm tracking-tight shrink-0">
+        {/* Brand Wordmark (Enlarged to comfortably cover space) */}
+        <a href="#top" className="flex items-center gap-2.5 sm:gap-3 group shrink-0">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#F5B800] border border-[#FFD24C] flex items-center justify-center font-display font-bold text-[#0D0F12] text-sm sm:text-base tracking-tight shrink-0">
             ET
           </div>
-          <span className="font-display font-bold text-[15px] sm:text-[19px] tracking-tight text-[#FAF9F6] whitespace-nowrap">
+          <span className="font-display font-bold text-[19px] sm:text-[23px] tracking-tight text-[#FAF9F6] whitespace-nowrap">
             EasyTransfer<span className="text-[#F5B800]">Hub</span>
           </span>
         </a>
@@ -98,35 +95,24 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           </div>
 
-          {/* Compact Green WhatsApp Direct Icon (Right next to Translation) */}
-          <a
-            href={whatsappHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="WhatsApp Mr. Mir"
-            title="WhatsApp +34 666 744 440"
-            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#25D366] hover:bg-[#1FB858] text-white flex items-center justify-center shadow-xs transition-transform hover:scale-105 active:scale-95 shrink-0"
-          >
-            <MessageCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-white text-white" />
-          </a>
-
-          {/* Compact Direct Phone Call Icon (Same Number) */}
+          {/* Direct Phone Call Box (Larger secure box same size as Fair Price) */}
           <a
             href={phoneHref}
             aria-label="Call +34 666 744 440 directly"
             title={`Call ${BUSINESS_INFO.phoneDisplay}`}
-            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#F5B800] hover:bg-[#E0A600] text-[#0D0F12] flex items-center justify-center shadow-xs transition-transform hover:scale-105 active:scale-95 shrink-0"
+            className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-extrabold px-2.5 py-1.5 rounded-lg bg-[#F5B800] hover:bg-[#E0A600] border border-[#FFD24C] text-[#0D0F12] shadow-2xs transition-colors whitespace-nowrap shrink-0"
           >
-            <Phone className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#0D0F12]" />
+            <Phone className="w-3.5 h-3.5 text-[#0D0F12] shrink-0" />
+            <span>Call</span>
           </a>
 
           {/* 3-Dots Details & Menu Button (Desktop + Mobile) */}
           <button
             type="button"
             onClick={onOpenMoreDetails}
-            className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-neutral-200 hover:text-[#F5B800] hover:border-[#F5B800] rounded-lg bg-[#171A21] border border-neutral-700 transition-colors cursor-pointer shrink-0"
-            aria-label="Open menu, 10-zone fares and more details"
-            title="Menu, Zone Fares & More Details"
+            className="h-8 w-8 flex items-center justify-center text-neutral-200 hover:text-[#F5B800] hover:border-[#F5B800] rounded-lg bg-[#171A21] border border-neutral-700 transition-colors cursor-pointer shrink-0"
+            aria-label="Open menu and more details"
+            title="Menu & More Details"
           >
             <MoreVertical className="w-4 h-4" />
           </button>
