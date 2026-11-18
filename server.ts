@@ -63,6 +63,11 @@ app.get('/easytransferhub-vercel.zip', (req, res) => {
   res.download(zipPath, 'easytransferhub-vercel.zip');
 });
 
+app.get('/easytransferhub-photos.zip', (req, res) => {
+  const zipPath = path.resolve(__dirname, 'public/easytransferhub-photos.zip');
+  res.download(zipPath, 'easytransferhub-photos.zip');
+});
+
 app.get('/easytransferhub-white-green-animated-theme.zip', (req, res) => {
   const zipPath = path.resolve(__dirname, 'public/easytransferhub-white-green-animated-theme.zip');
   res.download(zipPath, 'easytransferhub-white-green-animated-theme.zip');

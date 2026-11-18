@@ -43,6 +43,7 @@ export const VehiclesSection: React.FC = () => {
           {VEHICLES.map((vehicle) => {
             const currentIdx = activePhotoIndex[vehicle.id] || 0;
             const currentPhoto = vehicle.photos[currentIdx] || vehicle.photos[0];
+            const currentLabel = vehicle.photoLabels?.[currentIdx] || vehicle.name;
             const hasMultiplePhotos = vehicle.photos.length > 1;
 
             return (
@@ -52,10 +53,11 @@ export const VehiclesSection: React.FC = () => {
               >
                 <div>
                   {/* Vehicle Photo Container */}
-                  <div className="relative w-full h-52 bg-[#FBF7E6] overflow-hidden group">
+                  <div className="relative w-full h-56 bg-[#0D0F12] overflow-hidden group">
                     <img
                       src={currentPhoto}
-                      alt={vehicle.name}
+                      alt={currentLabel}
+                      referrerPolicy="no-referrer"
                       className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                       loading="lazy"
                     />
@@ -66,36 +68,76 @@ export const VehiclesSection: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => prevPhoto(vehicle.id, vehicle.photos.length)}
-                          className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/80 cursor-pointer"
-                          aria-label="Previous photo"
+                          className="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-[#0D0F12]/75 text-white border border-white/20 flex items-center justify-center transition-all hover:bg-[#F5B800] hover:text-[#0D0F12] cursor-pointer shadow-md"
+                          aria-label="Previous vehicle photo"
                         >
                           <ChevronLeft className="w-4 h-4" />
                         </button>
                         <button
                           type="button"
                           onClick={() => nextPhoto(vehicle.id, vehicle.photos.length)}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/80 cursor-pointer"
-                          aria-label="Next photo"
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-[#0D0F12]/75 text-white border border-white/20 flex items-center justify-center transition-all hover:bg-[#F5B800] hover:text-[#0D0F12] cursor-pointer shadow-md"
+                          aria-label="Next vehicle photo"
                         >
                           <ChevronRight className="w-4 h-4" />
                         </button>
-                        <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1.5">
-                          {vehicle.photos.map((_, i) => (
-                            <span
-                              key={i}
-                              className={`w-2 h-2 rounded-full transition-all ${
-                                i === currentIdx ? 'bg-[#F5B800] w-4' : 'bg-white/70'
-                              }`}
-                            />
-                          ))}
-                        </div>
                       </>
                     )}
 
-                    <div className="absolute top-3 left-3 bg-white/95 text-[#0D0F12] border border-[#DFC670] text-[11px] font-bold px-2.5 py-1 rounded-lg backdrop-blur-xs shadow-xs">
+                    <div className="absolute top-3 left-3 bg-[#0D0F12]/90 text-[#F5B800] border border-[#F5B800]/50 text-[11px] font-bold px-2.5 py-1 rounded-lg backdrop-blur-xs shadow-xs">
                       {vehicle.category}
                     </div>
+
+                    {hasMultiplePhotos && (
+                      <div className="absolute top-3 right-3 bg-white/95 text-[#0D0F12] text-[10px] font-extrabold px-2 py-0.5 rounded-md shadow-xs tabular-nums">
+                        {currentIdx + 1} / {vehicle.photos.length}
+                      </div>
+                    )}
+
+                    {/* Active Vehicle Model Strip */}
+                    <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-[#0D0F12]/90 via-[#0D0F12]/55 to-transparent px-3 pt-5 pb-2 flex items-center justify-between">
+                      <span className="text-[11px] font-bold text-white truncate">
+                        {currentLabel}
+                      </span>
+                      <span className="text-[10px] font-extrabold text-[#F5B800] shrink-0 ml-2">
+                        Taximeter
+                      </span>
+                    </div>
                   </div>
+
+                  {/* 4-Car Official Fleet Thumbnail Strip */}
+                  {hasMultiplePhotos && (
+                    <div className="grid grid-cols-4 gap-1.5 p-2 bg-[#F4EFE0] border-b border-[#E6DFCB]/80">
+                      {vehicle.photos.map((photoUrl, idx) => {
+                        const isActive = idx === currentIdx;
+                        const label = vehicle.photoLabels?.[idx] || `${vehicle.name} ${idx + 1}`;
+                        return (
+                          <button
+                            key={photoUrl}
+                            type="button"
+                            onClick={() =>
+                              setActivePhotoIndex((prev) => ({ ...prev, [vehicle.id]: idx }))
+                            }
+                            aria-label={`View ${label}`}
+                            title={label}
+                            className={`relative h-12 rounded-lg overflow-hidden border-2 transition-all cursor-pointer ${
+                              isActive
+                                ? 'border-[#F5B800] ring-1 ring-[#F5B800] scale-[1.02]'
+                                : 'border-transparent opacity-75 hover:opacity-100'
+                            }`}
+                          >
+                            <img
+                              src={photoUrl}
+                              alt={label}
+                              referrerPolicy="no-referrer"
+                              className="w-full h-full object-cover"
+                              loading="lazy"
+                            />
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
 
                   {/* Body Content */}
                   <div className="p-6">
