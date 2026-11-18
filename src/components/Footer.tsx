@@ -34,14 +34,14 @@ export const Footer: React.FC = () => {
 
           {/* Popular Destinations */}
           <div className="space-y-2.5">
-            <h4 className="font-bold text-white text-xs uppercase tracking-wider">Top Destinations</h4>
+            <h4 className="font-bold text-white text-xs uppercase tracking-wider">Popular Transfer Routes</h4>
             <ul className="space-y-1.5 text-neutral-400">
-              <li>Barcelona Airport (BCN T1 / T2)</li>
-              <li>Cruise Port (Moll Adossat)</li>
-              <li>Sitges &amp; Garraf Coast</li>
-              <li>Montserrat Monastery</li>
-              <li>Girona &amp; Costa Brava</li>
-              <li>Andorra la Vella</li>
+              <li>Barcelona Airport (BCN T1 / T2) Taxi &amp; Pickup</li>
+              <li>Barcelona Cruise Port (Moll Adossat) Transfer</li>
+              <li>Barcelona Sants Station &amp; City Center</li>
+              <li>Barcelona to Sitges, Salou &amp; Tarragona</li>
+              <li>Montserrat, Girona &amp; Costa Brava Transfers</li>
+              <li>Barcelona to Andorra Private Minivan</li>
             </ul>
           </div>
 
