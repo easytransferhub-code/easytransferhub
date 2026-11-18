@@ -8,9 +8,7 @@ import { APIProvider } from '@vis.gl/react-google-maps';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { VehiclesSection } from './components/VehiclesSection';
-import { PricingTable } from './components/PricingTable';
 import { HowItWorks } from './components/HowItWorks';
-import { WhyChooseUs } from './components/WhyChooseUs';
 import { ReviewsAndVisitorsSection } from './components/ReviewsAndVisitorsSection';
 import { FaqSection } from './components/FaqSection';
 import { ContactSection } from './components/ContactSection';
@@ -19,6 +17,7 @@ import { FloatingActions } from './components/FloatingWhatsAppButton';
 import { AIAssistantModal } from './components/AIAssistantModal';
 import { BookingVoucherModal } from './components/BookingVoucherModal';
 import { OwnerQuotaMeterModal } from './components/OwnerQuotaMeterModal';
+import { MoreDetailsModal } from './components/MoreDetailsModal';
 import { recordSessionVisitOnce } from './utils/telemetryClient';
 
 const ENV_MAPS_API_KEY = String(import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '').trim();
@@ -34,6 +33,7 @@ export default function App() {
   const [language, setLanguage] = useState<'en' | 'es' | 'ca' | 'ur'>('en');
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
   const [isOwnerMeterOpen, setIsOwnerMeterOpen] = useState<boolean>(() => checkOwnerMeterUrl());
+  const [isMoreDetailsOpen, setIsMoreDetailsOpen] = useState(false);
   const [voucherData, setVoucherData] = useState<any>(null);
   const [mapsApiKey, setMapsApiKey] = useState<string>(ENV_MAPS_API_KEY);
   const [quotaExceeded, setQuotaExceeded] = useState(false);
@@ -108,6 +108,7 @@ export default function App() {
         setLanguage={setLanguage}
         onOpenAssistant={() => setIsAssistantOpen(true)}
         onOpenOwnerMeter={() => setIsOwnerMeterOpen(true)}
+        onOpenMoreDetails={() => setIsMoreDetailsOpen(true)}
       />
 
       <main className="flex-1">
@@ -122,14 +123,8 @@ export default function App() {
         {/* Vehicle Fleet Showcase - Directly below Hero Meet & Greet */}
         <VehiclesSection />
 
-        {/* Barcelona 10-Zone Boundary & Airport Fixed Rate Guide */}
-        <PricingTable />
-
         {/* How It Works */}
         <HowItWorks />
-
-        {/* Guarantees & Why Choose Us */}
-        <WhyChooseUs />
 
         {/* Live Visitors Meter & Client Reviews */}
         <ReviewsAndVisitorsSection onOpenOwnerMeter={() => setIsOwnerMeterOpen(true)} />
@@ -146,6 +141,14 @@ export default function App() {
 
       {/* Floating Action Buttons */}
       <FloatingActions onOpenAssistant={() => setIsAssistantOpen(true)} />
+
+      {/* 3-Dots Details & Menu Modal (10-Zone Fares, Why Choose Us, Navigation & Direct Actions) */}
+      <MoreDetailsModal
+        isOpen={isMoreDetailsOpen}
+        onClose={() => setIsMoreDetailsOpen(false)}
+        onOpenAssistant={() => setIsAssistantOpen(true)}
+        onOpenOwnerMeter={() => setIsOwnerMeterOpen(true)}
+      />
 
       {/* 24/7 AI Concierge Chat Modal */}
       <AIAssistantModal

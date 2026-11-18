@@ -1,7 +1,11 @@
 import React from 'react';
 import { Radar, Clock, ShieldCheck, Baby, HeartHandshake, Sparkles, CheckCircle2 } from 'lucide-react';
 
-export const WhyChooseUs: React.FC = () => {
+interface WhyChooseUsProps {
+  embedded?: boolean;
+}
+
+export const WhyChooseUs: React.FC<WhyChooseUsProps> = ({ embedded = false }) => {
   const perks = [
     {
       title: 'Real-Time Flight Radar Tracking',
@@ -36,8 +40,8 @@ export const WhyChooseUs: React.FC = () => {
   ];
 
   return (
-    <section className="py-16 bg-[#F6F2E4] text-slate-900 border-y border-[#E6DFCB]/80">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+    <section className={embedded ? 'py-2 bg-transparent text-slate-900' : 'py-16 bg-[#F6F2E4] text-slate-900 border-y border-[#E6DFCB]/80'}>
+      <div className={embedded ? '' : 'max-w-7xl mx-auto px-4 sm:px-6'}>
         <div className="text-center max-w-2xl mx-auto mb-12">
           <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#8A5D00] block mb-2">
             Service Excellence

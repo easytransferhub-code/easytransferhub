@@ -25,9 +25,9 @@ export const FloatingActions: React.FC<FloatingActionsProps> = ({ onOpenAssistan
         )}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#F5B800] hover:bg-[#E0A600] text-[#0D0F12] text-xs sm:text-sm font-extrabold shadow-lg transition-all hover:scale-105 active:scale-95"
+        className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#25D366] hover:bg-[#1FB858] text-white text-xs sm:text-sm font-extrabold shadow-lg transition-all hover:scale-105 active:scale-95"
       >
-        <MessageCircle className="w-4 h-4 fill-[#0D0F12] text-[#0D0F12]" />
+        <MessageCircle className="w-4 h-4 fill-white text-white" />
         <span>WhatsApp Mr. Mir</span>
       </a>
     </div>

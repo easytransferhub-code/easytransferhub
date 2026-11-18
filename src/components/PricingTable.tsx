@@ -2,10 +2,17 @@ import React from 'react';
 import { Info, MapPin, ShieldCheck, Baby } from 'lucide-react';
 import { BARCELONA_ZONES, CHILD_SEAT_PRICE_EUR, DISTANCE_TIERS } from '../data/transferData';
 
-export const PricingTable: React.FC = () => {
+interface PricingTableProps {
+  embedded?: boolean;
+}
+
+export const PricingTable: React.FC<PricingTableProps> = ({ embedded = false }) => {
   return (
-    <section id="prices" className="py-16 bg-[#FAF9F6] border-b border-[#E6DFCB]/70">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-8">
+    <section
+      id="prices"
+      className={embedded ? 'py-2 bg-transparent' : 'py-16 bg-[#FAF9F6] border-b border-[#E6DFCB]/70'}
+    >
+      <div className={embedded ? 'space-y-6' : 'max-w-7xl mx-auto px-4 sm:px-6 space-y-8'}>
         <div>
           <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#8A5D00] block mb-1">
             Official 10-Zone Fixed Airport Fares

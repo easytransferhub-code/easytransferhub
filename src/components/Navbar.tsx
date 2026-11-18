@@ -1,16 +1,21 @@
 import React, { useState } from 'react';
-import { Menu, X, Globe, Sparkles, Gauge } from 'lucide-react';
-import { TRANSLATIONS } from '../data/transferData';
+import { MoreVertical, Globe, Phone, MessageCircle } from 'lucide-react';
+import { BUSINESS_INFO, TRANSLATIONS } from '../data/transferData';
 
 interface NavbarProps {
   language: 'en' | 'es' | 'ca' | 'ur';
   setLanguage: (lang: 'en' | 'es' | 'ca' | 'ur') => void;
   onOpenAssistant: () => void;
   onOpenOwnerMeter?: () => void;
+  onOpenMoreDetails: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ language, setLanguage, onOpenAssistant, onOpenOwnerMeter }) => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+export const Navbar: React.FC<NavbarProps> = ({
+  language,
+  setLanguage,
+  onOpenMoreDetails,
+}) => {
+  const [langMenuOpen, setLangMenuOpen] = useState(false);
   const t = TRANSLATIONS[language];
 
   const languages = [
@@ -20,76 +25,68 @@ export const Navbar: React.FC<NavbarProps> = ({ language, setLanguage, onOpenAss
     { code: 'ur', label: 'اردو', flag: '🇵🇰' },
   ] as const;
 
+  const phoneHref = `tel:${BUSINESS_INFO.phoneDisplay.replace(/\s+/g, '')}`;
+  const whatsappHref = `https://wa.me/${BUSINESS_INFO.whatsappNumber}?text=${encodeURIComponent(
+    'Hello Easytransferhub, I would like to book a private transfer in Barcelona.'
+  )}`;
+
   return (
     <header className="relative lg:sticky lg:top-0 z-40 bg-[#0D0F12]/95 text-white border-b border-[#F5B800]/30 shadow-sm backdrop-blur-md">
       {/* Main Nav */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-3.5 flex items-center justify-between gap-6">
-        {/* Brand Wordmark */}
-        <a href="#top" className="flex items-center gap-3 group shrink-0">
-          <div className="w-9 h-9 rounded-lg bg-[#F5B800] border border-[#FFD24C] flex items-center justify-center font-display font-bold text-[#0D0F12] text-base tracking-tight shrink-0">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-3">
+        {/* Brand Wordmark (Compact Adjusted Size) */}
+        <a href="#top" className="flex items-center gap-2 sm:gap-2.5 group shrink-0">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#F5B800] border border-[#FFD24C] flex items-center justify-center font-display font-bold text-[#0D0F12] text-xs sm:text-sm tracking-tight shrink-0">
             ET
           </div>
-          <span className="font-display font-bold text-[21px] sm:text-[23px] tracking-tight text-[#FAF9F6] whitespace-nowrap">
+          <span className="font-display font-bold text-[15px] sm:text-[19px] tracking-tight text-[#FAF9F6] whitespace-nowrap">
             EasyTransfer<span className="text-[#F5B800]">Hub</span>
           </span>
         </a>
 
-        {/* Desktop Nav Links */}
-        <nav className="hidden lg:flex items-center gap-7 text-[13px] font-medium text-neutral-300">
+        {/* Clean Essential Desktop Nav Links */}
+        <nav className="hidden lg:flex items-center gap-6 text-[13px] font-medium text-neutral-300">
           <a href="#calculator" className="hover:text-[#F5B800] transition-colors whitespace-nowrap shrink-0">
             {language === 'ur' ? 'کرایہ کیلکولیٹر' : 'Calculator'}
           </a>
           <a href="#fleet" className="hover:text-[#F5B800] transition-colors whitespace-nowrap shrink-0">
             {t.navFleet}
           </a>
-          <a href="#how" className="hover:text-[#F5B800] transition-colors whitespace-nowrap shrink-0">
-            {t.navHow}
-          </a>
-          <a href="#faq" className="hover:text-[#F5B800] transition-colors whitespace-nowrap shrink-0">
-            {t.navFaq}
+          <a href="#reviews" className="hover:text-[#F5B800] transition-colors whitespace-nowrap shrink-0">
+            Reviews
           </a>
           <a href="#contact" className="hover:text-[#F5B800] transition-colors whitespace-nowrap shrink-0">
             {t.navContact}
           </a>
         </nav>
 
-        {/* Actions & Language Switcher */}
-        <div className="flex items-center gap-2.5 shrink-0">
-          {onOpenOwnerMeter && (
-            <button
-              type="button"
-              onClick={onOpenOwnerMeter}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#171A21] hover:bg-[#F5B800] border border-[#F5B800]/60 text-[#F5B800] hover:text-[#0D0F12] text-xs font-bold transition-colors cursor-pointer whitespace-nowrap shrink-0"
-              title="Open A-to-Z Free Quota & SEO Visitor Meter"
-            >
-              <Gauge className="w-3.5 h-3.5" />
-              <span>Meter</span>
-            </button>
-          )}
-          <button
-            onClick={onOpenAssistant}
-            className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#F5B800] hover:bg-[#E0A600] text-[#0D0F12] text-xs font-bold transition-colors cursor-pointer whitespace-nowrap shrink-0"
-            title="Ask EasyTransferHub Concierge"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-[#0D0F12]" />
-            <span>24/7 Concierge</span>
-          </button>
-
-          {/* Language Selector */}
+        {/* Right Cluster: Translation Div -> Green WhatsApp -> Direct Call -> 3-Dots Details Menu */}
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          {/* Language / Translation Switcher */}
           <div className="relative group">
             <button
-              className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg bg-[#171A21] border border-neutral-700 text-xs font-medium text-neutral-200 hover:border-[#F5B800] transition-colors cursor-pointer whitespace-nowrap"
+              type="button"
+              onClick={() => setLangMenuOpen((prev) => !prev)}
+              className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-[#171A21] border border-neutral-700 text-[11px] font-medium text-neutral-200 hover:border-[#F5B800] transition-colors cursor-pointer whitespace-nowrap"
               aria-label="Change language"
             >
-              <Globe className="w-3.5 h-3.5 text-[#F5B800]" />
+              <Globe className="w-3 h-3 text-[#F5B800]" />
               <span>{languages.find((l) => l.code === language)?.flag}</span>
-              <span className="uppercase text-[11px] font-bold">{language}</span>
+              <span className="uppercase text-[10px] font-bold">{language}</span>
             </button>
-            <div className="absolute right-0 mt-1 w-32 py-1 bg-[#14171D] border border-neutral-700 rounded-lg shadow-xl hidden group-hover:block z-50">
+            <div
+              className={`absolute right-0 mt-1 w-32 py-1 bg-[#14171D] border border-neutral-700 rounded-lg shadow-xl z-50 ${
+                langMenuOpen ? 'block' : 'hidden group-hover:block'
+              }`}
+            >
               {languages.map((l) => (
                 <button
                   key={l.code}
-                  onClick={() => setLanguage(l.code)}
+                  type="button"
+                  onClick={() => {
+                    setLanguage(l.code);
+                    setLangMenuOpen(false);
+                  }}
                   className={`w-full text-left px-3 py-1.5 text-xs flex items-center gap-2 hover:bg-[#1F242D] transition-colors cursor-pointer ${
                     language === l.code ? 'text-[#F5B800] font-bold bg-[#1B1F27]' : 'text-neutral-200'
                   }`}
@@ -101,103 +98,40 @@ export const Navbar: React.FC<NavbarProps> = ({ language, setLanguage, onOpenAss
             </div>
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 text-neutral-200 hover:text-[#F5B800] rounded-lg bg-[#171A21] border border-neutral-700"
-            aria-label="Toggle mobile menu"
+          {/* Compact Green WhatsApp Direct Icon (Right next to Translation) */}
+          <a
+            href={whatsappHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="WhatsApp Mr. Mir"
+            title="WhatsApp +34 666 744 440"
+            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#25D366] hover:bg-[#1FB858] text-white flex items-center justify-center shadow-xs transition-transform hover:scale-105 active:scale-95 shrink-0"
           >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            <MessageCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-white text-white" />
+          </a>
+
+          {/* Compact Direct Phone Call Icon (Same Number) */}
+          <a
+            href={phoneHref}
+            aria-label="Call +34 666 744 440 directly"
+            title={`Call ${BUSINESS_INFO.phoneDisplay}`}
+            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#F5B800] hover:bg-[#E0A600] text-[#0D0F12] flex items-center justify-center shadow-xs transition-transform hover:scale-105 active:scale-95 shrink-0"
+          >
+            <Phone className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#0D0F12]" />
+          </a>
+
+          {/* 3-Dots Details & Menu Button (Desktop + Mobile) */}
+          <button
+            type="button"
+            onClick={onOpenMoreDetails}
+            className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-neutral-200 hover:text-[#F5B800] hover:border-[#F5B800] rounded-lg bg-[#171A21] border border-neutral-700 transition-colors cursor-pointer shrink-0"
+            aria-label="Open menu, 10-zone fares and more details"
+            title="Menu, Zone Fares & More Details"
+          >
+            <MoreVertical className="w-4 h-4" />
           </button>
         </div>
       </div>
-
-      {/* Mobile Drawer Menu */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden bg-[#12151A] border-t border-neutral-800 px-4 py-4 space-y-3 shadow-lg">
-          <nav className="flex flex-col space-y-2 text-sm font-medium text-neutral-200">
-            <a
-              href="#calculator"
-              onClick={() => setMobileMenuOpen(false)}
-              className="py-1.5 px-3 rounded-md hover:bg-[#1D2129] hover:text-[#F5B800]"
-            >
-              Calculator
-            </a>
-            <a
-              href="#fleet"
-              onClick={() => setMobileMenuOpen(false)}
-              className="py-1.5 px-3 rounded-md hover:bg-[#1D2129] hover:text-[#F5B800]"
-            >
-              {t.navFleet}
-            </a>
-            <a
-              href="#how"
-              onClick={() => setMobileMenuOpen(false)}
-              className="py-1.5 px-3 rounded-md hover:bg-[#1D2129] hover:text-[#F5B800]"
-            >
-              {t.navHow}
-            </a>
-            <a
-              href="#faq"
-              onClick={() => setMobileMenuOpen(false)}
-              className="py-1.5 px-3 rounded-md hover:bg-[#1D2129] hover:text-[#F5B800]"
-            >
-              {t.navFaq}
-            </a>
-            <a
-              href="#contact"
-              onClick={() => setMobileMenuOpen(false)}
-              className="py-1.5 px-3 rounded-md hover:bg-[#1D2129] hover:text-[#F5B800]"
-            >
-              {t.navContact}
-            </a>
-          </nav>
-
-          <div className="pt-3 border-t border-neutral-800 flex flex-col gap-2">
-            {onOpenOwnerMeter && (
-              <button
-                type="button"
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  onOpenOwnerMeter();
-                }}
-                className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-[#171A21] border border-[#F5B800]/60 text-[#F5B800] text-xs font-bold cursor-pointer"
-              >
-                <Gauge className="w-4 h-4" />
-                <span>Open Owner Quota &amp; SEO Meter</span>
-              </button>
-            )}
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                onOpenAssistant();
-              }}
-              className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-[#F5B800] text-[#0D0F12] text-xs font-bold"
-            >
-              <Sparkles className="w-4 h-4 text-[#0D0F12]" />
-              <span>Ask 24/7 Concierge</span>
-            </button>
-            <div className="grid grid-cols-4 gap-1.5 pt-2">
-              {languages.map((l) => (
-                <button
-                  key={l.code}
-                  onClick={() => {
-                    setLanguage(l.code);
-                    setMobileMenuOpen(false);
-                  }}
-                  className={`py-1.5 text-xs rounded-md border text-center ${
-                    language === l.code
-                      ? 'bg-[#F5B800] text-[#0D0F12] border-[#FFD24C] font-bold'
-                      : 'bg-[#171A21] text-neutral-300 border-neutral-700'
-                  }`}
-                >
-                  {l.flag} {l.code.toUpperCase()}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
     </header>
   );
 };
