@@ -1,9 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://www.easytransferhub.com/</loc>
-    <lastmod>2026-11-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.easytransferhub.com/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.easytransferhub.com/?lang=es" />
+    <xhtml:link rel="alternate" hreflang="ca" href="https://www.easytransferhub.com/?lang=ca" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.easytransferhub.com/" />
+    <lastmod>2026-11-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://www.easytransferhub.com/?lang=es</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.easytransferhub.com/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.easytransferhub.com/?lang=es" />
+    <xhtml:link rel="alternate" hreflang="ca" href="https://www.easytransferhub.com/?lang=ca" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.easytransferhub.com/" />
+    <lastmod>2026-11-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://www.easytransferhub.com/?lang=ca</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.easytransferhub.com/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.easytransferhub.com/?lang=es" />
+    <xhtml:link rel="alternate" hreflang="ca" href="https://www.easytransferhub.com/?lang=ca" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.easytransferhub.com/" />
+    <lastmod>2026-11-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
 </urlset>

@@ -29,8 +29,17 @@ function checkOwnerMeterUrl(): boolean {
   return hash === '#owner-meter' || params.get('meter') === 'owner';
 }
 
+function getInitialLanguage(): 'en' | 'es' | 'ca' | 'ur' {
+  if (typeof window === 'undefined') return 'en';
+  const param = new URLSearchParams(window.location.search).get('lang')?.toLowerCase();
+  if (param === 'es' || param === 'ca' || param === 'ur' || param === 'en') {
+    return param;
+  }
+  return 'en';
+}
+
 export default function App() {
-  const [language, setLanguage] = useState<'en' | 'es' | 'ca' | 'ur'>('en');
+  const [language, setLanguage] = useState<'en' | 'es' | 'ca' | 'ur'>(() => getInitialLanguage());
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
   const [isOwnerMeterOpen, setIsOwnerMeterOpen] = useState<boolean>(() => checkOwnerMeterUrl());
   const [isMoreDetailsOpen, setIsMoreDetailsOpen] = useState(false);
@@ -38,6 +47,17 @@ export default function App() {
   const [mapsApiKey, setMapsApiKey] = useState<string>(ENV_MAPS_API_KEY);
   const [quotaExceeded, setQuotaExceeded] = useState(false);
   const [mapsAuthFailed, setMapsAuthFailed] = useState(false);
+
+  useEffect(() => {
+    document.documentElement.lang = language;
+    if (language === 'es') {
+      document.title = 'EasyTransferHub – Reserva Taxi Barcelona 24h, Taxi Barato y Lujo Aeropuerto';
+    } else if (language === 'ca') {
+      document.title = 'EasyTransferHub – Taxi Barcelona 24h i Trasllats Aeroport BCN';
+    } else {
+      document.title = 'EasyTransferHub (Easy Transfer Hub) – Barcelona Airport Taxi 24h & Private Transfers';
+    }
+  }, [language]);
 
   // Record 1 SEO/Direct session visit and listen for #owner-meter deep-link
   useEffect(() => {

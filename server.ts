@@ -69,6 +69,54 @@ app.get('/easytransferhub-photos.zip', (req, res) => {
   res.download(zipPath, 'easytransferhub-photos.zip');
 });
 
+app.get('/easytransferhub-business-card.zip', (req, res) => {
+  const zipPath = path.resolve(__dirname, 'public/easytransferhub-business-card.zip');
+  res.download(zipPath, 'easytransferhub-business-card.zip');
+});
+
+app.get('/easytransferhub-card-front.jpg', (_req, res) => {
+  const imgPath = path.resolve(__dirname, 'public/easytransferhub-card-front.jpg');
+  res.setHeader('Content-Type', 'image/jpeg');
+  res.sendFile(imgPath);
+});
+
+app.get('/easytransferhub-card-back.jpg', (_req, res) => {
+  const imgPath = path.resolve(__dirname, 'public/easytransferhub-card-back.jpg');
+  res.setHeader('Content-Type', 'image/jpeg');
+  res.sendFile(imgPath);
+});
+
+app.get('/easytransferhub-card-both-sides.jpg', (_req, res) => {
+  const imgPath = path.resolve(__dirname, 'public/easytransferhub-card-both-sides.jpg');
+  res.setHeader('Content-Type', 'image/jpeg');
+  res.sendFile(imgPath);
+});
+
+app.get('/favicon.ico', (_req, res) => {
+  res.setHeader('Content-Type', 'image/x-icon');
+  res.setHeader('Cache-Control', 'public, max-age=86400');
+  res.sendFile(path.resolve(__dirname, 'public/favicon.ico'));
+});
+
+for (const pngIcon of [
+  '/favicon-48x48.png',
+  '/favicon-96x96.png',
+  '/icon-192x192.png',
+  '/icon-512x512.png',
+  '/apple-touch-icon.png',
+]) {
+  app.get(pngIcon, (_req, res) => {
+    res.setHeader('Content-Type', 'image/png');
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    res.sendFile(path.resolve(__dirname, `public${pngIcon}`));
+  });
+}
+
+app.get('/site.webmanifest', (_req, res) => {
+  res.setHeader('Content-Type', 'application/manifest+json; charset=utf-8');
+  res.sendFile(path.resolve(__dirname, 'public/site.webmanifest'));
+});
+
 app.get('/easytransferhub-white-green-animated-theme.zip', (req, res) => {
   const zipPath = path.resolve(__dirname, 'public/easytransferhub-white-green-animated-theme.zip');
   res.download(zipPath, 'easytransferhub-white-green-animated-theme.zip');

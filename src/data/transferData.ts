@@ -789,6 +789,14 @@ export const FAQS = [
     question: "Do you provide transfers to cruise ships and cruise terminals?",
     answer: "Absolutely! We provide direct door-to-door transfers to all Barcelona Cruise Terminals at Moll Adossat (Terminals A, B, C, D, E and World Trade Center) at fixed Zone 3 rates (€50 Standard / €60 Comfort / €70 Minivan from Airport).",
   },
+  {
+    question: "Can I book an instant 24/7 taxi (24taxi / momento taxi) or executive luxury taxi in Barcelona?",
+    answer: "Yes! EasyTransferHub (also searched as Easy Transfer Hub) operates 24/7 for immediate Barcelona airport service, city pickups, and instant taxi reservations. Choose between affordable fixed-fare Standard sedans (€50 base) or Comfort / VIP luxury vehicles (Mercedes E-Class, Mercedes Vito, and Tesla).",
+  },
+  {
+    question: "¿Cómo hacer una reserva de taxi Barcelona (taxi barato precio cerrado o taxi lujo) con EasyTransferHub?",
+    answer: "Puedes reservar tu taxi en Barcelona al momento las 24 horas (24taxi / instant taxi) directamente en nuestra calculadora o por WhatsApp (+34 666 744 440). Ofrecemos tanto taxis oficiales económicos con precio cerrado desde €50 como servicio ejecutivo VIP de lujo (taxi lujo).",
+  },
 ];
 
 export const TRANSLATIONS = {
