@@ -53,7 +53,7 @@ export const VehiclesSection: React.FC = () => {
               >
                 <div>
                   {/* Vehicle Photo Container */}
-                  <div className="relative w-full h-56 bg-[#0D0F12] overflow-hidden group">
+                  <div data-photo-frame="true" className="relative w-full h-56 bg-[#0D0F12] overflow-hidden group">
                     <img
                       src={currentPhoto}
                       alt={currentLabel}
@@ -68,6 +68,7 @@ export const VehiclesSection: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => prevPhoto(vehicle.id, vehicle.photos.length)}
+                          data-photo-overlay="true"
                           className="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-[#0D0F12]/75 text-white border border-white/20 flex items-center justify-center transition-all hover:bg-[#F5B800] hover:text-[#0D0F12] cursor-pointer shadow-md"
                           aria-label="Previous vehicle photo"
                         >
@@ -76,6 +77,7 @@ export const VehiclesSection: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => nextPhoto(vehicle.id, vehicle.photos.length)}
+                          data-photo-overlay="true"
                           className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-[#0D0F12]/75 text-white border border-white/20 flex items-center justify-center transition-all hover:bg-[#F5B800] hover:text-[#0D0F12] cursor-pointer shadow-md"
                           aria-label="Next vehicle photo"
                         >
@@ -84,18 +86,18 @@ export const VehiclesSection: React.FC = () => {
                       </>
                     )}
 
-                    <div className="absolute top-3 left-3 bg-[#0D0F12]/90 text-[#F5B800] border border-[#F5B800]/50 text-[11px] font-bold px-2.5 py-1 rounded-lg backdrop-blur-xs shadow-xs">
+                    <div data-photo-overlay="true" className="absolute top-3 left-3 bg-[#0D0F12]/90 text-[#F5B800] border border-[#F5B800]/50 text-[11px] font-bold px-2.5 py-1 rounded-lg backdrop-blur-xs shadow-xs">
                       {vehicle.category}
                     </div>
 
                     {hasMultiplePhotos && (
-                      <div className="absolute top-3 right-3 bg-white/95 text-[#0D0F12] text-[10px] font-extrabold px-2 py-0.5 rounded-md shadow-xs tabular-nums">
+                      <div data-photo-overlay="true" className="absolute top-3 right-3 bg-white/95 text-[#0D0F12] text-[10px] font-extrabold px-2 py-0.5 rounded-md shadow-xs tabular-nums">
                         {currentIdx + 1} / {vehicle.photos.length}
                       </div>
                     )}
 
                     {/* Active Vehicle Model Strip */}
-                    <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-[#0D0F12]/90 via-[#0D0F12]/55 to-transparent px-3 pt-5 pb-2 flex items-center justify-between">
+                    <div data-photo-overlay="true" className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-[#0D0F12]/90 via-[#0D0F12]/55 to-transparent px-3 pt-5 pb-2 flex items-center justify-between">
                       <span className="text-[11px] font-bold text-white truncate">
                         {currentLabel}
                       </span>

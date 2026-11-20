@@ -1,6 +1,14 @@
 import fs from 'fs';
 import path from 'path';
-import { recordServerTelemetryEvent } from './telemetry';
+
+async function trackReviewApiSafely() {
+  try {
+    const mod: any = await import('./telemetry.js').catch(() => import('./telemetry'));
+    mod?.recordServerTelemetryEvent?.('vercelApi');
+  } catch {
+    // telemetry is best-effort and must never crash /api/reviews on Vercel ESM
+  }
+}
 
 export interface ClientReview {
   id: string;
@@ -180,7 +188,7 @@ export default async function handler(req: any, res: any) {
           : req.body || {};
 
       const action = String(body.action || 'review');
-      recordServerTelemetryEvent('vercelApi');
+      void trackReviewApiSafely();
 
       if (action === 'visit') {
         const store = recordSiteVisit();

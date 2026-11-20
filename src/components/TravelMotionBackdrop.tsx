@@ -246,9 +246,9 @@ const TrainSvg: React.FC<TrainSvgProps> = ({
   className = 'w-[340px] sm:w-[440px] h-auto',
 }) => {
   const isHighSpeed = variant === 'highspeed';
-  const bodyPrimary = isHighSpeed ? '#ffffff' : '#FAF9F6';
-  const stripeColor = isHighSpeed ? '#F5B800' : '#8A5D00';
-  const noseAccent = isHighSpeed ? '#0D0F12' : '#262930';
+  const bodyPrimary = isHighSpeed ? '#ffffff' : '#f8fafc';
+  const stripeColor = isHighSpeed ? '#F5B800' : '#eab308';
+  const noseAccent = isHighSpeed ? '#1E293B' : '#0D0F12';
 
   return (
     <svg
@@ -506,6 +506,7 @@ export const HeroSkyPlanes: React.FC = () => {
 export const TransitCorridorScene: React.FC = () => {
   return (
     <div
+      id="eth-transit-corridor"
       className="relative w-full h-40 sm:h-48 mt-5 overflow-hidden pointer-events-none select-none border-y border-[#F5B800]/30 bg-gradient-to-b from-[#1A1E26] via-[#262B36] to-[#FAF9F6]"
       aria-hidden="true"
     >
@@ -523,7 +524,7 @@ export const TransitCorridorScene: React.FC = () => {
       <svg
         viewBox="0 0 1440 160"
         preserveAspectRatio="none"
-        className="absolute inset-x-0 bottom-[34px] sm:bottom-[42px] w-full h-24 sm:h-28 text-[#101318]/65"
+        className="absolute inset-x-0 bottom-[34px] sm:bottom-[42px] w-full h-24 sm:h-28 text-[#0F172A]/25"
         fill="currentColor"
       >
         <path d="M0,120 Q180,68 380,96 T780,84 T1160,98 T1440,76 L1440,160 L0,160 Z" />
@@ -567,8 +568,8 @@ export const TransitCorridorScene: React.FC = () => {
 
       {/* Overhead Electric Railway Catenary Wire + Poles */}
       <div className="absolute inset-x-0 bottom-[66px] sm:bottom-[80px] h-10 z-10">
-        <div className="absolute inset-x-0 top-2 h-[1px] bg-[#F5B800]/30" />
-        <div className="absolute inset-x-0 top-4 h-[1px] bg-[#F5B800]/40" />
+        <div className="absolute inset-x-0 top-2 h-[1px] bg-[#0F172A]/25" />
+        <div className="absolute inset-x-0 top-4 h-[1px] bg-[#0F172A]/35" />
         <div
           className="absolute inset-x-0 top-0 h-10 opacity-45"
           style={{
@@ -603,21 +604,21 @@ export const TransitCorridorScene: React.FC = () => {
         <div
           className="w-full h-[4px]"
           style={{
-            backgroundImage: 'repeating-linear-gradient(90deg, #8A5D00 0px, #8A5D00 6px, transparent 6px, transparent 14px)',
+            backgroundImage: 'repeating-linear-gradient(90deg, #0F172A 0px, #0F172A 6px, transparent 6px, transparent 14px)',
             opacity: 0.45,
           }}
         />
-        <div className="w-full h-[5px] bg-[#FAF9F6] border-y border-[#E5DEC9]" />
+        <div data-rail-bed="true" className="w-full h-[5px] bg-[#FAF9F6] border-y border-[#E5DEC9]" />
       </div>
 
-      {/* Taxi gold median strip */}
-      <div className="absolute inset-x-0 bottom-[33px] sm:bottom-[40px] h-[7px] bg-gradient-to-r from-[#F5B800]/35 via-[#F5B800]/65 to-[#F5B800]/35 z-20" />
+      {/* Gold/Charcoal median strip */}
+      <div data-median-strip="true" className="absolute inset-x-0 bottom-[33px] sm:bottom-[40px] h-[7px] bg-gradient-to-r from-[#F5B800]/25 via-[#F5B800]/45 to-[#F5B800]/25 z-20" />
 
       {/* Boulevard Asphalt Road with Dashed Lanes & Moving Barcelona Taxis */}
-      <div className="absolute inset-x-0 bottom-0 h-[34px] sm:h-[40px] bg-[#0D0F12] border-t-2 border-[#F5B800] z-30">
+      <div data-road-surface="true" className="absolute inset-x-0 bottom-0 h-[34px] sm:h-[40px] bg-[#0D0F12] border-t-2 border-[#050608] z-30">
         <div className="w-full h-[2px] bg-neutral-700/80" />
         <div
-          className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-[2px] opacity-75"
+          className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-[2px] opacity-80"
           style={{
             backgroundImage: 'repeating-linear-gradient(90deg, #F5B800 0px, #F5B800 18px, transparent 18px, transparent 36px)',
           }}

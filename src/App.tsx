@@ -121,43 +121,44 @@ export default function App() {
 
   const content = (
     <div id="top" className={`min-h-screen flex flex-col bg-white text-slate-900 ${language === 'ur' ? 'font-sans' : ''}`}>
-
-      {/* Top Navigation */}
-      <Navbar
-        language={language}
-        setLanguage={setLanguage}
-        onOpenAssistant={() => setIsAssistantOpen(true)}
-        onOpenOwnerMeter={() => setIsOwnerMeterOpen(true)}
-        onOpenMoreDetails={() => setIsMoreDetailsOpen(true)}
-      />
-
-      <main className="flex-1">
-        {/* Hero & Interactive Calculator */}
-        <Hero
+      <div id="eth-site-shell" className="min-h-screen flex flex-col">
+        {/* Top Navigation */}
+        <Navbar
           language={language}
-          onOpenVoucher={(data) => setVoucherData(data)}
+          setLanguage={setLanguage}
           onOpenAssistant={() => setIsAssistantOpen(true)}
-          mapsEnabled={mapsEnabled}
+          onOpenOwnerMeter={() => setIsOwnerMeterOpen(true)}
+          onOpenMoreDetails={() => setIsMoreDetailsOpen(true)}
         />
 
-        {/* Vehicle Fleet Showcase - Directly below Hero Meet & Greet */}
-        <VehiclesSection />
+        <main className="flex-1">
+          {/* Hero & Interactive Calculator */}
+          <Hero
+            language={language}
+            onOpenVoucher={(data) => setVoucherData(data)}
+            onOpenAssistant={() => setIsAssistantOpen(true)}
+            mapsEnabled={mapsEnabled}
+          />
 
-        {/* How It Works */}
-        <HowItWorks />
+          {/* Vehicle Fleet Showcase - Directly below Hero Meet & Greet */}
+          <VehiclesSection />
 
-        {/* Live Visitors Meter & Client Reviews */}
-        <ReviewsAndVisitorsSection onOpenOwnerMeter={() => setIsOwnerMeterOpen(true)} />
+          {/* How It Works */}
+          <HowItWorks />
 
-        {/* FAQ Section */}
-        <FaqSection />
+          {/* Live Visitors Meter & Client Reviews */}
+          <ReviewsAndVisitorsSection onOpenOwnerMeter={() => setIsOwnerMeterOpen(true)} />
 
-        {/* Direct Contact & WhatsApp Form */}
-        <ContactSection />
-      </main>
+          {/* FAQ Section */}
+          <FaqSection />
 
-      {/* Footer */}
-      <Footer onOpenOwnerMeter={() => setIsOwnerMeterOpen(true)} />
+          {/* Direct Contact & WhatsApp Form */}
+          <ContactSection />
+        </main>
+
+        {/* Footer */}
+        <Footer onOpenOwnerMeter={() => setIsOwnerMeterOpen(true)} />
+      </div>
 
       {/* Floating Action Buttons */}
       <FloatingActions onOpenAssistant={() => setIsAssistantOpen(true)} />

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   Activity,
+  AlertTriangle,
   BarChart3,
   CheckCircle2,
   Clock,
@@ -14,6 +15,7 @@ import {
   RefreshCw,
   RotateCcw,
   Search,
+  Send,
   Settings,
   ShieldCheck,
   Sparkles,
@@ -30,6 +32,29 @@ import {
 interface OwnerQuotaMeterModalProps {
   isOpen: boolean;
   onClose: () => void;
+}
+
+interface EmailDiagnosticStatus {
+  ok: boolean;
+  ready: boolean;
+  provider: string | null;
+  resendConfigured: boolean;
+  smtpConfigured: boolean;
+  smtpHost: string;
+  smtpPort: number;
+  smtpUserMasked: string;
+  ownerEmailMasked: string;
+  issueHint: string;
+}
+
+interface EmailTestResult {
+  loading: boolean;
+  bookingRef?: string;
+  emailSent?: boolean;
+  ownerEmailSent?: boolean;
+  emailProvider?: string | null;
+  emailError?: string;
+  httpError?: string;
 }
 
 function getDaysLeftInMonth(): number {
@@ -245,10 +270,24 @@ export const OwnerQuotaMeterModal: React.FC<OwnerQuotaMeterModalProps> = ({
   const [githubMinsUsedInput, setGithubMinsUsedInput] = useState('0');
   const [gscClicksInput, setGscClicksInput] = useState('0');
   const [domainRenewalInput, setDomainRenewalInput] = useState('2027-01-15');
+  const [emailDiag, setEmailDiag] = useState<EmailDiagnosticStatus | null>(null);
+  const [emailTestResult, setEmailTestResult] = useState<EmailTestResult>({ loading: false });
+
+  const fetchEmailDiag = async () => {
+    try {
+      const res = await fetch('/api/booking-confirm', { cache: 'no-store' });
+      if (res.ok) {
+        const data = (await res.json()) as EmailDiagnosticStatus;
+        setEmailDiag(data);
+      }
+    } catch {
+      // ignore background diagnostics fetch failure
+    }
+  };
 
   const loadData = async () => {
     setLoading(true);
-    const snap = await fetchQuotaSnapshot();
+    const [snap] = await Promise.all([fetchQuotaSnapshot(), fetchEmailDiag()]);
     setStore(snap);
     setPlacesLimitInput(String(snap.limits.placesMonthlyLimit));
     setRoutesLimitInput(String(snap.limits.routesMonthlyLimit));
@@ -259,6 +298,55 @@ export const OwnerQuotaMeterModal: React.FC<OwnerQuotaMeterModalProps> = ({
     setGscClicksInput(String(snap.manualUsage.gscMonthlyClicks));
     setDomainRenewalInput(snap.limits.domainRenewalDate || '2027-01-15');
     setLoading(false);
+  };
+
+  const handleSendTestEmail = async () => {
+    setEmailTestResult({ loading: true });
+    try {
+      const res = await fetch('/api/booking-confirm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pickup: 'Barcelona Airport (BCN) Terminal 1',
+          dropoff: 'Sagrada Familia, Barcelona',
+          dateTime: new Date().toISOString().slice(0, 16).replace('T', ' '),
+          passengers: 2,
+          adults: 2,
+          children: 0,
+          luggage: 2,
+          childSeats: 0,
+          vehicleName: 'Standard Sedan',
+          quotedPrice: 50,
+          passengerName: 'Mr. Mir (Live Email Test)',
+          email: 'easytransferhub@gmail.com',
+          phone: '+34 666 744 440',
+          paymentMethod: 'Diagnostic Test',
+          driverNotes: 'Automated test triggered from #owner-meter',
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setEmailTestResult({
+          loading: false,
+          httpError: data?.error || `Server returned HTTP ${res.status}`,
+        });
+      } else {
+        setEmailTestResult({
+          loading: false,
+          bookingRef: data.bookingRef,
+          emailSent: Boolean(data.emailSent),
+          ownerEmailSent: Boolean(data.ownerEmailSent),
+          emailProvider: data.emailProvider || null,
+          emailError: data.emailError,
+        });
+        void fetchEmailDiag();
+      }
+    } catch (err) {
+      setEmailTestResult({
+        loading: false,
+        httpError: err instanceof Error ? err.message : 'Network error reaching /api/booking-confirm',
+      });
+    }
   };
 
   useEffect(() => {
@@ -639,6 +727,119 @@ export const OwnerQuotaMeterModal: React.FC<OwnerQuotaMeterModalProps> = ({
 
         {/* Body Content */}
         <div className="p-4 sm:p-6 space-y-6">
+          {/* Owner-Only Booking Email Health & 1-Click Live Test */}
+          <div
+            className={`rounded-2xl border p-4 transition-colors ${
+              emailDiag?.ready
+                ? 'bg-emerald-950/25 border-emerald-500/35'
+                : 'bg-amber-950/30 border-amber-500/45'
+            }`}
+          >
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-start gap-3">
+                <div
+                  className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border ${
+                    emailDiag?.ready
+                      ? 'bg-emerald-500/15 border-emerald-500/35 text-emerald-400'
+                      : 'bg-amber-500/15 border-amber-500/35 text-amber-400'
+                  }`}
+                >
+                  {emailDiag?.ready ? (
+                    <Mail className="w-4 h-4" />
+                  ) : (
+                    <AlertTriangle className="w-4 h-4" />
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="text-sm font-display font-bold text-white">
+                      Booking Email Server Status
+                    </h3>
+                    <span
+                      className={`text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md border ${
+                        emailDiag?.ready
+                          ? 'text-emerald-300 bg-emerald-500/15 border-emerald-500/40'
+                          : 'text-amber-300 bg-amber-500/15 border-amber-500/40'
+                      }`}
+                    >
+                      {emailDiag
+                        ? emailDiag.ready
+                          ? `READY (${emailDiag.provider?.toUpperCase()})`
+                          : 'CREDENTIALS MISSING'
+                        : 'CHECKING...'}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    {emailDiag?.issueHint || 'Checking booking email configuration...'}
+                  </p>
+                  {emailDiag && (
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-slate-400 pt-0.5">
+                      <span>
+                        Sender: <strong className="text-slate-200">{emailDiag.smtpUserMasked}</strong>
+                      </span>
+                      <span>
+                        Owner Inbox: <strong className="text-slate-200">{emailDiag.ownerEmailMasked}</strong>
+                      </span>
+                      <span>
+                        SMTP: <strong className="text-slate-200">{emailDiag.smtpHost}:{emailDiag.smtpPort}</strong>
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleSendTestEmail}
+                disabled={emailTestResult.loading}
+                className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#F5B800] hover:bg-[#eab308] disabled:opacity-60 text-[#0D0F12] text-xs font-extrabold transition-colors cursor-pointer shrink-0"
+              >
+                <Send className={`w-3.5 h-3.5 ${emailTestResult.loading ? 'animate-pulse' : ''}`} />
+                <span>{emailTestResult.loading ? 'Sending Test...' : 'Send Test Booking Email'}</span>
+              </button>
+            </div>
+
+            {(emailTestResult.bookingRef || emailTestResult.httpError) && (
+              <div className="mt-3 pt-3 border-t border-white/10 text-xs flex flex-col gap-1">
+                {emailTestResult.httpError ? (
+                  <p className="text-red-300 font-semibold">Error: {emailTestResult.httpError}</p>
+                ) : (
+                  <>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <span className="text-slate-300">
+                        Test Ref: <strong className="text-white">{emailTestResult.bookingRef}</strong>
+                      </span>
+                      <span
+                        className={`font-bold ${
+                          emailTestResult.emailSent ? 'text-emerald-400' : 'text-red-400'
+                        }`}
+                      >
+                        Client Email: {emailTestResult.emailSent ? 'SENT' : 'FAILED'}
+                      </span>
+                      <span
+                        className={`font-bold ${
+                          emailTestResult.ownerEmailSent ? 'text-emerald-400' : 'text-red-400'
+                        }`}
+                      >
+                        Owner Email: {emailTestResult.ownerEmailSent ? 'SENT' : 'FAILED'}
+                      </span>
+                      {emailTestResult.emailProvider && (
+                        <span className="text-slate-400">
+                          Provider: <strong className="text-white">{emailTestResult.emailProvider}</strong>
+                        </span>
+                      )}
+                    </div>
+                    {emailTestResult.emailError && (
+                      <p className="text-amber-300 font-medium">
+                        Server Diagnostic: {emailTestResult.emailError}
+                      </p>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+
           {/* Row 1: 3 Analog + Digital Speedometer / Taximeter Dials */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <AnalogTaximeterGauge

@@ -21,19 +21,19 @@ export const Hero: React.FC<HeroProps> = ({
   const t = TRANSLATIONS[language];
 
   return (
-    <section className="relative bg-gradient-to-b from-[#0D0F12] via-[#15181E] to-[#FAF9F6] text-white overflow-hidden pt-2.5 sm:pt-3.5 pb-8 border-b border-[#E5DEC9]">
+    <section id="eth-hero-section" className="relative bg-gradient-to-b from-[#0D0F12] via-[#15181E] to-[#FAF9F6] text-white overflow-hidden pt-2.5 sm:pt-3.5 pb-8 border-b border-[#E5DEC9]">
       {/* Subtle warm Barcelona Taxi Gold ambient light behind hero */}
-      <div className="absolute -top-28 right-1/4 w-[520px] h-[420px] bg-[#F5B800]/10 rounded-full blur-3xl pointer-events-none" />
+      <div data-hero-orb="true" className="absolute -top-28 right-1/4 w-[520px] h-[420px] bg-[#F5B800]/10 rounded-full blur-3xl pointer-events-none" />
 
       {/* Flying Vueling & Ryanair Airplanes across the upper Barcelona sky */}
       <HeroSkyPlanes />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
         {/* Compact Single-Line Hero Headline + Fair-Price-Sized Green WhatsApp Badge */}
-        <div className="mb-2.5 sm:mb-3 flex items-center justify-between sm:justify-start gap-2.5">
+        <div className="mb-2.5 sm:mb-3 flex items-center justify-between gap-2.5">
           <h1
-            className="font-display font-bold text-[#FAF9F6] tracking-tight leading-tight whitespace-nowrap truncate min-w-0 m-0"
-            style={{ fontSize: 'clamp(13px, 2.25vw, 24px)' }}
+            className="font-display font-bold text-[#FAF9F6] tracking-tight leading-snug sm:whitespace-nowrap min-w-0 m-0"
+            style={{ fontSize: 'clamp(13.5px, 2.25vw, 24px)' }}
           >
             {t.heroTitle}
           </h1>
@@ -44,6 +44,7 @@ export const Hero: React.FC<HeroProps> = ({
             )}`}
             target="_blank"
             rel="noopener noreferrer"
+            data-whatsapp-btn="true"
             className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-extrabold px-2.5 py-1.5 rounded-lg bg-[#25D366] hover:bg-[#1FB858] border border-[#1EA952] text-white shadow-2xs whitespace-nowrap shrink-0 transition-colors"
             title="Chat on WhatsApp +34 666 744 440"
           >

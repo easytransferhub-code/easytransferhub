@@ -1,5 +1,13 @@
 import nodemailer from 'nodemailer';
-import { recordServerTelemetryEvent } from './telemetry';
+
+async function trackBookingEmailSafely() {
+  try {
+    const mod: any = await import('./telemetry.js').catch(() => import('./telemetry'));
+    mod?.recordServerTelemetryEvent?.('bookingEmail');
+  } catch {
+    // telemetry is best-effort and must never fail booking emails on Vercel ESM
+  }
+}
 
 export interface BookingConfirmPayload {
   bookingRef?: string;
@@ -119,22 +127,22 @@ function buildBookingEmailHtml(data: BookingConfirmPayload, bookingRef: string):
   const safePhone = escapeHtml(data.phone);
 
   return `
-  <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background:#f2feff; padding:28px 16px; color:#0f172a;">
-    <div style="max-width:620px; margin:0 auto; background:#ffffff; border:1px solid #67efff; border-radius:20px; overflow:hidden; box-shadow:0 12px 32px rgba(0,166,191,0.12);">
-      <div style="height:6px; background:#00f0ff;"></div>
-      <div style="background:#e6fdff; padding:22px 26px; border-bottom:1px solid #8ceeff;">
+  <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background:#FAF9F6; padding:28px 16px; color:#0D0F12;">
+    <div style="max-width:620px; margin:0 auto; background:#ffffff; border:1px solid #E3D6AD; border-radius:20px; overflow:hidden; box-shadow:0 12px 32px rgba(13,15,18,0.10);">
+      <div style="height:6px; background:#F5B800;"></div>
+      <div style="background:#0D0F12; padding:22px 26px; border-bottom:2px solid #F5B800;">
         <table style="width:100%; border-collapse:collapse;">
           <tr>
             <td>
-              <div style="font-size:22px; font-weight:800; color:#042f40; letter-spacing:-0.02em;">
-                Easytransfer<span style="color:#00a6bf;">hub</span>
+              <div style="font-size:22px; font-weight:800; color:#FAF9F6; letter-spacing:-0.02em;">
+                EasyTransfer<span style="color:#F5B800;">Hub</span>
               </div>
-              <div style="margin-top:4px; font-size:12px; color:#007c91; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">
-                Official Transfer Confirmation
+              <div style="margin-top:4px; font-size:12px; color:#E5C158; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;">
+                Official Transfer Confirmation · AMB / IMET Barcelona
               </div>
             </td>
             <td style="text-align:right; vertical-align:top;">
-              <span style="display:inline-block; background:#00f0ff; color:#042f40; font-weight:800; font-size:12px; padding:6px 12px; border-radius:999px; border:1px solid #00c8e8;">
+              <span style="display:inline-block; background:#F5B800; color:#0D0F12; font-weight:800; font-size:12px; padding:6px 12px; border-radius:999px;">
                 REF ${escapeHtml(bookingRef)}
               </span>
             </td>
@@ -148,15 +156,15 @@ function buildBookingEmailHtml(data: BookingConfirmPayload, bookingRef: string):
           Thank you for choosing <strong>Easytransferhub</strong>. Your private Barcelona chauffeur transfer has been registered with our 24/7 dispatch center. Here is your official ride pass:
         </p>
 
-        <div style="background:#f5feff; border:1px solid #8ceeff; border-radius:14px; padding:18px; margin-bottom:18px;">
-          <div style="font-size:11px; font-weight:800; color:#007c91; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;">Pickup Location</div>
-          <div style="font-size:15px; font-weight:800; color:#042f40; margin-bottom:12px;">${safePickup}</div>
-          <div style="border-top:1px dashed #67efff; margin:10px 0;"></div>
-          <div style="font-size:11px; font-weight:800; color:#007c91; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;">Drop-off Destination</div>
-          <div style="font-size:15px; font-weight:800; color:#042f40;">${safeDropoff}</div>
+        <div style="background:#FCFBF7; border:1px solid #E3D6AD; border-radius:14px; padding:18px; margin-bottom:18px;">
+          <div style="font-size:11px; font-weight:800; color:#8A5D00; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;">Pickup Location</div>
+          <div style="font-size:15px; font-weight:800; color:#0D0F12; margin-bottom:12px;">${safePickup}</div>
+          <div style="border-top:1px dashed #DFC670; margin:10px 0;"></div>
+          <div style="font-size:11px; font-weight:800; color:#8A5D00; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;">Drop-off Destination</div>
+          <div style="font-size:15px; font-weight:800; color:#0D0F12;">${safeDropoff}</div>
         </div>
 
-        <div style="background:#ffffff; border:1px solid #cff9ff; border-radius:14px; padding:16px 18px; margin-bottom:18px;">
+        <div style="background:#ffffff; border:1px solid #E6DFCB; border-radius:14px; padding:16px 18px; margin-bottom:18px;">
           <table style="width:100%; border-collapse:collapse; font-size:13px;">
             <tr>
               <td style="padding:7px 0; color:#64748b; width:155px; border-bottom:1px solid #f1f5f9;">Pickup Date &amp; Time</td>
@@ -184,27 +192,27 @@ function buildBookingEmailHtml(data: BookingConfirmPayload, bookingRef: string):
           </table>
         </div>
 
-        <div style="background:#e6fdff; border:1px solid #00c8e8; border-radius:14px; padding:16px 20px; margin-bottom:20px;">
+        <div style="background:#FBF7E6; border:1px solid #DFC670; border-radius:14px; padding:16px 20px; margin-bottom:20px;">
           <table style="width:100%; border-collapse:collapse;">
             <tr>
               <td>
-                <div style="font-size:11px; font-weight:800; color:#007c91; text-transform:uppercase; letter-spacing:0.05em;">Guaranteed Fixed Fare</div>
+                <div style="font-size:11px; font-weight:800; color:#8A5D00; text-transform:uppercase; letter-spacing:0.05em;">Guaranteed Fixed Fare</div>
                 <div style="font-size:12px; color:#334155; margin-top:2px;">All highway tolls, taxes &amp; 60m flight wait included</div>
               </td>
               <td style="text-align:right;">
-                <span style="font-size:26px; font-weight:800; color:#042f40;">€${data.quotedPrice}</span>
+                <span style="font-size:26px; font-weight:800; color:#0D0F12;">€${data.quotedPrice}</span>
               </td>
             </tr>
           </table>
         </div>
 
         <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:14px 16px; margin-bottom:20px; font-size:13px; color:#334155; line-height:1.5;">
-          <strong style="color:#042f40;">Airport Meet &amp; Greet Instructions:</strong><br/>
+          <strong style="color:#0D0F12;">Airport Meet &amp; Greet Instructions:</strong><br/>
           Your chauffeur will track your flight live and wait inside the arrivals hall holding a nameboard reading <strong>"${safeName}"</strong>. 60 minutes of complimentary airport waiting time is included.
         </div>
 
         <div style="text-align:center; margin-bottom:14px;">
-          <a href="https://wa.me/34666744440?text=${encodeURIComponent(`Hello Mr. Mir, regarding my Easytransferhub booking ${bookingRef} (${data.pickup} to ${data.dropoff}).`)}" style="display:inline-block; background:#00f0ff; color:#042f40; text-decoration:none; font-weight:800; font-size:14px; padding:12px 24px; border-radius:12px; border:1px solid #00c8e8;">
+          <a href="https://wa.me/34666744440?text=${encodeURIComponent(`Hello Mr. Mir, regarding my EasyTransferHub booking ${bookingRef} (${data.pickup} to ${data.dropoff}).`)}" style="display:inline-block; background:#F5B800; color:#0D0F12; text-decoration:none; font-weight:800; font-size:14px; padding:12px 24px; border-radius:12px; border:1px solid #D99F00;">
             Message Chauffeur Dispatch on WhatsApp
           </a>
         </div>
@@ -220,31 +228,35 @@ function buildBookingEmailHtml(data: BookingConfirmPayload, bookingRef: string):
 function buildOwnerDispatchEmailHtml(data: BookingConfirmPayload, bookingRef: string): string {
   const clientDigits = normalizePhoneDigits(data.phone);
   const waClientReplyUrl = clientDigits
-    ? `https://wa.me/${clientDigits}?text=${encodeURIComponent(`Hello ${data.passengerName}, thank you for booking with Easytransferhub! Your transfer (${bookingRef}) from ${data.pickup} to ${data.dropoff} is confirmed for €${data.quotedPrice}. Best regards, Mr. Mir (+34 666 744 440)`)}`
+    ? `https://wa.me/${clientDigits}?text=${encodeURIComponent(`Hello ${data.passengerName}, thank you for booking with EasyTransferHub! Your transfer (${bookingRef}) from ${data.pickup} to ${data.dropoff} is confirmed for €${data.quotedPrice}. Best regards, Mr. Mir (+34 666 744 440)`)}`
     : '';
 
   return `
-  <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background:#f2feff; padding:24px;">
-    <div style="max-width:600px; margin:0 auto; background:#ffffff; border:2px solid #00c8e8; border-radius:16px; padding:24px;">
-      <div style="font-size:12px; font-weight:800; color:#007c91; text-transform:uppercase; letter-spacing:0.06em;">
-        NEW TRANSFER BOOKING RECEIVED
+  <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background:#FAF9F6; padding:24px;">
+    <div style="max-width:600px; margin:0 auto; background:#ffffff; border:2px solid #F5B800; border-radius:16px; overflow:hidden;">
+      <div style="background:#0D0F12; padding:16px 24px; border-bottom:2px solid #F5B800;">
+        <div style="font-size:11px; font-weight:800; color:#F5B800; text-transform:uppercase; letter-spacing:0.08em;">
+          NEW TRANSFER BOOKING RECEIVED
+        </div>
+        <h2 style="margin:4px 0 0; color:#FFFFFF; font-size:20px;">
+          ${escapeHtml(bookingRef)} · €${data.quotedPrice} (${escapeHtml(data.vehicleName)})
+        </h2>
       </div>
-      <h2 style="margin:6px 0 16px; color:#042f40; font-size:20px;">
-        ${escapeHtml(bookingRef)} · €${data.quotedPrice} (${escapeHtml(data.vehicleName)})
-      </h2>
-      <p style="margin:0 0 14px; font-size:14px; color:#0f172a;">
-        <strong>Client:</strong> ${escapeHtml(data.passengerName)}<br/>
-        <strong>Phone / WhatsApp:</strong> ${escapeHtml(data.phone)}<br/>
-        <strong>Email:</strong> ${escapeHtml(data.email)}<br/>
-        <strong>Pickup:</strong> ${escapeHtml(data.pickup)}<br/>
-        <strong>Drop-off:</strong> ${escapeHtml(data.dropoff)}<br/>
-        <strong>Date &amp; Time:</strong> ${escapeHtml(data.dateTime || 'To be confirmed')}<br/>
-        ${data.flightNumber ? `<strong>Flight:</strong> ${escapeHtml(data.flightNumber)}<br/>` : ''}
-        <strong>Pax / Luggage / Seats:</strong> ${data.passengers} Pax · ${data.luggage} Bags · ${data.childSeats} Child Seats${data.childSeats > 0 ? ` (+€${data.childSeats * 5})` : ''}<br/>
-        <strong>Payment:</strong> ${escapeHtml(data.paymentMethod || 'Card / Cash')}<br/>
-        ${data.driverNotes ? `<strong>Notes:</strong> ${escapeHtml(data.driverNotes)}<br/>` : ''}
-      </p>
-      ${waClientReplyUrl ? `<a href="${waClientReplyUrl}" style="display:inline-block; background:#00f0ff; color:#042f40; font-weight:800; font-size:14px; text-decoration:none; padding:12px 20px; border-radius:10px; border:1px solid #00c8e8;">1-Tap Reply to Client on WhatsApp</a>` : ''}
+      <div style="padding:22px 24px;">
+        <p style="margin:0 0 16px; font-size:14px; color:#0f172a; line-height:1.7;">
+          <strong>Client:</strong> ${escapeHtml(data.passengerName)}<br/>
+          <strong>Phone / WhatsApp:</strong> ${escapeHtml(data.phone)}<br/>
+          <strong>Email:</strong> ${escapeHtml(data.email)}<br/>
+          <strong>Pickup:</strong> ${escapeHtml(data.pickup)}<br/>
+          <strong>Drop-off:</strong> ${escapeHtml(data.dropoff)}<br/>
+          <strong>Date &amp; Time:</strong> ${escapeHtml(data.dateTime || 'To be confirmed')}<br/>
+          ${data.flightNumber ? `<strong>Flight:</strong> ${escapeHtml(data.flightNumber)}<br/>` : ''}
+          <strong>Pax / Luggage / Seats:</strong> ${data.passengers} Pax · ${data.luggage} Bags · ${data.childSeats} Child Seats${data.childSeats > 0 ? ` (+€${data.childSeats * 5})` : ''}<br/>
+          <strong>Payment:</strong> ${escapeHtml(data.paymentMethod || 'Card / Cash')}<br/>
+          ${data.driverNotes ? `<strong>Notes:</strong> ${escapeHtml(data.driverNotes)}<br/>` : ''}
+        </p>
+        ${waClientReplyUrl ? `<a href="${waClientReplyUrl}" style="display:inline-block; background:#25D366; color:#FFFFFF; font-weight:800; font-size:14px; text-decoration:none; padding:12px 20px; border-radius:10px;">1-Tap Reply to Client on WhatsApp</a>` : ''}
+      </div>
     </div>
   </div>`;
 }
@@ -283,32 +295,119 @@ function buildPlainTextMessage(data: BookingConfirmPayload, bookingRef: string):
   return lines.join('\n');
 }
 
-async function sendEmailNotifications(
-  data: BookingConfirmPayload,
-  bookingRef: string
-): Promise<{ sent: boolean; ownerSent: boolean; provider: string | null }> {
-  const cleanEnv = (val?: string) =>
-    (val || '').trim().replace(/^["']|["']$/g, '').trim();
-  const configuredOwnerRaw = cleanEnv(process.env.BOOKING_OWNER_EMAIL);
+function cleanEnvValue(val?: string): string {
+  return (val || '').trim().replace(/^["']|["']$/g, '').trim();
+}
+
+function maskEmailAddress(email: string): string {
+  const [local, domain] = email.split('@');
+  if (!local || !domain) return '***';
+  const head = local.slice(0, 2);
+  return `${head}***@${domain}`;
+}
+
+function getResolvedEmailEnv() {
+  const configuredOwnerRaw = cleanEnvValue(process.env.BOOKING_OWNER_EMAIL);
   const parsedOwners = configuredOwnerRaw
     .split(/[,;\s]+/)
     .map((e) => e.trim().toLowerCase())
     .filter((e) => EMAIL_REGEX.test(e));
   const ownerEmails =
     parsedOwners.length > 0 ? Array.from(new Set(parsedOwners)) : ['easytransferhub@gmail.com'];
-  const ownerEmail = ownerEmails[0];
+
+  const resendKey = cleanEnvValue(process.env.RESEND_API_KEY);
+  const resendFrom =
+    cleanEnvValue(process.env.RESEND_FROM_EMAIL) || 'EasyTransferHub <bookings@easytransferhub.com>';
+
+  const smtpUser =
+    cleanEnvValue(process.env.SMTP_USER) ||
+    cleanEnvValue(process.env.GMAIL_USER) ||
+    cleanEnvValue(process.env.EMAIL_USER) ||
+    ownerEmails[0];
+  const rawPass =
+    cleanEnvValue(process.env.SMTP_PASS) ||
+    cleanEnvValue(process.env.GMAIL_APP_PASSWORD) ||
+    cleanEnvValue(process.env.SMTP_PASSWORD) ||
+    cleanEnvValue(process.env.EMAIL_PASS) ||
+    '';
+  const smtpPass = rawPass.replace(/\s+/g, '').trim();
+  const smtpHost = cleanEnvValue(process.env.SMTP_HOST) || 'smtp.gmail.com';
+  const smtpPort = Number(cleanEnvValue(process.env.SMTP_PORT) || 465);
+
+  return {
+    ownerEmails,
+    ownerEmail: ownerEmails[0],
+    resendKey,
+    resendFrom,
+    smtpUser,
+    smtpPass,
+    smtpHost,
+    smtpPort,
+  };
+}
+
+export function getEmailConfigStatus() {
+  const cfg = getResolvedEmailEnv();
+  const resendConfigured = Boolean(cfg.resendKey && cfg.resendKey.length > 8);
+  const smtpConfigured = Boolean(cfg.smtpUser && cfg.smtpPass && cfg.smtpPass.length >= 8);
+  const ready = resendConfigured || smtpConfigured;
+
+  let issueHint = 'Configured and ready to send client & owner confirmation emails.';
+  if (!ready) {
+    if (cfg.smtpPass && cfg.smtpPass.length < 8) {
+      issueHint = 'SMTP_PASS looks too short. Set your 16-character Google App Password in Vercel Environment Variables and Redeploy.';
+    } else {
+      issueHint =
+        'Neither SMTP_PASS (16-char Google App Password) nor RESEND_API_KEY is configured in Environment Variables. Add SMTP_PASS in Vercel -> Settings -> Environment Variables and Redeploy.';
+    }
+  }
+
+  return {
+    ok: true,
+    ready,
+    provider: resendConfigured ? 'resend' : smtpConfigured ? 'smtp' : null,
+    resendConfigured,
+    smtpConfigured,
+    smtpHost: cfg.smtpHost,
+    smtpPort: cfg.smtpPort,
+    smtpUserMasked: maskEmailAddress(cfg.smtpUser),
+    ownerEmailMasked: maskEmailAddress(cfg.ownerEmail),
+    issueHint,
+  };
+}
+
+function summarizeEmailError(err: unknown): string {
+  const raw = err instanceof Error ? err.message : String(err || '');
+  if (/535|Invalid login|Username and Password not accepted|BadCredentials/i.test(raw)) {
+    return 'Gmail rejected password (535). Use a 16-character Google App Password (myaccount.google.com/apppasswords), not your regular Gmail password.';
+  }
+  if (/ECONNREFUSED|ETIMEDOUT|ENOTFOUND|Greeting never received/i.test(raw)) {
+    return `SMTP connection timeout/blocked (${raw.slice(0, 90)}). Consider using Resend API (RESEND_API_KEY) for instant HTTP delivery.`;
+  }
+  if (/domain is not verified|not verified|403/i.test(raw)) {
+    return 'Resend rejected sender domain. Verify easytransferhub.com DNS in Resend, or use Gmail SMTP_USER + SMTP_PASS.';
+  }
+  return raw ? raw.slice(0, 140) : 'Email delivery failed.';
+}
+
+async function sendEmailNotifications(
+  data: BookingConfirmPayload,
+  bookingRef: string
+): Promise<{ sent: boolean; ownerSent: boolean; provider: string | null; emailError?: string }> {
+  const cfg = getResolvedEmailEnv();
+  const { ownerEmails, ownerEmail, resendKey, resendFrom, smtpUser, smtpPass, smtpHost, smtpPort } = cfg;
+
   const subject = `Booking Confirmation ${bookingRef} - EasyTransferHub Barcelona`;
   const ownerSubject = `New Booking ${bookingRef} (${data.vehicleName}) - ${data.passengerName}`;
   const html = buildBookingEmailHtml(data, bookingRef);
   const ownerHtml = buildOwnerDispatchEmailHtml(data, bookingRef);
   const text = buildPlainTextMessage(data, bookingRef);
 
-  // Primary Recommended Option for Verified Domains: Resend HTTP API (SPF/DKIM/DMARC Inbox Deliverability)
-  const resendKey = cleanEnv(process.env.RESEND_API_KEY);
+  const errors: string[] = [];
+
+  // Primary Option: Resend HTTP API
   if (resendKey && resendKey.length > 8) {
     try {
-      const fromAddress =
-        cleanEnv(process.env.RESEND_FROM_EMAIL) || 'EasyTransferHub <bookings@easytransferhub.com>';
       const requests: Promise<Response>[] = [
         fetch('https://api.resend.com/emails', {
           method: 'POST',
@@ -317,7 +416,7 @@ async function sendEmailNotifications(
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            from: fromAddress,
+            from: resendFrom,
             to: [data.email],
             reply_to: ownerEmail,
             subject,
@@ -339,7 +438,7 @@ async function sendEmailNotifications(
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              from: fromAddress,
+              from: resendFrom,
               to: ownerEmails,
               reply_to: data.email,
               subject: ownerSubject,
@@ -360,60 +459,55 @@ async function sendEmailNotifications(
         ownerSettled?.status === 'fulfilled' ? ownerSettled.value.ok : false;
 
       if (!clientOk && clientSettled.status === 'fulfilled') {
-        console.warn('Resend client email returned non-OK:', await clientSettled.value.text());
+        const errBody = await clientSettled.value.text();
+        console.warn('Resend client email returned non-OK:', errBody);
+        errors.push(summarizeEmailError(errBody));
       }
       if (!ownerOk && ownerSettled?.status === 'fulfilled') {
-        console.warn('Resend owner email returned non-OK:', await ownerSettled.value.text());
+        const errBody = await ownerSettled.value.text();
+        console.warn('Resend owner email returned non-OK:', errBody);
+        if (errors.length === 0) errors.push(summarizeEmailError(errBody));
       }
 
       if (clientOk || ownerOk) {
-        return { sent: clientOk, ownerSent: ownerOk, provider: 'resend' };
+        return {
+          sent: clientOk,
+          ownerSent: ownerOk,
+          provider: 'resend',
+          emailError: errors[0],
+        };
       }
     } catch (err) {
       console.warn('Resend email error:', err);
+      errors.push(summarizeEmailError(err));
     }
   }
 
-  // Fallback Option: Gmail / Custom SMTP via Nodemailer
-  const smtpUser =
-    cleanEnv(process.env.SMTP_USER) ||
-    cleanEnv(process.env.GMAIL_USER) ||
-    cleanEnv(process.env.EMAIL_USER) ||
-    ownerEmail;
-  const rawPass =
-    cleanEnv(process.env.SMTP_PASS) ||
-    cleanEnv(process.env.GMAIL_APP_PASSWORD) ||
-    cleanEnv(process.env.SMTP_PASSWORD) ||
-    cleanEnv(process.env.EMAIL_PASS) ||
-    '';
-  const smtpPass = rawPass.replace(/\s+/g, '').trim();
-
+  // Fallback / Direct Free Option: Gmail / Custom SMTP via Nodemailer (IPv4 + 465/587 retry)
   if (smtpUser && smtpPass) {
-    try {
-      const smtpHost = cleanEnv(process.env.SMTP_HOST) || 'smtp.gmail.com';
-      const smtpPort = Number(cleanEnv(process.env.SMTP_PORT) || 465);
-      const transporter = nodemailer.createTransport(
-        smtpHost === 'smtp.gmail.com'
-          ? {
-              service: 'gmail',
-              auth: {
-                user: smtpUser,
-                pass: smtpPass,
-              },
-            }
-          : {
-              host: smtpHost,
-              port: smtpPort,
-              secure: smtpPort === 465,
-              auth: {
-                user: smtpUser,
-                pass: smtpPass,
-              },
-            }
-      );
+    const attemptSmtpPort = async (port: number) => {
+      const transporter = nodemailer.createTransport({
+        host: smtpHost,
+        port,
+        secure: port === 465,
+        auth: {
+          user: smtpUser,
+          pass: smtpPass,
+        },
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
+        socketTimeout: 15000,
+        tls: {
+          servername: smtpHost,
+        },
+        // Prefer IPv4 to avoid slow/broken IPv6 sockets on serverless runtimes
+        family: 4,
+      } as any);
 
-      // 1. Send Client Email independently
       let clientAccepted = false;
+      let ownerSent = false;
+      let lastErr = '';
+
       try {
         const clientInfo = await transporter.sendMail({
           from: `"EasyTransferHub" <${smtpUser}>`,
@@ -426,19 +520,15 @@ async function sendEmailNotifications(
             'X-Entity-Ref-ID': bookingRef,
           },
         });
-        clientAccepted =
-          Array.isArray(clientInfo?.accepted) && clientInfo.accepted.length > 0;
+        clientAccepted = Array.isArray(clientInfo?.accepted) && clientInfo.accepted.length > 0;
         if (!clientAccepted) {
-          console.warn('SMTP client email rejected:', clientInfo?.rejected);
+          lastErr = `SMTP client rejected: ${JSON.stringify(clientInfo?.rejected)}`;
         }
       } catch (clientErr: unknown) {
-        console.warn('SMTP client email error:', clientErr);
+        lastErr = summarizeEmailError(clientErr);
+        console.warn(`SMTP (port ${port}) client email error:`, clientErr);
       }
 
-      // 2. Send Dedicated Owner Dispatch Email(s) to Inbox
-      // If sender and owner are the same @gmail.com account, use +booking sub-address
-      // so Gmail delivers it into Primary Inbox instead of hiding it as self-sent mail.
-      let ownerSent = false;
       for (const targetOwner of ownerEmails) {
         const ownerInboxTarget =
           targetOwner.toLowerCase() === smtpUser.toLowerCase() &&
@@ -462,19 +552,49 @@ async function sendEmailNotifications(
             ownerSent = true;
           }
         } catch (ownerErr: unknown) {
-          console.warn('SMTP owner dispatch warning:', ownerErr);
+          if (!lastErr) lastErr = summarizeEmailError(ownerErr);
+          console.warn(`SMTP (port ${port}) owner dispatch error:`, ownerErr);
         }
       }
 
-      if (clientAccepted || ownerSent) {
-        return { sent: clientAccepted, ownerSent, provider: 'smtp' };
+      return { clientAccepted, ownerSent, lastErr };
+    };
+
+    try {
+      let attempt = await attemptSmtpPort(smtpPort);
+      // If Gmail 465 was blocked/timed out, retry once on port 587 STARTTLS
+      if (!attempt.clientAccepted && !attempt.ownerSent && smtpHost === 'smtp.gmail.com' && smtpPort === 465 && /timeout|ECONN/i.test(attempt.lastErr)) {
+        attempt = await attemptSmtpPort(587);
+      }
+
+      if (attempt.lastErr) {
+        errors.push(attempt.lastErr);
+      }
+
+      if (attempt.clientAccepted || attempt.ownerSent) {
+        return {
+          sent: attempt.clientAccepted,
+          ownerSent: attempt.ownerSent,
+          provider: 'smtp',
+          emailError: errors[0],
+        };
       }
     } catch (err) {
       console.warn('SMTP transport error:', err);
+      errors.push(summarizeEmailError(err));
     }
+  } else {
+    errors.push(
+      'Missing SMTP_PASS (16-char Google App Password) and RESEND_API_KEY in server Environment Variables.'
+    );
   }
 
-  return { sent: false, ownerSent: false, provider: null };
+  return {
+    sent: false,
+    ownerSent: false,
+    provider: null,
+    emailError: errors[0] || 'No active email provider configured.',
+  };
 }
 
 async function sendWhatsAppNotifications(
@@ -660,12 +780,18 @@ export async function processBookingConfirmation(rawPayload: BookingConfirmPaylo
     emailSent: emailResult.sent,
     ownerEmailSent: emailResult.ownerSent,
     emailProvider: emailResult.provider,
+    emailError: emailResult.emailError,
     whatsappSent: whatsappResult.sent,
     whatsappProvider: whatsappResult.provider,
   };
 }
 
 export default async function handler(req: any, res: any) {
+  if (req.method === 'GET') {
+    res.setHeader('Cache-Control', 'no-store, max-age=0');
+    return res.status(200).json(getEmailConfigStatus());
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -711,7 +837,7 @@ export default async function handler(req: any, res: any) {
     }
 
     const result = await processBookingConfirmation(body);
-    recordServerTelemetryEvent('bookingEmail');
+    await trackBookingEmailSafely();
     return res.status(200).json(result);
   } catch (error) {
     console.error('Booking Confirm API Error:', error);

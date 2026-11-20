@@ -1,5 +1,13 @@
 import { GoogleGenAI } from '@google/genai';
-import { recordServerTelemetryEvent } from './telemetry';
+
+async function trackChatSafely() {
+  try {
+    const mod: any = await import('./telemetry.js').catch(() => import('./telemetry'));
+    mod?.recordServerTelemetryEvent?.('aiChat');
+  } catch {
+    // telemetry is best-effort and must never crash /api/chat on Vercel ESM
+  }
+}
 
 const SYSTEM_INSTRUCTION = `You are the friendly, professional virtual concierge for EasyTransferHub (owned and managed by Mr. Mir in Barcelona, Spain).
 Contact Details:
@@ -100,7 +108,7 @@ export default async function handler(req: any, res: any) {
         const reply =
           response.text ||
           "I'd be delighted to assist you with your transfer. Please contact Mr. Mir on WhatsApp at +34 666 744 440 for instant confirmation.";
-        recordServerTelemetryEvent('aiChat');
+        void trackChatSafely();
         return res.status(200).json({ reply });
       } catch (aiErr) {
         console.warn('Gemini API call failed or timed out, using fallback rules:', aiErr);

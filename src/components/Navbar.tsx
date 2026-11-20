@@ -28,16 +28,16 @@ export const Navbar: React.FC<NavbarProps> = ({
   const phoneHref = `tel:${BUSINESS_INFO.phoneDisplay.replace(/\s+/g, '')}`;
 
   return (
-    <header className="relative lg:sticky lg:top-0 z-40 bg-[#0D0F12]/95 text-white border-b border-[#F5B800]/30 shadow-sm backdrop-blur-md">
+    <header id="eth-navbar" className="relative lg:sticky lg:top-0 z-40 bg-[#0D0F12]/95 text-white border-b border-[#F5B800]/30 shadow-sm backdrop-blur-md">
       {/* Main Nav */}
       <div className="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-3">
         {/* Brand Wordmark (Enlarged to comfortably cover space) */}
         <a href="#top" className="flex items-center gap-2.5 sm:gap-3 group shrink-0">
-          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#F5B800] border border-[#FFD24C] flex items-center justify-center font-display font-bold text-[#0D0F12] text-sm sm:text-base tracking-tight shrink-0">
+          <div data-brand-badge="true" className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#F5B800] border border-[#FFD24C] flex items-center justify-center font-display font-bold text-[#0D0F12] text-sm sm:text-base tracking-tight shrink-0">
             ET
           </div>
-          <span className="font-display font-bold text-[19px] sm:text-[23px] tracking-tight text-[#FAF9F6] whitespace-nowrap">
-            EasyTransfer<span className="text-[#F5B800]">Hub</span>
+          <span data-brand-wordmark="true" className="font-display font-bold text-[19px] sm:text-[23px] tracking-tight text-[#FAF9F6] whitespace-nowrap">
+            EasyTransfer<span data-brand-accent="true" className="text-[#F5B800]">Hub</span>
           </span>
         </a>
 
@@ -98,6 +98,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Direct Phone Call Box (Larger secure box same size as Fair Price) */}
           <a
             href={phoneHref}
+            data-nav-cta="true"
             aria-label="Call +34 666 744 440 directly"
             title={`Call ${BUSINESS_INFO.phoneDisplay}`}
             className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-extrabold px-2.5 py-1.5 rounded-lg bg-[#F5B800] hover:bg-[#E0A600] border border-[#FFD24C] text-[#0D0F12] shadow-2xs transition-colors whitespace-nowrap shrink-0"

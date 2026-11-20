@@ -8,7 +8,7 @@ interface FooterProps {
 
 export const Footer: React.FC<FooterProps> = ({ onOpenOwnerMeter }) => {
   return (
-    <footer className="bg-[#0D0F12] text-neutral-300 text-xs border-t-2 border-[#F5B800]">
+    <footer id="eth-footer" className="bg-[#0D0F12] text-neutral-300 text-xs border-t-2 border-[#F5B800]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
           {/* Brand Info */}

@@ -1012,9 +1012,9 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
 
         {/* Date & Time Row (Pickup + Optional Return if Round Trip) */}
         <div className="pt-2 border-t border-[#EFE7D1]">
-          <div className={`grid grid-cols-1 ${isRoundTrip ? 'sm:grid-cols-2' : ''} gap-2.5`}>
+          <div className={`grid grid-cols-1 ${isRoundTrip ? 'sm:grid-cols-2' : ''} gap-2.5 min-w-0`}>
             {/* Box 1: Pickup Date & Time */}
-            <div>
+            <div className="min-w-0 overflow-hidden">
               <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 mb-1">
                 <Calendar className="w-3.5 h-3.5 text-[#8A5D00]" />
                 <span>Pickup Date & Time</span>
@@ -1023,13 +1023,13 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 type="datetime-local"
                 value={dateTime}
                 onChange={(e) => setDateTime(e.target.value)}
-                className="w-full px-3 py-2 text-xs sm:text-sm bg-[#FCFBF7] hover:bg-white focus:bg-white border border-[#E6DFCB] focus:border-[#9A6B00] rounded-xl focus:ring-2 focus:ring-[#F5B800]/35 outline-none shadow-2xs transition-all font-medium"
+                className="w-full max-w-full min-w-0 block box-border appearance-none px-3 py-2 text-xs sm:text-sm bg-[#FCFBF7] hover:bg-white focus:bg-white border border-[#E6DFCB] focus:border-[#9A6B00] rounded-xl focus:ring-2 focus:ring-[#F5B800]/35 outline-none shadow-2xs transition-all font-medium"
               />
             </div>
 
             {/* Box 2: Return Date & Time if Round Trip */}
             {isRoundTrip && (
-              <div>
+              <div className="min-w-0 overflow-hidden">
                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 mb-1">
                   <Clock className="w-3.5 h-3.5 text-[#8A5D00]" />
                   <span>Return Date & Time</span>
@@ -1038,7 +1038,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                   type="datetime-local"
                   value={returnDateTime}
                   onChange={(e) => setReturnDateTime(e.target.value)}
-                  className="w-full px-3 py-2 text-xs sm:text-sm bg-[#FCFBF7] hover:bg-white focus:bg-white border border-[#E6DFCB] focus:border-[#9A6B00] rounded-xl focus:ring-2 focus:ring-[#F5B800]/35 outline-none shadow-2xs transition-all font-medium"
+                  className="w-full max-w-full min-w-0 block box-border appearance-none px-3 py-2 text-xs sm:text-sm bg-[#FCFBF7] hover:bg-white focus:bg-white border border-[#E6DFCB] focus:border-[#9A6B00] rounded-xl focus:ring-2 focus:ring-[#F5B800]/35 outline-none shadow-2xs transition-all font-medium"
                 />
               </div>
             )}
@@ -1457,8 +1457,7 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
           </button>
 
           <p
-            className="text-center text-black font-semibold flex items-center justify-center gap-1 sm:gap-2 whitespace-nowrap flex-nowrap overflow-hidden mt-2"
-            style={{ fontSize: 'clamp(7.5px, 2.25vw, 11px)' }}
+            className="text-center text-black font-semibold flex flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5 mt-2 text-[10px] sm:text-[11px] leading-snug"
           >
             <span>✓ All-Inclusive Fixed Prices</span>
             <span>·</span>

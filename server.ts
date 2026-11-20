@@ -4,7 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import { GoogleGenAI } from '@google/genai';
-import { checkBookingRateLimit, isValidEmailAddress, processBookingConfirmation } from './api/booking-confirm';
+import { checkBookingRateLimit, getEmailConfigStatus, isValidEmailAddress, processBookingConfirmation } from './api/booking-confirm';
 import reviewsHandler from './api/reviews';
 import telemetryHandler, { recordServerTelemetryEvent } from './api/telemetry';
 
@@ -61,6 +61,7 @@ app.get('/easytransferhub-lagoon-water-theme.zip', (req, res) => {
 
 app.get('/easytransferhub-vercel.zip', (req, res) => {
   const zipPath = path.resolve(__dirname, 'public/easytransferhub-vercel.zip');
+  res.setHeader('Cache-Control', 'no-store, max-age=0');
   res.download(zipPath, 'easytransferhub-vercel.zip');
 });
 
@@ -115,6 +116,16 @@ for (const pngIcon of [
 app.get('/site.webmanifest', (_req, res) => {
   res.setHeader('Content-Type', 'application/manifest+json; charset=utf-8');
   res.sendFile(path.resolve(__dirname, 'public/site.webmanifest'));
+});
+
+app.get('/easytransferhub-promo-vertical.mp4', (_req, res) => {
+  res.setHeader('Content-Type', 'video/mp4');
+  res.sendFile(path.resolve(__dirname, 'public/easytransferhub-promo-vertical.mp4'));
+});
+
+app.get('/easytransferhub-promo-landscape.mp4', (_req, res) => {
+  res.setHeader('Content-Type', 'video/mp4');
+  res.sendFile(path.resolve(__dirname, 'public/easytransferhub-promo-landscape.mp4'));
 });
 
 app.get('/easytransferhub-white-green-animated-theme.zip', (req, res) => {
@@ -242,6 +253,11 @@ app.post('/api/chat', async (req, res) => {
 });
 
 // Automated Booking Confirmation Endpoint (Email + WhatsApp)
+app.get('/api/booking-confirm', (_req, res) => {
+  res.setHeader('Cache-Control', 'no-store, max-age=0');
+  return res.status(200).json(getEmailConfigStatus());
+});
+
 app.post('/api/booking-confirm', async (req, res) => {
   if (!checkBookingRateLimit(req)) {
     return res.status(429).json({
