@@ -295,14 +295,39 @@ const VALID_EVENTS = new Set<TelemetryEventType>([
   'vercelApi',
 ]);
 
+async function isAuthorizedOwner(req: any): Promise<boolean> {
+  try {
+    const mod: any = await import('./owner-auth.js').catch(() => import('./owner-auth'));
+    return Boolean(mod?.verifyOwnerBearerToken?.(req));
+  } catch {
+    return false;
+  }
+}
+
+async function isValidOrigin(req: any): Promise<boolean> {
+  try {
+    const mod: any = await import('./owner-auth.js').catch(() => import('./owner-auth'));
+    return Boolean(mod?.isAllowedBrowserOrigin?.(req));
+  } catch {
+    return true;
+  }
+}
+
 export default async function handler(req: any, res: any) {
   res.setHeader('Cache-Control', 'no-store, max-age=0');
 
   if (req.method === 'GET') {
+    if (!(await isAuthorizedOwner(req))) {
+      return res.status(401).json({ error: 'Owner authentication required.' });
+    }
     return res.status(200).json(getTelemetrySnapshot());
   }
 
   if (req.method === 'POST') {
+    if (!(await isValidOrigin(req))) {
+      return res.status(403).json({ error: 'Forbidden origin.' });
+    }
+
     if (!checkTelemetryRateLimit(req)) {
       return res.status(429).json({ error: 'Rate limit exceeded' });
     }
@@ -322,11 +347,14 @@ export default async function handler(req: any, res: any) {
         if (!VALID_EVENTS.has(event)) {
           return res.status(400).json({ error: 'Invalid telemetry event' });
         }
-        const updated = recordServerTelemetryEvent(event);
-        return res.status(200).json(updated);
+        recordServerTelemetryEvent(event);
+        return res.status(200).json({ ok: true });
       }
 
       if (action === 'updateSettings') {
+        if (!(await isAuthorizedOwner(req))) {
+          return res.status(401).json({ error: 'Owner authentication required.' });
+        }
         const store = loadTelemetryStore();
         if (body.limits && typeof body.limits === 'object') {
           const l = body.limits;
@@ -359,6 +387,9 @@ export default async function handler(req: any, res: any) {
       }
 
       if (action === 'resetMonth') {
+        if (!(await isAuthorizedOwner(req))) {
+          return res.status(401).json({ error: 'Owner authentication required.' });
+        }
         const current = loadTelemetryStore();
         const reset = createCleanStore(current.limits, DEFAULT_MANUAL_USAGE);
         saveTelemetryStore(reset);
@@ -373,3 +404,4 @@ export default async function handler(req: any, res: any) {
 
   return res.status(405).json({ error: 'Method not allowed' });
 }
+

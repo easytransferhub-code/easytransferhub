@@ -1,5 +1,9 @@
 User-agent: *
 Allow: /
 Disallow: /api/
+Disallow: /*.zip$
+Disallow: /BookingCalculator*
+Disallow: /settings.json
 
 Sitemap: https://www.easytransferhub.com/sitemap.xml
+

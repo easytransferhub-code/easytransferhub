@@ -9,7 +9,6 @@ import {
   Phone,
   MessageCircle,
   Sparkles,
-  Gauge,
   ChevronRight,
   LayoutGrid,
 } from 'lucide-react';
@@ -31,7 +30,6 @@ export const MoreDetailsModal: React.FC<MoreDetailsModalProps> = ({
   onClose,
   initialTab = 'menu',
   onOpenAssistant,
-  onOpenOwnerMeter,
 }) => {
   const [activeTab, setActiveTab] = useState<MoreDetailsTab>(initialTab);
 
@@ -176,12 +174,12 @@ export const MoreDetailsModal: React.FC<MoreDetailsModalProps> = ({
                 </div>
               </div>
 
-              {/* Direct Support & Tools Heading */}
+              {/* Direct Support Heading */}
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#8A5D00] block mb-2">
-                  Direct Assistance &amp; Owner Tools
+                  Direct Assistance
                 </span>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                   <a
                     href={`https://wa.me/${BUSINESS_INFO.whatsappNumber}?text=${encodeURIComponent(
                       'Hello Easytransferhub, I would like to book a transfer in Barcelona.'
@@ -220,21 +218,6 @@ export const MoreDetailsModal: React.FC<MoreDetailsModalProps> = ({
                     <div>
                       <div className="leading-tight">24/7 AI Concierge</div>
                       <div className="text-[10px] text-neutral-400 font-normal">Ask Price &amp; Route Help</div>
-                    </div>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      onClose();
-                      onOpenOwnerMeter();
-                    }}
-                    className="p-3 rounded-xl bg-white hover:bg-[#FBF7E6] border border-[#E3D6AD] text-[#0D0F12] font-bold text-xs flex items-center gap-2.5 shadow-xs transition-colors cursor-pointer text-left"
-                  >
-                    <Gauge className="w-4 h-4 text-[#8A5D00] shrink-0" />
-                    <div>
-                      <div className="leading-tight">Owner Quota Meter</div>
-                      <div className="text-[10px] text-slate-500 font-normal">SEO, API &amp; Free Limits</div>
                     </div>
                   </button>
                 </div>

@@ -191,6 +191,13 @@ export function recordSessionVisitOnce(): void {
   trackQuotaEvent(detectVisitSource());
 }
 
+export class TelemetryAuthError extends Error {
+  constructor(message = 'Owner authentication required.') {
+    super(message);
+    this.name = 'TelemetryAuthError';
+  }
+}
+
 export function trackQuotaEvent(event: TelemetryEventType): void {
   if (typeof window === 'undefined') return;
   const current = readLocalTelemetry();
@@ -202,81 +209,88 @@ export function trackQuotaEvent(event: TelemetryEventType): void {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ action: 'track', event }),
     keepalive: true,
-  })
-    .then((res) => (res.ok ? res.json() : null))
-    .then((serverData: TelemetryStore | null) => {
-      if (serverData && serverData.monthKey) {
-        writeLocalTelemetry(mergeServerAndLocal(serverData, readLocalTelemetry()));
-      }
-    })
-    .catch(() => {
-      // local cache continues tracking smoothly
-    });
+  }).catch(() => {
+    // local cache continues tracking smoothly
+  });
 }
 
-export async function fetchQuotaSnapshot(): Promise<TelemetryStore> {
+export async function fetchQuotaSnapshot(ownerToken?: string): Promise<TelemetryStore> {
   const local = readLocalTelemetry();
-  try {
-    const res = await fetch('/api/telemetry', { cache: 'no-store' });
-    if (res.ok) {
-      const serverData = (await res.json()) as TelemetryStore;
-      const merged = mergeServerAndLocal(serverData, local);
-      writeLocalTelemetry(merged);
-      return merged;
-    }
-  } catch {
-    // fallback to local snapshot
+  if (!ownerToken) {
+    throw new TelemetryAuthError();
+  }
+  const res = await fetch('/api/telemetry', {
+    cache: 'no-store',
+    headers: {
+      Authorization: `Bearer ${ownerToken}`,
+    },
+  });
+  if (res.status === 401) {
+    throw new TelemetryAuthError();
+  }
+  if (res.ok) {
+    const serverData = (await res.json()) as TelemetryStore;
+    const merged = mergeServerAndLocal(serverData, local);
+    writeLocalTelemetry(merged);
+    return merged;
   }
   return local;
 }
 
 export async function updateQuotaSettings(
   limits: Partial<QuotaLimits>,
-  manualUsage?: Partial<ManualSyncUsage>
+  manualUsage?: Partial<ManualSyncUsage>,
+  ownerToken?: string
 ): Promise<TelemetryStore> {
+  if (!ownerToken) {
+    throw new TelemetryAuthError();
+  }
   const local = readLocalTelemetry();
+  const res = await fetch('/api/telemetry', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${ownerToken}`,
+    },
+    body: JSON.stringify({ action: 'updateSettings', limits, manualUsage }),
+  });
+  if (res.status === 401) {
+    throw new TelemetryAuthError();
+  }
+  if (!res.ok) {
+    throw new Error(`Failed to save meter settings (HTTP ${res.status})`);
+  }
+  const serverData = (await res.json()) as TelemetryStore;
   const updatedLocal: TelemetryStore = {
     ...local,
     limits: { ...local.limits, ...limits },
     manualUsage: manualUsage ? { ...local.manualUsage, ...manualUsage } : local.manualUsage,
     lastUpdated: new Date().toISOString(),
   };
-  writeLocalTelemetry(updatedLocal);
-
-  try {
-    const res = await fetch('/api/telemetry', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'updateSettings', limits, manualUsage }),
-    });
-    if (res.ok) {
-      const serverData = (await res.json()) as TelemetryStore;
-      const merged = mergeServerAndLocal(serverData, updatedLocal);
-      writeLocalTelemetry(merged);
-      return merged;
-    }
-  } catch {
-    // ignore
-  }
-  return updatedLocal;
+  const merged = mergeServerAndLocal(serverData, updatedLocal);
+  writeLocalTelemetry(merged);
+  return merged;
 }
 
-export async function resetMonthlyMeter(): Promise<TelemetryStore> {
-  const fresh = getDefaultLocalStore();
-  writeLocalTelemetry(fresh);
-  try {
-    const res = await fetch('/api/telemetry', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'resetMonth' }),
-    });
-    if (res.ok) {
-      const serverData = (await res.json()) as TelemetryStore;
-      writeLocalTelemetry(serverData);
-      return serverData;
-    }
-  } catch {
-    // ignore
+export async function resetMonthlyMeter(ownerToken?: string): Promise<TelemetryStore> {
+  if (!ownerToken) {
+    throw new TelemetryAuthError();
   }
-  return fresh;
+  const res = await fetch('/api/telemetry', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${ownerToken}`,
+    },
+    body: JSON.stringify({ action: 'resetMonth' }),
+  });
+  if (res.status === 401) {
+    throw new TelemetryAuthError();
+  }
+  if (!res.ok) {
+    throw new Error(`Failed to reset monthly meter (HTTP ${res.status})`);
+  }
+  const serverData = (await res.json()) as TelemetryStore;
+  writeLocalTelemetry(serverData);
+  return serverData;
 }

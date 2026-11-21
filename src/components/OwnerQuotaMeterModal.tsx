@@ -6,10 +6,13 @@ import {
   CheckCircle2,
   Clock,
   Cloud,
+  Download,
   ExternalLink,
   GitBranch,
   Globe,
   HardDrive,
+  KeyRound,
+  Lock,
   Mail,
   MapPin,
   RefreshCw,
@@ -26,6 +29,7 @@ import type { TelemetryStore } from '../../api/telemetry';
 import {
   fetchQuotaSnapshot,
   resetMonthlyMeter,
+  TelemetryAuthError,
   updateQuotaSettings,
 } from '../utils/telemetryClient';
 
@@ -256,6 +260,17 @@ export const OwnerQuotaMeterModal: React.FC<OwnerQuotaMeterModalProps> = ({
   isOpen,
   onClose,
 }) => {
+  const [ownerToken, setOwnerToken] = useState<string | null>(null);
+  const [authChecking, setAuthChecking] = useState(false);
+  const [authStatus, setAuthStatus] = useState<{ envConfigured: boolean; claimed: boolean }>({
+    envConfigured: false,
+    claimed: true,
+  });
+  const [passcodeInput, setPasscodeInput] = useState('');
+  const [confirmPasscodeInput, setConfirmPasscodeInput] = useState('');
+  const [authSubmitting, setAuthSubmitting] = useState(false);
+  const [authError, setAuthError] = useState('');
+
   const [store, setStore] = useState<TelemetryStore | null>(null);
   const [loading, setLoading] = useState(false);
   const [showEditor, setShowEditor] = useState(false);
@@ -273,9 +288,49 @@ export const OwnerQuotaMeterModal: React.FC<OwnerQuotaMeterModalProps> = ({
   const [emailDiag, setEmailDiag] = useState<EmailDiagnosticStatus | null>(null);
   const [emailTestResult, setEmailTestResult] = useState<EmailTestResult>({ loading: false });
 
-  const fetchEmailDiag = async () => {
+  const handleLock = () => {
+    setOwnerToken(null);
+    setStore(null);
+    setEmailDiag(null);
+    setShowEditor(false);
+    setPasscodeInput('');
+    setConfirmPasscodeInput('');
+    setAuthError('');
+  };
+
+  const handleCloseModal = () => {
+    handleLock();
+    onClose();
+  };
+
+  const checkAuthState = async () => {
+    setAuthChecking(true);
     try {
-      const res = await fetch('/api/booking-confirm', { cache: 'no-store' });
+      const res = await fetch('/api/owner-auth', { cache: 'no-store' });
+      if (res.ok) {
+        const data = await res.json();
+        setAuthStatus({
+          envConfigured: Boolean(data.envConfigured),
+          claimed: Boolean(data.claimed),
+        });
+      }
+    } catch {
+      // keep existing status fallback
+    } finally {
+      setAuthChecking(false);
+    }
+  };
+
+  const fetchEmailDiag = async (token: string) => {
+    try {
+      const res = await fetch('/api/booking-confirm', {
+        cache: 'no-store',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.status === 401) {
+        handleLock();
+        return;
+      }
       if (res.ok) {
         const data = (await res.json()) as EmailDiagnosticStatus;
         setEmailDiag(data);
@@ -285,22 +340,75 @@ export const OwnerQuotaMeterModal: React.FC<OwnerQuotaMeterModalProps> = ({
     }
   };
 
-  const loadData = async () => {
+  const loadData = async (token: string) => {
     setLoading(true);
-    const [snap] = await Promise.all([fetchQuotaSnapshot(), fetchEmailDiag()]);
-    setStore(snap);
-    setPlacesLimitInput(String(snap.limits.placesMonthlyLimit));
-    setRoutesLimitInput(String(snap.limits.routesMonthlyLimit));
-    setVercelApiLimitInput(String(snap.limits.vercelApiMonthlyLimit));
-    setVercelGbLimitInput(String(snap.limits.vercelBandwidthGbLimit));
-    setVercelGbUsedInput(String(snap.manualUsage.vercelBandwidthGbUsed));
-    setGithubMinsUsedInput(String(snap.manualUsage.githubActionsMinutesUsed));
-    setGscClicksInput(String(snap.manualUsage.gscMonthlyClicks));
-    setDomainRenewalInput(snap.limits.domainRenewalDate || '2027-01-15');
-    setLoading(false);
+    try {
+      const [snap] = await Promise.all([fetchQuotaSnapshot(token), fetchEmailDiag(token)]);
+      setStore(snap);
+      setPlacesLimitInput(String(snap.limits.placesMonthlyLimit));
+      setRoutesLimitInput(String(snap.limits.routesMonthlyLimit));
+      setVercelApiLimitInput(String(snap.limits.vercelApiMonthlyLimit));
+      setVercelGbLimitInput(String(snap.limits.vercelBandwidthGbLimit));
+      setVercelGbUsedInput(String(snap.manualUsage.vercelBandwidthGbUsed));
+      setGithubMinsUsedInput(String(snap.manualUsage.githubActionsMinutesUsed));
+      setGscClicksInput(String(snap.manualUsage.gscMonthlyClicks));
+      setDomainRenewalInput(snap.limits.domainRenewalDate || '2027-01-15');
+    } catch (err) {
+      if (err instanceof TelemetryAuthError) {
+        handleLock();
+        setAuthError('Owner session expired. Please unlock again.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOwnerAuthSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthError('');
+    const trimmed = passcodeInput.trim();
+    const isClaimMode = !authStatus.envConfigured && !authStatus.claimed;
+
+    if (trimmed.length < 6) {
+      setAuthError('Passcode must be at least 6 characters.');
+      return;
+    }
+    if (isClaimMode && trimmed !== confirmPasscodeInput.trim()) {
+      setAuthError('Passcodes do not match.');
+      return;
+    }
+
+    setAuthSubmitting(true);
+    try {
+      const res = await fetch('/api/owner-auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: isClaimMode ? 'claim' : 'login',
+          passcode: trimmed,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.token) {
+        setAuthError(data?.error || `Authentication failed (HTTP ${res.status})`);
+        if (res.status === 409) {
+          void checkAuthState();
+        }
+        return;
+      }
+      setPasscodeInput('');
+      setConfirmPasscodeInput('');
+      setAuthStatus((prev) => ({ ...prev, claimed: true }));
+      setOwnerToken(String(data.token));
+    } catch {
+      setAuthError('Network error connecting to owner authentication endpoint.');
+    } finally {
+      setAuthSubmitting(false);
+    }
   };
 
   const handleSendTestEmail = async () => {
+    if (!ownerToken) return;
     setEmailTestResult({ loading: true });
     try {
       const res = await fetch('/api/booking-confirm', {
@@ -339,7 +447,7 @@ export const OwnerQuotaMeterModal: React.FC<OwnerQuotaMeterModalProps> = ({
           emailProvider: data.emailProvider || null,
           emailError: data.emailError,
         });
-        void fetchEmailDiag();
+        void fetchEmailDiag(ownerToken);
       }
     } catch (err) {
       setEmailTestResult({
@@ -351,14 +459,133 @@ export const OwnerQuotaMeterModal: React.FC<OwnerQuotaMeterModalProps> = ({
 
   useEffect(() => {
     if (!isOpen) return;
-    void loadData();
-    const timer = window.setInterval(() => {
-      void fetchQuotaSnapshot().then(setStore);
-    }, 10000);
-    return () => window.clearInterval(timer);
+    void checkAuthState();
   }, [isOpen]);
 
+  useEffect(() => {
+    if (!isOpen || !ownerToken) return;
+    void loadData(ownerToken);
+    const timer = window.setInterval(() => {
+      void fetchQuotaSnapshot(ownerToken)
+        .then(setStore)
+        .catch((err) => {
+          if (err instanceof TelemetryAuthError) {
+            handleLock();
+          }
+        });
+    }, 10000);
+    return () => window.clearInterval(timer);
+  }, [isOpen, ownerToken]);
+
   if (!isOpen) return null;
+
+  if (!ownerToken) {
+    const isClaimMode = !authStatus.envConfigured && !authStatus.claimed;
+    return (
+      <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm overflow-y-auto p-4 flex items-center justify-center">
+        <div className="w-full max-w-md bg-[#0D0F12] border border-[#2A2F38] rounded-3xl shadow-2xl overflow-hidden text-slate-100">
+          <div className="bg-[#14171C] border-b border-[#2A2F38] px-5 py-4 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-[#F5B800] text-[#0D0F12] flex items-center justify-center shrink-0">
+                <Lock className="w-4 h-4" />
+              </div>
+              <div>
+                <h2 className="font-display font-bold text-base text-white">
+                  {isClaimMode ? 'Set Owner Meter Passcode' : 'Owner Quota Meter Unlock'}
+                </h2>
+                <p className="text-[11px] text-slate-400">
+                  Protected business telemetry &amp; server diagnostics
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={handleCloseModal}
+              aria-label="Close Owner Meter Login"
+              className="p-2 rounded-xl bg-[#1D222B] hover:bg-red-500/20 hover:text-red-400 border border-[#303642] text-slate-300 cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          <form onSubmit={handleOwnerAuthSubmit} className="p-5 space-y-4">
+            <p className="text-xs text-slate-300 leading-relaxed">
+              {authChecking
+                ? 'Checking owner security status...'
+                : isClaimMode
+                ? 'First-time setup: Create your private Owner Passcode (min 6 characters) to lock this dashboard. For Vercel production, also set OWNER_ADMIN_PASSCODE in Environment Variables.'
+                : 'Enter your private Owner Passcode to view live visitor metrics, API limits, and email diagnostics.'}
+            </p>
+
+            {authError && (
+              <div className="rounded-xl bg-red-500/15 border border-red-500/40 px-3 py-2 text-xs text-red-300 font-medium">
+                {authError}
+              </div>
+            )}
+
+            <label className="block space-y-1.5">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                <KeyRound className="w-3.5 h-3.5 text-[#F5B800]" />
+                <span>{isClaimMode ? 'Create Owner Passcode' : 'Owner Passcode'}</span>
+              </span>
+              <input
+                type="password"
+                autoComplete={isClaimMode ? 'new-password' : 'current-password'}
+                value={passcodeInput}
+                onChange={(e) => setPasscodeInput(e.target.value)}
+                placeholder="Minimum 6 characters"
+                required
+                minLength={6}
+                className="w-full px-3.5 py-2.5 rounded-xl bg-[#14171C] border border-[#2F3542] focus:border-[#F5B800] focus:outline-none text-sm text-white"
+              />
+            </label>
+
+            {isClaimMode && (
+              <label className="block space-y-1.5">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  Confirm Passcode
+                </span>
+                <input
+                  type="password"
+                  autoComplete="new-password"
+                  value={confirmPasscodeInput}
+                  onChange={(e) => setConfirmPasscodeInput(e.target.value)}
+                  placeholder="Re-enter owner passcode"
+                  required
+                  minLength={6}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#14171C] border border-[#2F3542] focus:border-[#F5B800] focus:outline-none text-sm text-white"
+                />
+              </label>
+            )}
+
+            <div className="flex items-center justify-end gap-2 pt-1">
+              <button
+                type="button"
+                onClick={handleCloseModal}
+                className="px-3.5 py-2 rounded-xl bg-[#1D222B] text-slate-300 text-xs font-semibold cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={authSubmitting || authChecking}
+                className="px-4 py-2 rounded-xl bg-[#F5B800] hover:bg-[#E0A600] disabled:opacity-60 text-[#0D0F12] text-xs font-extrabold cursor-pointer inline-flex items-center gap-1.5"
+              >
+                <ShieldCheck className="w-4 h-4" />
+                <span>
+                  {authSubmitting
+                    ? 'Verifying...'
+                    : isClaimMode
+                    ? 'Save & Unlock Meter'
+                    : 'Unlock Owner Meter'}
+                </span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   const daysLeft = getDaysLeftInMonth();
   const domainDaysLeft = store ? getDaysUntilDate(store.limits.domainRenewalDate) : null;
@@ -378,29 +605,45 @@ export const OwnerQuotaMeterModal: React.FC<OwnerQuotaMeterModalProps> = ({
 
   const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!ownerToken) return;
     setSaving(true);
-    const updated = await updateQuotaSettings(
-      {
-        placesMonthlyLimit: Math.max(100, Number(placesLimitInput) || 5000),
-        routesMonthlyLimit: Math.max(100, Number(routesLimitInput) || 10000),
-        vercelApiMonthlyLimit: Math.max(1000, Number(vercelApiLimitInput) || 100000),
-        vercelBandwidthGbLimit: Math.max(1, Number(vercelGbLimitInput) || 100),
-        domainRenewalDate: domainRenewalInput || '2027-01-15',
-      },
-      {
-        vercelBandwidthGbUsed: Math.max(0, Number(vercelGbUsedInput) || 0),
-        githubActionsMinutesUsed: Math.max(0, Number(githubMinsUsedInput) || 0),
-        gscMonthlyClicks: Math.max(0, Number(gscClicksInput) || 0),
+    try {
+      const updated = await updateQuotaSettings(
+        {
+          placesMonthlyLimit: Math.max(100, Number(placesLimitInput) || 5000),
+          routesMonthlyLimit: Math.max(100, Number(routesLimitInput) || 10000),
+          vercelApiMonthlyLimit: Math.max(1000, Number(vercelApiLimitInput) || 100000),
+          vercelBandwidthGbLimit: Math.max(1, Number(vercelGbLimitInput) || 100),
+          domainRenewalDate: domainRenewalInput || '2027-01-15',
+        },
+        {
+          vercelBandwidthGbUsed: Math.max(0, Number(vercelGbUsedInput) || 0),
+          githubActionsMinutesUsed: Math.max(0, Number(githubMinsUsedInput) || 0),
+          gscMonthlyClicks: Math.max(0, Number(gscClicksInput) || 0),
+        },
+        ownerToken
+      );
+      setStore(updated);
+      setShowEditor(false);
+    } catch (err) {
+      if (err instanceof TelemetryAuthError) {
+        handleLock();
       }
-    );
-    setStore(updated);
-    setSaving(false);
-    setShowEditor(false);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleReset = async () => {
-    const fresh = await resetMonthlyMeter();
-    setStore(fresh);
+    if (!ownerToken) return;
+    try {
+      const fresh = await resetMonthlyMeter(ownerToken);
+      setStore(fresh);
+    } catch (err) {
+      if (err instanceof TelemetryAuthError) {
+        handleLock();
+      }
+    }
   };
 
   const stackServices = [
@@ -568,7 +811,7 @@ export const OwnerQuotaMeterModal: React.FC<OwnerQuotaMeterModalProps> = ({
           <div className="flex items-center gap-2 self-end sm:self-auto">
             <button
               type="button"
-              onClick={() => void loadData()}
+              onClick={() => void loadData(ownerToken)}
               disabled={loading}
               className="px-3 py-2 rounded-xl bg-[#1D222B] hover:bg-[#272D38] border border-[#303642] text-xs font-semibold text-slate-200 inline-flex items-center gap-1.5 cursor-pointer"
             >
@@ -589,7 +832,15 @@ export const OwnerQuotaMeterModal: React.FC<OwnerQuotaMeterModalProps> = ({
             </button>
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleLock}
+              className="px-3 py-2 rounded-xl bg-[#1D222B] hover:bg-[#272D38] border border-[#303642] text-xs font-semibold text-amber-300 inline-flex items-center gap-1.5 cursor-pointer"
+            >
+              <Lock className="w-3.5 h-3.5" />
+              <span>Lock</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleCloseModal}
               aria-label="Close Owner Meter"
               className="p-2 rounded-xl bg-[#1D222B] hover:bg-red-500/20 hover:text-red-400 border border-[#303642] text-slate-300 cursor-pointer"
             >
@@ -1028,17 +1279,27 @@ export const OwnerQuotaMeterModal: React.FC<OwnerQuotaMeterModalProps> = ({
                   Where is this Owner Meter located? (Clients do NOT see this panel)
                 </p>
                 <p className="text-slate-400">
-                  Bookmark <code className="text-[#F5B800]">https://www.easytransferhub.com/#owner-meter</code> or click the discreet <b>Owner Meter</b> link at the very bottom of your website footer anytime.
+                  Bookmark <code className="text-[#F5B800]">https://www.easytransferhub.com/#owner-meter</code> directly — public admin links are hidden from passengers, and access requires your Owner Passcode.
                 </p>
               </div>
             </div>
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 rounded-xl bg-[#F5B800] hover:bg-[#E0A600] text-[#0D0F12] font-extrabold text-xs shrink-0 cursor-pointer"
-            >
-              Back to Website
-            </button>
+            <div className="flex items-center gap-2 shrink-0 flex-wrap">
+              <a
+                href="/easytransferhub-vercel.zip?v=fresh-20261121"
+                download="easytransferhub-vercel.zip"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#1D222B] hover:bg-[#272D38] border border-[#F5B800]/50 text-[#F5B800] font-bold text-xs transition-colors"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Download Vercel ZIP</span>
+              </a>
+              <button
+                type="button"
+                onClick={handleCloseModal}
+                className="px-4 py-2 rounded-xl bg-[#F5B800] hover:bg-[#E0A600] text-[#0D0F12] font-extrabold text-xs shrink-0 cursor-pointer"
+              >
+                Back to Website
+              </button>
+            </div>
           </div>
         </div>
       </div>

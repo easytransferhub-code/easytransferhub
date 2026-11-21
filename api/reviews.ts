@@ -211,6 +211,7 @@ function sanitizeText(value: unknown, maxLen: number): string {
   if (typeof value !== 'string') return '';
   return value
     .replace(/[\r\n\0\x00-\x1F\x7F]/g, ' ')
+    .replace(/https?:\/\/\S+|ftp:\/\/\S+|www\.\S+/gi, '')
     .replace(/[<>]/g, '')
     .replace(/\s+/g, ' ')
     .trim()
@@ -292,6 +293,24 @@ export function toggleHelpfulReview(reviewId: string): CommunityStore {
   return store;
 }
 
+async function isAuthorizedOwner(req: any): Promise<boolean> {
+  try {
+    const mod: any = await import('./owner-auth.js').catch(() => import('./owner-auth'));
+    return Boolean(mod?.verifyOwnerBearerToken?.(req));
+  } catch {
+    return false;
+  }
+}
+
+async function isValidOrigin(req: any): Promise<boolean> {
+  try {
+    const mod: any = await import('./owner-auth.js').catch(() => import('./owner-auth'));
+    return Boolean(mod?.isAllowedBrowserOrigin?.(req));
+  } catch {
+    return true;
+  }
+}
+
 export default async function handler(req: any, res: any) {
   res.setHeader('Cache-Control', 'no-store, max-age=0');
 
@@ -314,6 +333,10 @@ export default async function handler(req: any, res: any) {
   }
 
   if (req.method === 'POST') {
+    if (!(await isValidOrigin(req))) {
+      return res.status(403).json({ error: 'Forbidden origin.' });
+    }
+
     try {
       const body =
         typeof req.body === 'string'
@@ -326,8 +349,22 @@ export default async function handler(req: any, res: any) {
       void trackReviewApiSafely();
 
       if (action === 'visit') {
+        if (!checkReviewRateLimit(req, 30, 60 * 1000)) {
+          return res.status(429).json({ error: 'Too many requests.' });
+        }
         const store = recordSiteVisit();
-        return res.status(200).json(store);
+        return res.status(200).json({
+          totalVisits: store.totalVisits,
+          todayVisits: store.todayVisits,
+          reviews: store.reviews,
+        });
+      }
+
+      // Only authenticated Owner can add/modify reviews displayed on homepage slider
+      if (!(await isAuthorizedOwner(req))) {
+        return res.status(401).json({
+          error: 'Owner authentication required to publish reviews.',
+        });
       }
 
       if (action === 'helpful') {

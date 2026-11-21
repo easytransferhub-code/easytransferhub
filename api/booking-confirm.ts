@@ -132,11 +132,42 @@ export function checkBookingRateLimit(req: any, maxRequests = 12, windowMs = 10 
 
 function sanitizeLine(value: unknown, maxLen = 200): string {
   if (typeof value !== 'string') return '';
-  return value.replace(/[\r\n\0\x00-\x1F\x7F]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, maxLen);
+  return value
+    .replace(/[\r\n\0\x00-\x1F\x7F]/g, ' ')
+    .replace(/https?:\/\/\S+|ftp:\/\/\S+|www\.\S+/gi, '')
+    .replace(/[<>]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, maxLen);
 }
 
 export function isValidEmailAddress(email: string): boolean {
   return EMAIL_REGEX.test(email) && email.length <= 160;
+}
+
+function computeMinimumAllowedFare(
+  pickup: string,
+  dropoff: string,
+  vehicleName: string,
+  childSeats: number,
+  isRoundTrip: boolean
+): number {
+  const combined = `${pickup} ${dropoff}`.toLowerCase();
+  const veh = vehicleName.toLowerCase();
+  let minBase = 50;
+  if (veh.includes('minivan') || veh.includes('vito') || veh.includes('tourneo') || veh.includes('van')) {
+    minBase = 70;
+  } else if (veh.includes('comfort') || veh.includes('executive') || veh.includes('mercedes') || veh.includes('tesla')) {
+    minBase = 60;
+  }
+  if (combined.includes('andorra')) minBase = Math.max(minBase, 284);
+  else if (combined.includes('girona')) minBase = Math.max(minBase, 189);
+  else if (combined.includes('salou') || combined.includes('portaventura') || combined.includes('cambrils')) minBase = Math.max(minBase, 164);
+  else if (combined.includes('montserrat')) minBase = Math.max(minBase, 89);
+  else if (combined.includes('sitges')) minBase = Math.max(minBase, 74);
+
+  const oneWay = minBase + Math.max(0, childSeats) * 5;
+  return isRoundTrip ? Math.round(oneWay * 1.8) : oneWay;
 }
 
 function sanitizeBookingPayload(raw: BookingConfirmPayload): BookingConfirmPayload {
@@ -145,15 +176,26 @@ function sanitizeBookingPayload(raw: BookingConfirmPayload): BookingConfirmPaylo
   const safePax = Math.min(30, Math.max(1, Number(raw.passengers) || 1));
   const safeBags = Math.min(30, Math.max(0, Number(raw.luggage) || 0));
   const safeSeats = Math.min(10, Math.max(0, Number(raw.childSeats) || 0));
+  const cleanPickup = sanitizeLine(raw.pickup, 220);
+  const cleanDropoff = sanitizeLine(raw.dropoff, 220);
+  const cleanVehicle = sanitizeLine(raw.vehicleName, 100) || 'Standard Sedan';
+  const roundTrip = Boolean(raw.isRoundTrip);
+  const minAllowed = computeMinimumAllowedFare(
+    cleanPickup,
+    cleanDropoff,
+    cleanVehicle,
+    safeSeats,
+    roundTrip
+  );
 
   return {
     bookingRef: /^ETH-\d{6}$/.test(cleanRef)
       ? cleanRef
       : `ETH-${Math.floor(100000 + Math.random() * 900000)}`,
-    pickup: sanitizeLine(raw.pickup, 220),
-    dropoff: sanitizeLine(raw.dropoff, 220),
+    pickup: cleanPickup,
+    dropoff: cleanDropoff,
     dateTime: sanitizeLine(raw.dateTime, 60),
-    isRoundTrip: Boolean(raw.isRoundTrip),
+    isRoundTrip: roundTrip,
     returnDateTime: sanitizeLine(raw.returnDateTime, 60),
     passengers: safePax,
     adults: Math.min(30, Math.max(1, Number(raw.adults) || safePax)),
@@ -163,8 +205,11 @@ function sanitizeBookingPayload(raw: BookingConfirmPayload): BookingConfirmPaylo
     luggageDetails: sanitizeLine(raw.luggageDetails, 160),
     childSeats: safeSeats,
     childSeatsDetails: sanitizeLine(raw.childSeatsDetails, 160),
-    vehicleName: sanitizeLine(raw.vehicleName, 100) || 'Standard Sedan',
-    quotedPrice: Number.isFinite(safePrice) && safePrice > 0 && safePrice <= 50000 ? Math.round(safePrice) : 50,
+    vehicleName: cleanVehicle,
+    quotedPrice:
+      Number.isFinite(safePrice) && safePrice >= minAllowed && safePrice <= 50000
+        ? Math.round(safePrice)
+        : minAllowed,
     flightNumber: sanitizeLine(raw.flightNumber, 40),
     passengerName: sanitizeLine(raw.passengerName, 120),
     email: sanitizeLine(raw.email, 160).toLowerCase(),
@@ -914,14 +959,39 @@ export async function processBookingConfirmation(rawPayload: BookingConfirmPaylo
   };
 }
 
+async function isAuthorizedOwner(req: any): Promise<boolean> {
+  try {
+    const mod: any = await import('./owner-auth.js').catch(() => import('./owner-auth'));
+    return Boolean(mod?.verifyOwnerBearerToken?.(req));
+  } catch {
+    return false;
+  }
+}
+
+async function isValidOrigin(req: any): Promise<boolean> {
+  try {
+    const mod: any = await import('./owner-auth.js').catch(() => import('./owner-auth'));
+    return Boolean(mod?.isAllowedBrowserOrigin?.(req));
+  } catch {
+    return true;
+  }
+}
+
 export default async function handler(req: any, res: any) {
   if (req.method === 'GET') {
     res.setHeader('Cache-Control', 'no-store, max-age=0');
+    if (!(await isAuthorizedOwner(req))) {
+      return res.status(401).json({ error: 'Owner authentication required.' });
+    }
     return res.status(200).json(getEmailConfigStatus());
   }
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  if (!(await isValidOrigin(req))) {
+    return res.status(403).json({ error: 'Forbidden origin.' });
   }
 
   if (!checkBookingRateLimit(req)) {
@@ -939,6 +1009,20 @@ export default async function handler(req: any, res: any) {
         : req.body || {};
 
     const body = sanitizeBookingPayload(rawBody);
+
+    const submittedPrice = Number(rawBody?.quotedPrice);
+    const minFareAllowed = computeMinimumAllowedFare(
+      body.pickup,
+      body.dropoff,
+      body.vehicleName,
+      body.childSeats,
+      Boolean(body.isRoundTrip)
+    );
+    if (!Number.isFinite(submittedPrice) || submittedPrice < minFareAllowed || submittedPrice > 50000) {
+      return res.status(400).json({
+        error: `Invalid transfer fare. Minimum verified fare for this route and vehicle is €${minFareAllowed}.`,
+      });
+    }
 
     if (
       !body.pickup ||

@@ -104,15 +104,6 @@ export const Footer: React.FC<FooterProps> = ({ onOpenOwnerMeter }) => {
           </div>
           <div className="flex items-center gap-3 text-neutral-300">
             <span>Fair Prices · Flight Delay Tracking · 60 Min Free Waiting</span>
-            {onOpenOwnerMeter && (
-              <button
-                type="button"
-                onClick={onOpenOwnerMeter}
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#171A21] border border-[#F5B800]/60 text-[#F5B800] hover:bg-[#F5B800] hover:text-[#0D0F12] font-bold transition-colors cursor-pointer"
-              >
-                <span>Owner A-to-Z Quota Meter</span>
-              </button>
-            )}
           </div>
         </div>
       </div>

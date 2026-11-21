@@ -59,9 +59,22 @@ function checkChatRateLimit(req: any, maxRequests = 25, windowMs = 5 * 60 * 1000
   return true;
 }
 
+async function isValidOrigin(req: any): Promise<boolean> {
+  try {
+    const mod: any = await import('./owner-auth.js').catch(() => import('./owner-auth'));
+    return Boolean(mod?.isAllowedBrowserOrigin?.(req));
+  } catch {
+    return true;
+  }
+}
+
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  if (!(await isValidOrigin(req))) {
+    return res.status(403).json({ error: 'Forbidden origin.' });
   }
 
   if (!checkChatRateLimit(req)) {
@@ -79,7 +92,7 @@ export default async function handler(req: any, res: any) {
         : req.body || {};
     const { messages, userMessage } = body;
     const rawQuery = userMessage || (messages && messages[messages.length - 1]?.content) || '';
-    const query = String(rawQuery).replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '').trim().slice(0, 1000);
+    const query = String(rawQuery).replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '').trim().slice(0, 600);
 
     if (!query) {
       return res.status(400).json({ error: 'Message is required' });
@@ -91,13 +104,15 @@ export default async function handler(req: any, res: any) {
     if (isRealKey) {
       try {
         const ai = new GoogleGenAI({ apiKey });
-        const contents = [
-          { role: 'user', parts: [{ text: `${SYSTEM_INSTRUCTION}\n\nCustomer question: ${query}` }] },
-        ];
+        const contents = [{ role: 'user', parts: [{ text: query }] }];
 
         const generatePromise = ai.models.generateContent({
           model: 'gemini-3.8-flash',
           contents,
+          config: {
+            systemInstruction: SYSTEM_INSTRUCTION,
+            maxOutputTokens: 450,
+          },
         });
 
         const timeoutPromise = new Promise((_, reject) =>

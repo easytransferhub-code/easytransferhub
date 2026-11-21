@@ -1,10 +1,30 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
+import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import {defineConfig, loadEnv} from 'vite';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+function stripPrivateArtifactsFromDist() {
+  return {
+    name: 'strip-private-artifacts-from-dist',
+    closeBundle() {
+      const distDir = path.resolve(__dirname, 'dist');
+      if (!fs.existsSync(distDir)) return;
+      for (const entry of fs.readdirSync(distDir)) {
+        if (
+          entry.endsWith('.zip') ||
+          entry.startsWith('BookingCalculator.') ||
+          entry === 'settings.json'
+        ) {
+          fs.rmSync(path.join(distDir, entry), { force: true });
+        }
+      }
+    },
+  };
+}
 
 export default defineConfig(({mode}) => {
   const env = loadEnv(mode, '.', '');
@@ -16,7 +36,7 @@ export default defineConfig(({mode}) => {
     '';
 
   return {
-    plugins: [react(), tailwindcss()],
+    plugins: [react(), tailwindcss(), stripPrivateArtifactsFromDist()],
     define: {
       'import.meta.env.VITE_GOOGLE_MAPS_API_KEY': JSON.stringify(mapsApiKey),
     },
@@ -34,3 +54,4 @@ export default defineConfig(({mode}) => {
     },
   };
 });
+
