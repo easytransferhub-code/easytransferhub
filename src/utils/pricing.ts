@@ -405,6 +405,20 @@ export function generateWhatsAppLink(details: {
     `📅 *Date & Time:* ${details.dateTime || 'To be confirmed'}`,
   ];
 
+  if (
+    /terminal\s*1|\bbcn\s*t1\b|\bt1\b.*(?:airport|barcelona|bcn|prat)|(?:airport|barcelona|bcn|prat).*\bt1\b/i.test(
+      details.pickup || ''
+    )
+  ) {
+    lines.push(`📍 *T1 Meeting Point:* In front of COMO Restaurant (Arrivals Hall, Floor 1)`);
+  } else if (
+    /terminal\s*2|\bbcn\s*t2\b|\bt2\b.*(?:airport|barcelona|bcn|prat)|(?:airport|barcelona|bcn|prat).*\bt2\b/i.test(
+      details.pickup || ''
+    )
+  ) {
+    lines.push(`📍 *T2 Meeting Point:* At the Horse Statue "El Caballo" (T2 Arrivals Hall)`);
+  }
+
   if (details.isRoundTrip && details.returnDateTime) {
     lines.push(`🔄 *Return Date & Time:* ${details.returnDateTime}`);
   }

@@ -1,4 +1,79 @@
+import fs from 'fs';
+import path from 'path';
 import nodemailer from 'nodemailer';
+
+interface EmailMeetingPointConfig {
+  terminal: 'T1' | 'T2';
+  cid: string;
+  filename: string;
+  localName: string;
+  publicUrl: string;
+  headerLabel: string;
+  headline: string;
+  ownerLine: string;
+  plainLine: string;
+  imgAlt: string;
+}
+
+function getEmailMeetingPointConfig(pickup?: string): EmailMeetingPointConfig | null {
+  if (!pickup) return null;
+  if (
+    /terminal\s*1|\bbcn\s*t1\b|\bt1\b.*(?:airport|barcelona|bcn|prat)|(?:airport|barcelona|bcn|prat).*\bt1\b/i.test(
+      pickup
+    )
+  ) {
+    return {
+      terminal: 'T1',
+      cid: 'como-t1-meeting-point@easytransferhub.com',
+      filename: 'como-restaurant-terminal1-meeting-point.jpg',
+      localName: 'como-t1-meeting-point.jpg',
+      publicUrl: 'https://www.easytransferhub.com/images/como-t1-meeting-point.jpg',
+      headerLabel: 'Terminal 1 Meeting Point · Barcelona Airport (BCN)',
+      headline: 'In front of COMO Restaurant (Arrivals Hall, Floor 1)',
+      ownerLine: 'Terminal 1 Arrivals — In front of COMO Restaurant',
+      plainLine:
+        'Meeting Point (T1): In front of COMO Restaurant (Arrivals Hall, Floor 1) — Photo: https://www.easytransferhub.com/images/como-t1-meeting-point.jpg',
+      imgAlt: 'COMO Restaurante & Café meeting point at Barcelona Airport Terminal 1',
+    };
+  }
+  if (
+    /terminal\s*2|\bbcn\s*t2\b|\bt2\b.*(?:airport|barcelona|bcn|prat)|(?:airport|barcelona|bcn|prat).*\bt2\b/i.test(
+      pickup
+    )
+  ) {
+    return {
+      terminal: 'T2',
+      cid: 'horse-t2-meeting-point@easytransferhub.com',
+      filename: 'horse-statue-terminal2-meeting-point.jpg',
+      localName: 'horse-t2-meeting-point.jpg',
+      publicUrl: 'https://www.easytransferhub.com/images/horse-t2-meeting-point.jpg',
+      headerLabel: 'Terminal 2 Meeting Point · Barcelona Airport (BCN)',
+      headline: 'At the Horse Statue · "El Caballo" (T2 Arrivals Hall)',
+      ownerLine: 'Terminal 2 Arrivals — At the Horse Statue ("El Caballo")',
+      plainLine:
+        'Meeting Point (T2): At the Horse Statue "El Caballo" (T2 Arrivals Hall) — Photo: https://www.easytransferhub.com/images/horse-t2-meeting-point.jpg',
+      imgAlt: 'Horse Statue El Caballo meeting point at Barcelona Airport Terminal 2',
+    };
+  }
+  return null;
+}
+
+function loadMeetingPointPhotoBuffer(localName: string): Buffer | null {
+  try {
+    const candidates = [
+      path.resolve(process.cwd(), 'public/images', localName),
+      path.resolve(process.cwd(), 'dist/images', localName),
+    ];
+    for (const filePath of candidates) {
+      if (fs.existsSync(filePath)) {
+        return fs.readFileSync(filePath);
+      }
+    }
+  } catch {
+    // fallback to hosted HTTPS URL
+  }
+  return null;
+}
 
 async function trackBookingEmailSafely() {
   try {
@@ -114,7 +189,7 @@ function escapeHtml(str: string): string {
     .replace(/'/g, '&#39;');
 }
 
-function buildBookingEmailHtml(data: BookingConfirmPayload, bookingRef: string): string {
+function buildBookingEmailHtml(data: BookingConfirmPayload, bookingRef: string, hasEmbeddedCid = false): string {
   const safeName = escapeHtml(data.passengerName);
   const safePickup = escapeHtml(data.pickup);
   const safeDropoff = escapeHtml(data.dropoff);
@@ -125,6 +200,8 @@ function buildBookingEmailHtml(data: BookingConfirmPayload, bookingRef: string):
   const safeFlight = data.flightNumber ? escapeHtml(data.flightNumber) : '';
   const safeNotes = data.driverNotes ? escapeHtml(data.driverNotes) : '';
   const safePhone = escapeHtml(data.phone);
+  const mp = getEmailMeetingPointConfig(data.pickup);
+  const mpImgSrc = mp ? (hasEmbeddedCid ? `cid:${mp.cid}` : mp.publicUrl) : '';
 
   return `
   <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background:#FAF9F6; padding:28px 16px; color:#0D0F12;">
@@ -206,10 +283,31 @@ function buildBookingEmailHtml(data: BookingConfirmPayload, bookingRef: string):
           </table>
         </div>
 
+        ${
+          mp
+            ? `
+        <div style="background:#FBF7E6; border:1px solid #DFC670; border-radius:14px; padding:16px 18px; margin-bottom:20px; font-size:13px; color:#334155; line-height:1.55;">
+          <div style="font-size:11px; font-weight:800; color:#8A5D00; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;">
+            ${escapeHtml(mp.headerLabel)}
+          </div>
+          <div style="font-size:15px; font-weight:800; color:#0D0F12; margin-bottom:6px;">
+            ${escapeHtml(mp.headline)}
+          </div>
+          <p style="margin:0 0 10px;">
+            ${
+              mp.terminal === 'T1'
+                ? `After collecting your luggage, exit into the main Terminal 1 public Arrivals Hall and walk toward <strong>COMO Restaurante &amp; Café</strong>. Your chauffeur will be waiting right outside COMO Restaurant holding a nameboard reading <strong>"${safeName}"</strong> (60 minutes free airport waiting included).`
+                : `After collecting your luggage at Terminal 2, exit into the main Arrivals Hall and walk toward the famous giant bronze <strong>Horse Statue (&ldquo;El Caballo&rdquo;)</strong>. Your chauffeur will be waiting right beside the Horse Statue holding a nameboard reading <strong>"${safeName}"</strong> (60 minutes free airport waiting included).`
+            }
+          </p>
+          <img src="${mpImgSrc}" alt="${escapeHtml(mp.imgAlt)}" style="display:block; width:100%; max-width:540px; height:auto; border-radius:10px; border:1px solid #DFC670;" />
+        </div>`
+            : `
         <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:14px 16px; margin-bottom:20px; font-size:13px; color:#334155; line-height:1.5;">
           <strong style="color:#0D0F12;">Airport Meet &amp; Greet Instructions:</strong><br/>
           Your chauffeur will track your flight live and wait inside the arrivals hall holding a nameboard reading <strong>"${safeName}"</strong>. 60 minutes of complimentary airport waiting time is included.
-        </div>
+        </div>`
+        }
 
         <div style="text-align:center; margin-bottom:14px;">
           <a href="https://wa.me/34666744440?text=${encodeURIComponent(`Hello Mr. Mir, regarding my EasyTransferHub booking ${bookingRef} (${data.pickup} to ${data.dropoff}).`)}" style="display:inline-block; background:#F5B800; color:#0D0F12; text-decoration:none; font-weight:800; font-size:14px; padding:12px 24px; border-radius:12px; border:1px solid #D99F00;">
@@ -248,6 +346,10 @@ function buildOwnerDispatchEmailHtml(data: BookingConfirmPayload, bookingRef: st
           <strong>Phone / WhatsApp:</strong> ${escapeHtml(data.phone)}<br/>
           <strong>Email:</strong> ${escapeHtml(data.email)}<br/>
           <strong>Pickup:</strong> ${escapeHtml(data.pickup)}<br/>
+          ${(() => {
+            const mpOwner = getEmailMeetingPointConfig(data.pickup);
+            return mpOwner ? `<strong>Meeting Point:</strong> ${escapeHtml(mpOwner.ownerLine)}<br/>` : '';
+          })()}
           <strong>Drop-off:</strong> ${escapeHtml(data.dropoff)}<br/>
           <strong>Date &amp; Time:</strong> ${escapeHtml(data.dateTime || 'To be confirmed')}<br/>
           ${data.flightNumber ? `<strong>Flight:</strong> ${escapeHtml(data.flightNumber)}<br/>` : ''}
@@ -262,6 +364,7 @@ function buildOwnerDispatchEmailHtml(data: BookingConfirmPayload, bookingRef: st
 }
 
 function buildPlainTextMessage(data: BookingConfirmPayload, bookingRef: string): string {
+  const mpPlain = getEmailMeetingPointConfig(data.pickup);
   const lines = [
     `Easytransferhub — Booking Confirmed (${bookingRef})`,
     ``,
@@ -270,6 +373,7 @@ function buildPlainTextMessage(data: BookingConfirmPayload, bookingRef: string):
     ``,
     `• Ref: ${bookingRef}`,
     `• Pickup: ${data.pickup}`,
+    ...(mpPlain ? [`• ${mpPlain.plainLine}`] : []),
     `• Drop-off: ${data.dropoff}`,
     `• Date & Time: ${data.dateTime || 'To be confirmed'}`,
   ];
@@ -399,7 +503,9 @@ async function sendEmailNotifications(
 
   const subject = `Booking Confirmation ${bookingRef} - EasyTransferHub Barcelona`;
   const ownerSubject = `New Booking ${bookingRef} (${data.vehicleName}) - ${data.passengerName}`;
-  const html = buildBookingEmailHtml(data, bookingRef);
+  const mpConfig = getEmailMeetingPointConfig(data.pickup);
+  const mpBuffer = mpConfig ? loadMeetingPointPhotoBuffer(mpConfig.localName) : null;
+  const html = buildBookingEmailHtml(data, bookingRef, Boolean(mpBuffer));
   const ownerHtml = buildOwnerDispatchEmailHtml(data, bookingRef);
   const text = buildPlainTextMessage(data, bookingRef);
 
@@ -408,6 +514,27 @@ async function sendEmailNotifications(
   // Primary Option: Resend HTTP API
   if (resendKey && resendKey.length > 8) {
     try {
+      const resendBody: Record<string, any> = {
+        from: resendFrom,
+        to: [data.email],
+        reply_to: ownerEmail,
+        subject,
+        html,
+        text,
+        headers: {
+          'X-Entity-Ref-ID': bookingRef,
+        },
+      };
+      if (mpConfig && mpBuffer) {
+        resendBody.attachments = [
+          {
+            filename: mpConfig.filename,
+            content: mpBuffer.toString('base64'),
+            content_id: mpConfig.cid,
+          },
+        ];
+      }
+
       const requests: Promise<Response>[] = [
         fetch('https://api.resend.com/emails', {
           method: 'POST',
@@ -415,17 +542,7 @@ async function sendEmailNotifications(
             Authorization: `Bearer ${resendKey}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            from: resendFrom,
-            to: [data.email],
-            reply_to: ownerEmail,
-            subject,
-            html,
-            text,
-            headers: {
-              'X-Entity-Ref-ID': bookingRef,
-            },
-          }),
+          body: JSON.stringify(resendBody),
         }),
       ];
 
@@ -516,6 +633,17 @@ async function sendEmailNotifications(
           subject,
           html,
           text,
+          attachments:
+            mpConfig && mpBuffer
+              ? [
+                  {
+                    filename: mpConfig.filename,
+                    content: mpBuffer,
+                    cid: mpConfig.cid,
+                    contentDisposition: 'inline',
+                  },
+                ]
+              : undefined,
           headers: {
             'X-Entity-Ref-ID': bookingRef,
           },

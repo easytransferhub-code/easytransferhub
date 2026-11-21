@@ -54,6 +54,7 @@ import {
 } from '../utils/pricing';
 import { GooglePlacesInput } from './GooglePlacesInput';
 import { GoogleRouteDistanceSync } from './GoogleRouteMap';
+import { Terminal1MeetingPointCard } from './Terminal1MeetingPointCard';
 
 interface CountryCodeOption {
   iso2: string;
@@ -1008,6 +1009,8 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
               setRouteDurationMinutes(durationMinutes);
             }}
           />
+
+          <Terminal1MeetingPointCard pickup={pickup} compact />
         </div>
 
         {/* Date & Time Row (Pickup + Optional Return if Round Trip) */}
@@ -1795,6 +1798,8 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                   We monitor your flight live — if your flight is delayed, your chauffeur automatically adjusts pickup time.
                 </p>
               </div>
+
+              <Terminal1MeetingPointCard pickup={pickup} passengerName={passengerName} compact />
             </div>
 
             {/* 3. Client Details & Driver Notes */}
@@ -2408,6 +2413,9 @@ export const BookingCalculator: React.FC<BookingCalculatorProps> = ({
                 </div>
               </div>
             </div>
+
+            {/* Terminal 1 COMO Restaurant Meeting Point Photo & Instructions */}
+            <Terminal1MeetingPointCard pickup={pickup} passengerName={passengerName} />
 
             {/* Delivery Cards: Email & Client WhatsApp */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

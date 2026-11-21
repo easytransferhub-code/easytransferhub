@@ -3,6 +3,11 @@
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
+  "functions": {
+    "api/booking-confirm.ts": {
+      "includeFiles": "public/images/*-meeting-point.jpg"
+    }
+  },
   "rewrites": [
     {
       "source": "/((?!api/|favicon\\.ico|favicon-|icon-|apple-touch-icon|site\\.webmanifest|robots\\.txt|sitemap\\.xml|images/|assets/).*)",

@@ -3,6 +3,7 @@ import { X, Printer, Copy, Check, MessageCircle, MapPin, Calendar, Users, Briefc
 import confetti from 'canvas-confetti';
 import { BUSINESS_INFO } from '../data/transferData';
 import { generateWhatsAppLink } from '../utils/pricing';
+import { Terminal1MeetingPointCard, getAirportMeetingPoint } from './Terminal1MeetingPointCard';
 
 interface BookingVoucherModalProps {
   isOpen: boolean;
@@ -45,6 +46,7 @@ export const BookingVoucherModal: React.FC<BookingVoucherModalProps> = ({
       ? `${bookingData.passengers} (${bookingData.adults || 1} Adults, ${bookingData.children} Children${bookingData.childAge ? ` [${bookingData.childAge}]` : ''})`
       : `${bookingData.passengers} Adult(s)`;
 
+    const meetingPointDetails = getAirportMeetingPoint(bookingData.pickup);
     const text = `EASYTRANSFERHUB BOOKING VOUCHER
 Ref: ${bookingRef}
 Pickup: ${bookingData.pickup}
@@ -55,7 +57,7 @@ Luggage: ${bookingData.luggage} bags ${bookingData.luggageDetails ? `(${bookingD
 Child Seats: ${bookingData.childSeatsDetails || (bookingData.childSeats > 0 ? `${bookingData.childSeats} seat(s) (+€${bookingData.childSeats * 5})` : 'None')}
 Vehicle: ${bookingData.vehicleName}
 Total Fixed Fare: €${bookingData.quotedPrice} ${bookingData.isRoundTrip ? '(Round Trip)' : '(One Way)'}
-Payment Method: ${bookingData.paymentMethod || 'Pay Cash or Card to Chauffeur'}${bookingData.driverNotes ? `\nDriver Notes: ${bookingData.driverNotes}` : ''}
+Payment Method: ${bookingData.paymentMethod || 'Pay Cash or Card to Chauffeur'}${meetingPointDetails ? `\n${meetingPointDetails.badge}: ${meetingPointDetails.shortLine}` : ''}${bookingData.driverNotes ? `\nDriver Notes: ${bookingData.driverNotes}` : ''}
 Manager: ${BUSINESS_INFO.owner} (${BUSINESS_INFO.phoneDisplay})
 All highway tolls & flight tracking included.`;
 
@@ -239,6 +241,13 @@ All highway tolls & flight tracking included.`;
             </div>
           </div>
 
+          {/* Terminal 1 COMO Restaurant Meeting Point Photo (shown automatically for T1 pickups) */}
+          <Terminal1MeetingPointCard
+            pickup={bookingData.pickup}
+            passengerName={bookingData.passengerName}
+            compact
+          />
+
           {/* Driver Contact & Assistance */}
           <div className="text-xs text-slate-600 bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-1">
             <div className="flex items-center justify-between font-semibold text-slate-800">
@@ -246,7 +255,16 @@ All highway tolls & flight tracking included.`;
               <span>Phone / WhatsApp: <b>{BUSINESS_INFO.phoneDisplay}</b></span>
             </div>
             <p className="text-[11px] text-slate-500">
-              Meeting point: The driver waits inside the arrivals hall holding a sign with your name. Flight radar tracking is enabled automatically.
+              {(() => {
+                const mp = getAirportMeetingPoint(bookingData.pickup);
+                if (mp?.terminal === 'T1') {
+                  return 'Terminal 1 Meeting Point: Wait at COMO Restaurante & Café inside the Arrivals Hall. Your driver holds a signboard with your name. Flight radar tracking is enabled automatically.';
+                }
+                if (mp?.terminal === 'T2') {
+                  return 'Terminal 2 Meeting Point: Wait beside the large Horse Statue ("El Caballo") inside the Arrivals Hall. Your driver holds a signboard with your name. Flight radar tracking is enabled automatically.';
+                }
+                return 'Meeting point: The driver waits inside the arrivals hall holding a sign with your name. Flight radar tracking is enabled automatically.';
+              })()}
             </p>
           </div>
 
