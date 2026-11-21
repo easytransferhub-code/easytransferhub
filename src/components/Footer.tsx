@@ -1,5 +1,5 @@
 import React from 'react';
-import { Phone, Mail, MapPin, MessageCircle } from 'lucide-react';
+import { Phone, Mail, MapPin, MessageCircle, Star } from 'lucide-react';
 import { BUSINESS_INFO } from '../data/transferData';
 
 interface FooterProps {
@@ -32,6 +32,17 @@ export const Footer: React.FC<FooterProps> = ({ onOpenOwnerMeter }) => {
               <li><a href="#fleet" className="hover:text-[#F5B800] transition-colors">Our Vehicle Fleet</a></li>
               <li><a href="#how" className="hover:text-[#F5B800] transition-colors">How It Works</a></li>
               <li><a href="#reviews" className="hover:text-[#F5B800] transition-colors">Visitors &amp; Reviews</a></li>
+              <li>
+                <a
+                  href="https://www.trustpilot.com/review/easytransferhub.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-neutral-200 hover:text-[#F5B800] transition-colors"
+                >
+                  <Star className="w-3.5 h-3.5 fill-[#00B67A] text-[#00B67A]" />
+                  <span>Review us on Trustpilot</span>
+                </a>
+              </li>
               <li><a href="#faq" className="hover:text-[#F5B800] transition-colors">FAQ &amp; Flight Delays</a></li>
             </ul>
           </div>

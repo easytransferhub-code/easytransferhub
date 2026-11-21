@@ -70,6 +70,18 @@ app.get('/easytransferhub-photos.zip', (req, res) => {
   res.download(zipPath, 'easytransferhub-photos.zip');
 });
 
+app.get('/easytransferhub-comfort-photos.zip', (req, res) => {
+  const zipPath = path.resolve(__dirname, 'public/easytransferhub-comfort-photos.zip');
+  res.setHeader('Cache-Control', 'no-store, max-age=0');
+  res.download(zipPath, 'easytransferhub-comfort-photos.zip');
+});
+
+app.get('/easytransferhub-minivan-photos.zip', (req, res) => {
+  const zipPath = path.resolve(__dirname, 'public/easytransferhub-minivan-photos.zip');
+  res.setHeader('Cache-Control', 'no-store, max-age=0');
+  res.download(zipPath, 'easytransferhub-minivan-photos.zip');
+});
+
 app.get('/easytransferhub-business-card.zip', (req, res) => {
   const zipPath = path.resolve(__dirname, 'public/easytransferhub-business-card.zip');
   res.download(zipPath, 'easytransferhub-business-card.zip');

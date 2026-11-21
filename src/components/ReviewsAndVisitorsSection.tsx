@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Star, ThumbsUp, Send, CheckCircle2, Users, MessageSquare, Compass, Gauge } from 'lucide-react';
 import type { ClientReview } from '../../api/reviews';
+import { TrustpilotWidget } from './TrustpilotWidget';
 
 const LOCAL_REVIEWS_KEY = 'eth_client_reviews_v1';
 const LOCAL_VISITS_KEY = 'eth_total_visits_v1';
@@ -305,6 +306,11 @@ export const ReviewsAndVisitorsSection: React.FC<ReviewsAndVisitorsSectionProps>
             <p className="text-sm text-slate-600 leading-relaxed">
               Track real visitor activity on Easytransferhub and read or share honest passenger reviews about your Barcelona private transfer experience.
             </p>
+            <div className="pt-2">
+              <div className="bg-white border border-[#E6DFCB] rounded-xl px-4 py-2.5 shadow-2xs max-w-md">
+                <TrustpilotWidget />
+              </div>
+            </div>
           </div>
 
           {/* Executive Visitor Gauge + Key Tabular Metrics */}
