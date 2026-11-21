@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { QrCode, Download, Copy, Check, Star, X, ExternalLink, Maximize2 } from 'lucide-react';
 
 export const TRUSTPILOT_DIRECT_REVIEW_URL = 'https://www.trustpilot.com/evaluate/easytransferhub.com';
@@ -12,6 +13,58 @@ interface TrustpilotQrModalProps {
 export const TrustpilotQrModal: React.FC<TrustpilotQrModalProps> = ({ isOpen, onClose }) => {
   const [copied, setCopied] = useState(false);
 
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const scrollY = window.scrollY || window.pageYOffset || 0;
+    const htmlEl = document.documentElement;
+    const bodyEl = document.body;
+    const scrollbarWidth = window.innerWidth - htmlEl.clientWidth;
+
+    const prevHtmlOverflow = htmlEl.style.overflow;
+    const prevHtmlOverscroll = htmlEl.style.overscrollBehavior;
+    const prevBodyOverflow = bodyEl.style.overflow;
+    const prevBodyPosition = bodyEl.style.position;
+    const prevBodyTop = bodyEl.style.top;
+    const prevBodyLeft = bodyEl.style.left;
+    const prevBodyRight = bodyEl.style.right;
+    const prevBodyWidth = bodyEl.style.width;
+    const prevBodyPaddingRight = bodyEl.style.paddingRight;
+
+    htmlEl.style.overflow = 'hidden';
+    htmlEl.style.overscrollBehavior = 'none';
+    bodyEl.style.overflow = 'hidden';
+    bodyEl.style.position = 'fixed';
+    bodyEl.style.top = `-${scrollY}px`;
+    bodyEl.style.left = '0';
+    bodyEl.style.right = '0';
+    bodyEl.style.width = '100%';
+    if (scrollbarWidth > 0) {
+      bodyEl.style.paddingRight = `${scrollbarWidth}px`;
+    }
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      htmlEl.style.overflow = prevHtmlOverflow;
+      htmlEl.style.overscrollBehavior = prevHtmlOverscroll;
+      bodyEl.style.overflow = prevBodyOverflow;
+      bodyEl.style.position = prevBodyPosition;
+      bodyEl.style.top = prevBodyTop;
+      bodyEl.style.left = prevBodyLeft;
+      bodyEl.style.right = prevBodyRight;
+      bodyEl.style.width = prevBodyWidth;
+      bodyEl.style.paddingRight = prevBodyPaddingRight;
+      window.scrollTo({ top: scrollY, behavior: 'auto' });
+    };
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const handleCopy = () => {
@@ -20,13 +73,16 @@ export const TrustpilotQrModal: React.FC<TrustpilotQrModalProps> = ({ isOpen, on
     setTimeout(() => setCopied(false), 2400);
   };
 
-  return (
+  const modalContent = (
     <div
-      className="fixed inset-0 z-[75] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs overflow-y-auto overscroll-contain touch-none"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Trustpilot QR Code Review"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-3xl max-w-sm w-full overflow-hidden border-2 border-[#F5B800] shadow-2xl text-slate-900"
+        className="bg-white rounded-3xl max-w-sm w-full overflow-hidden border-2 border-[#F5B800] shadow-2xl text-slate-900 my-auto touch-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Dark Taxi Brand Header */}
@@ -112,6 +168,11 @@ export const TrustpilotQrModal: React.FC<TrustpilotQrModalProps> = ({ isOpen, on
       </div>
     </div>
   );
+
+  if (typeof document !== 'undefined') {
+    return createPortal(modalContent, document.body);
+  }
+  return modalContent;
 };
 
 export const TrustpilotQrCard: React.FC = () => {
