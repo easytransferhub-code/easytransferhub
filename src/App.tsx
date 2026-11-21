@@ -8,7 +8,6 @@ import { APIProvider } from '@vis.gl/react-google-maps';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { VehiclesSection } from './components/VehiclesSection';
-import { HowItWorks } from './components/HowItWorks';
 import { ReviewsAndVisitorsSection } from './components/ReviewsAndVisitorsSection';
 import { FaqSection } from './components/FaqSection';
 import { ContactSection } from './components/ContactSection';
@@ -142,9 +141,6 @@ export default function App() {
 
           {/* Vehicle Fleet Showcase - Directly below Hero Meet & Greet */}
           <VehiclesSection />
-
-          {/* How It Works */}
-          <HowItWorks />
 
           {/* Live Visitors Meter & Client Reviews */}
           <ReviewsAndVisitorsSection onOpenOwnerMeter={() => setIsOwnerMeterOpen(true)} />

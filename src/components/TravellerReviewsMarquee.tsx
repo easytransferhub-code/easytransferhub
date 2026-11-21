@@ -220,7 +220,9 @@ export const TravellerReviewsMarquee: React.FC = () => {
           </a>
 
           <a
-            href="#reviews"
+            href="https://www.trustpilot.com/review/easytransferhub.com"
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center gap-1 px-3 py-2 rounded-lg bg-[#0D0F12] hover:bg-[#1E232B] text-[#F5B800] text-xs font-bold transition-colors whitespace-nowrap"
           >
             <span>Leave a Review</span>

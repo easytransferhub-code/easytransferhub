@@ -30,7 +30,6 @@ export const Footer: React.FC<FooterProps> = ({ onOpenOwnerMeter }) => {
             <ul className="space-y-1.5">
               <li><a href="#calculator" className="hover:text-[#F5B800] transition-colors">Instant Calculator</a></li>
               <li><a href="#fleet" className="hover:text-[#F5B800] transition-colors">Our Vehicle Fleet</a></li>
-              <li><a href="#how" className="hover:text-[#F5B800] transition-colors">How It Works</a></li>
               <li><a href="#reviews" className="hover:text-[#F5B800] transition-colors">Visitors &amp; Reviews</a></li>
               <li>
                 <a

@@ -4,7 +4,6 @@ import {
   ShieldCheck,
   Calculator,
   Car,
-  Compass,
   Users,
   HelpCircle,
   Phone,
@@ -53,7 +52,6 @@ export const MoreDetailsModal: React.FC<MoreDetailsModalProps> = ({
   const quickNavItems = [
     { label: 'Fare Calculator', desc: 'Instant pickup & drop-off price quote', href: '#calculator', icon: Calculator },
     { label: 'Vehicle Fleet', desc: '12 Official AMB / IMET Yellow-Black Taxis', href: '#fleet', icon: Car },
-    { label: 'How It Works', desc: 'Simple 3-step arrival & pickup guide', href: '#how', icon: Compass },
     { label: 'Visitors & Reviews', desc: 'Live passenger feedback & ratings', href: '#reviews', icon: Users },
     { label: 'FAQ & Flight Delays', desc: 'Answers about delays, child seats & luggage', href: '#faq', icon: HelpCircle },
     { label: 'Direct Contact', desc: 'Reach Mr. Mir directly 24/7', href: '#contact', icon: Phone },

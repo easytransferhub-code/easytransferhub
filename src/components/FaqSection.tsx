@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { ChevronDown, HelpCircle, MessageCircle } from 'lucide-react';
-import { FAQS, BUSINESS_INFO } from '../data/transferData';
+import { ChevronDown } from 'lucide-react';
+import { FAQS } from '../data/transferData';
 
 export const FaqSection: React.FC = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
@@ -56,23 +56,6 @@ export const FaqSection: React.FC = () => {
               </div>
             );
           })}
-        </div>
-
-        {/* Still have questions banner */}
-        <div className="mt-8 p-5 rounded-2xl bg-[#FBF7E6] text-slate-900 border border-[#DFC670] flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left shadow-xs">
-          <div>
-            <h4 className="font-bold text-sm text-slate-900">Have a custom question or special group request?</h4>
-            <p className="text-xs text-slate-600 mt-0.5">Mr. Mir replies within minutes on WhatsApp.</p>
-          </div>
-          <a
-            href={`https://wa.me/${BUSINESS_INFO.whatsappNumber}?text=${encodeURIComponent('Hello Easytransferhub, I have a question about a transfer.')}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 py-2.5 px-4 rounded-xl bg-[#F5B800] hover:bg-[#E0A600] text-slate-950 font-extrabold text-xs shadow-[0_4px_16px_-4px_rgba(245,184,0,0.55)] transition-colors"
-          >
-            <MessageCircle className="w-4 h-4 fill-slate-950 text-slate-950" />
-            <span>Chat on WhatsApp</span>
-          </a>
         </div>
       </div>
     </section>
