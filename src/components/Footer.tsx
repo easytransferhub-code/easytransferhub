@@ -33,7 +33,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenOwnerMeter }) => {
               <li><a href="#reviews" className="hover:text-[#F5B800] transition-colors">Visitors &amp; Reviews</a></li>
               <li>
                 <a
-                  href="https://www.trustpilot.com/review/easytransferhub.com"
+                  href="https://www.trustpilot.com/evaluate/easytransferhub.com"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 text-neutral-200 hover:text-[#F5B800] transition-colors"

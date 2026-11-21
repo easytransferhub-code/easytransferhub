@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Star, Pause, Play, ChevronLeft, ChevronRight, ArrowUpRight } from 'lucide-react';
+import { Star, Pause, Play, ChevronLeft, ChevronRight, ArrowUpRight, QrCode } from 'lucide-react';
 import type { ClientReview } from '../../api/reviews';
+import { TrustpilotQrModal, TRUSTPILOT_DIRECT_REVIEW_URL } from './TrustpilotQrCard';
 
 const LOCAL_REVIEWS_KEY = 'eth_client_reviews_v1';
 
@@ -86,6 +87,7 @@ function formatShortDate(iso: string): string {
 export const TravellerReviewsMarquee: React.FC = () => {
   const [liveReviews, setLiveReviews] = useState<ClientReview[]>([]);
   const [isPaused, setIsPaused] = useState(false);
+  const [qrModalOpen, setQrModalOpen] = useState(false);
   const scrollerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -208,8 +210,18 @@ export const TravellerReviewsMarquee: React.FC = () => {
             </button>
           </div>
 
+          <button
+            type="button"
+            onClick={() => setQrModalOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border border-[#E5DEC9] hover:border-[#00B67A] text-xs font-bold text-[#111317] transition-colors whitespace-nowrap cursor-pointer"
+            title="Show scannable Trustpilot QR code"
+          >
+            <QrCode className="w-3.5 h-3.5 text-[#008C5E]" />
+            <span>QR Review</span>
+          </button>
+
           <a
-            href="https://www.trustpilot.com/review/easytransferhub.com"
+            href={TRUSTPILOT_DIRECT_REVIEW_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border border-[#E5DEC9] hover:border-[#00B67A] text-xs font-bold text-[#111317] transition-colors whitespace-nowrap"
@@ -220,7 +232,7 @@ export const TravellerReviewsMarquee: React.FC = () => {
           </a>
 
           <a
-            href="https://www.trustpilot.com/review/easytransferhub.com"
+            href={TRUSTPILOT_DIRECT_REVIEW_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1 px-3 py-2 rounded-lg bg-[#0D0F12] hover:bg-[#1E232B] text-[#F5B800] text-xs font-bold transition-colors whitespace-nowrap"
@@ -305,6 +317,8 @@ export const TravellerReviewsMarquee: React.FC = () => {
           ))}
         </div>
       </div>
+
+      <TrustpilotQrModal isOpen={qrModalOpen} onClose={() => setQrModalOpen(false)} />
     </div>
   );
 };
