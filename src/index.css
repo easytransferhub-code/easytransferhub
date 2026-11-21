@@ -41,54 +41,54 @@
   background: #0D0F12;
 }
 
-/* Smooth GPU-accelerated travel scene animations */
-@keyframes fly-ltr {
+/* Smooth GPU-accelerated realistic Barcelona transit animations */
+@keyframes fly-rtl-low {
   0% {
-    transform: translate3d(-18vw, 18px, 0) rotate(-3deg);
+    transform: translate3d(calc(100vw + 220px), 10px, 0) rotate(1deg);
     opacity: 0;
   }
-  8% {
+  5% {
     opacity: 1;
   }
-  92% {
+  95% {
     opacity: 1;
   }
   100% {
-    transform: translate3d(118vw, -26px, 0) rotate(-4deg);
+    transform: translate3d(-320px, -16px, 0) rotate(1.5deg);
     opacity: 0;
   }
 }
 
-@keyframes fly-rtl {
+@keyframes fly-rtl-mid {
   0% {
-    transform: translate3d(115vw, -12px, 0) rotate(2deg);
+    transform: translate3d(calc(100vw + 240px), 4px, 0) rotate(0.8deg);
     opacity: 0;
   }
-  8% {
-    opacity: 0.92;
+  6% {
+    opacity: 0.98;
   }
-  92% {
-    opacity: 0.92;
+  94% {
+    opacity: 0.98;
   }
   100% {
-    transform: translate3d(-18vw, 14px, 0) rotate(3deg);
+    transform: translate3d(-300px, -12px, 0) rotate(1.2deg);
     opacity: 0;
   }
 }
 
-@keyframes fly-high-ltr {
+@keyframes fly-rtl-high {
   0% {
-    transform: translate3d(-15vw, 8px, 0) rotate(-2deg);
+    transform: translate3d(calc(100vw + 220px), 0px, 0) rotate(0.5deg);
     opacity: 0;
   }
-  10% {
-    opacity: 0.72;
+  7% {
+    opacity: 0.92;
   }
-  90% {
-    opacity: 0.72;
+  93% {
+    opacity: 0.92;
   }
   100% {
-    transform: translate3d(115vw, -14px, 0) rotate(-2deg);
+    transform: translate3d(-280px, -8px, 0) rotate(0.8deg);
     opacity: 0;
   }
 }
@@ -102,72 +102,60 @@
   }
 }
 
-@keyframes rail-ltr {
+@keyframes ave-rail-ltr {
   0% {
-    transform: translate3d(-460px, 0, 0);
+    transform: translate3d(-680px, 0, 0);
   }
   100% {
-    transform: translate3d(calc(100vw + 80px), 0, 0);
+    transform: translate3d(calc(100vw + 160px), 0, 0);
   }
 }
 
-@keyframes rail-rtl {
+@keyframes road-ltr {
   0% {
-    transform: translate3d(calc(100vw + 80px), 0, 0);
+    transform: translate3d(-260px, 0, 0);
   }
   100% {
-    transform: translate3d(-460px, 0, 0);
+    transform: translate3d(calc(100vw + 180px), 0, 0);
   }
 }
 
-@keyframes drive-ltr {
+@keyframes road-rtl {
   0% {
-    transform: translate3d(-180px, 0, 0);
+    transform: translate3d(calc(100vw + 180px), 0, 0);
   }
   100% {
-    transform: translate3d(calc(100vw + 140px), 0, 0);
+    transform: translate3d(-260px, 0, 0);
   }
 }
 
-@keyframes drive-rtl {
-  0% {
-    transform: translate3d(calc(100vw + 140px), 0, 0);
-  }
-  100% {
-    transform: translate3d(-180px, 0, 0);
-  }
+/* Airline flight tracks (natural Barcelona Airport BCN approach R->L) */
+.animate-jet-vueling {
+  animation: fly-rtl-low 21s linear infinite;
+  animation-delay: -3s;
+}
+.animate-jet-iberia {
+  animation: fly-rtl-mid 26s linear infinite;
+  animation-delay: -11s;
+}
+.animate-jet-ryanair {
+  animation: fly-rtl-high 29s linear infinite;
+  animation-delay: -19s;
+}
+.animate-jet-easyjet {
+  animation: fly-rtl-mid 24s linear infinite;
+  animation-delay: -6s;
 }
 
-@keyframes wheel-rotate {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+.animate-hero-jet-1 {
+  animation: fly-rtl-low 22s linear infinite;
+  animation-delay: -4s;
+}
+.animate-hero-jet-2 {
+  animation: fly-rtl-high 28s linear infinite;
+  animation-delay: -16s;
 }
 
-@keyframes wheel-rotate-rev {
-  0% {
-    transform: rotate(360deg);
-  }
-  100% {
-    transform: rotate(0deg);
-  }
-}
-
-.animate-fly-ltr {
-  animation: fly-ltr 20s linear infinite;
-  animation-delay: -5s;
-}
-.animate-fly-rtl {
-  animation: fly-rtl 24s linear infinite;
-  animation-delay: -9s;
-}
-.animate-fly-high {
-  animation: fly-high-ltr 27s linear infinite;
-  animation-delay: -15s;
-}
 .animate-cloud-slow {
   animation: cloud-drift 65s linear infinite;
 }
@@ -175,37 +163,51 @@
   animation: cloud-drift 48s linear infinite;
   animation-delay: -18s;
 }
-.animate-rail-ltr {
-  animation: rail-ltr 18s linear infinite;
+
+/* Renfe AVE high-speed viaduct trains */
+.animate-ave-primary {
+  animation: ave-rail-ltr 16s linear infinite;
+  animation-delay: -2s;
 }
-.animate-rail-rtl {
-  animation: rail-rtl 23s linear infinite;
+.animate-ave-secondary {
+  animation: ave-rail-ltr 16s linear infinite;
+  animation-delay: -10s;
+}
+
+/* Far road lane (Right -> Left) */
+.animate-lane-rtl-1 {
+  animation: road-rtl 14s linear infinite;
+  animation-delay: -1s;
+}
+.animate-lane-rtl-2 {
+  animation: road-rtl 17s linear infinite;
+  animation-delay: -6.5s;
+}
+.animate-lane-rtl-3 {
+  animation: road-rtl 15.5s linear infinite;
+  animation-delay: -11.5s;
+}
+.animate-lane-rtl-4 {
+  animation: road-rtl 14s linear infinite;
+  animation-delay: -8s;
+}
+
+/* Near road lane (Left -> Right) */
+.animate-lane-ltr-1 {
+  animation: road-ltr 12.5s linear infinite;
+  animation-delay: -2s;
+}
+.animate-lane-ltr-2 {
+  animation: road-ltr 16s linear infinite;
+  animation-delay: -6s;
+}
+.animate-lane-ltr-3 {
+  animation: road-ltr 11s linear infinite;
   animation-delay: -9s;
 }
-.animate-drive-ltr-fast {
-  animation: drive-ltr 13s linear infinite;
-}
-.animate-drive-ltr-slow {
-  animation: drive-ltr 18s linear infinite;
-  animation-delay: -7s;
-}
-.animate-drive-rtl-fast {
-  animation: drive-rtl 14s linear infinite;
-  animation-delay: -3s;
-}
-.animate-drive-rtl-slow {
-  animation: drive-rtl 20s linear infinite;
-  animation-delay: -11s;
-}
-.animate-wheel {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: wheel-rotate 0.75s linear infinite;
-}
-.animate-wheel-rev {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: wheel-rotate-rev 0.75s linear infinite;
+.animate-lane-ltr-4 {
+  animation: road-ltr 14.5s linear infinite;
+  animation-delay: -12s;
 }
 
 @keyframes review-marquee {
@@ -231,19 +233,24 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-fly-ltr,
-  .animate-fly-rtl,
-  .animate-fly-high,
+  .animate-jet-vueling,
+  .animate-jet-iberia,
+  .animate-jet-ryanair,
+  .animate-jet-easyjet,
+  .animate-hero-jet-1,
+  .animate-hero-jet-2,
   .animate-cloud-slow,
   .animate-cloud-mid,
-  .animate-rail-ltr,
-  .animate-rail-rtl,
-  .animate-drive-ltr-fast,
-  .animate-drive-ltr-slow,
-  .animate-drive-rtl-fast,
-  .animate-drive-rtl-slow,
-  .animate-wheel,
-  .animate-wheel-rev,
+  .animate-ave-primary,
+  .animate-ave-secondary,
+  .animate-lane-rtl-1,
+  .animate-lane-rtl-2,
+  .animate-lane-rtl-3,
+  .animate-lane-rtl-4,
+  .animate-lane-ltr-1,
+  .animate-lane-ltr-2,
+  .animate-lane-ltr-3,
+  .animate-lane-ltr-4,
   .animate-review-marquee {
     animation: none !important;
   }
