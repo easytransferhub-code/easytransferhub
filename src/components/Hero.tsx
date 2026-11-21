@@ -3,6 +3,7 @@ import { ShieldCheck, Radar, Clock, Sparkles, MessageCircle } from 'lucide-react
 import { BUSINESS_INFO, TRANSLATIONS } from '../data/transferData';
 import { BookingCalculator } from './BookingCalculator';
 import { HeroSkyPlanes, TransitCorridorScene } from './TravelMotionBackdrop';
+import { TravellerReviewsMarquee } from './TravellerReviewsMarquee';
 
 interface HeroProps {
   language: 'en' | 'es' | 'ca' | 'ur';
@@ -110,6 +111,9 @@ export const Hero: React.FC<HeroProps> = ({
             </div>
           </div>
         </div>
+
+        {/* 4. Sliding Passenger Reviews Marquee — directly beneath Flight Tracking & Guarantee Cards */}
+        <TravellerReviewsMarquee />
       </div>
     </section>
   );

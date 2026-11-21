@@ -208,6 +208,28 @@
   animation: wheel-rotate-rev 0.75s linear infinite;
 }
 
+@keyframes review-marquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.animate-review-marquee {
+  display: flex;
+  width: max-content;
+  animation: review-marquee 42s linear infinite;
+  will-change: transform;
+}
+
+.review-marquee-group:hover .animate-review-marquee,
+.review-marquee-group:focus-within .animate-review-marquee,
+.animate-review-marquee-paused {
+  animation-play-state: paused !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-fly-ltr,
   .animate-fly-rtl,
@@ -221,7 +243,8 @@
   .animate-drive-rtl-fast,
   .animate-drive-rtl-slow,
   .animate-wheel,
-  .animate-wheel-rev {
+  .animate-wheel-rev,
+  .animate-review-marquee {
     animation: none !important;
   }
 }

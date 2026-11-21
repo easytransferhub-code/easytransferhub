@@ -252,6 +252,7 @@ export const ReviewsAndVisitorsSection: React.FC<ReviewsAndVisitorsSectionProps>
     } catch {
       // ignore
     }
+    window.dispatchEvent(new Event('eth-reviews-updated'));
 
     setName('');
     setComment('');
